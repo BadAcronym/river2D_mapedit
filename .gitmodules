@@ -1,0 +1,3 @@
+[submodule "vendor/river2D"]
+	path = vendor/river2D
+	url = git@github.com:FlyMandi/river2D
