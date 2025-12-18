@@ -15,11 +15,11 @@ then
     mkdir ./bin/
 fi
 
-compile_imgsurf()
+compile_river2D()
 {
-    if [[ -f "./vendor/imgsurf/run" ]]
+    if [[ -f "./vendor/river2D/run" ]]
     then
-        pushd ./vendor/imgsurf/ > /dev/null
+        pushd ./vendor/river2D/ > /dev/null
         ./run $1 --compile-only
         if [[ $? != 0 ]]
         then
@@ -27,7 +27,7 @@ compile_imgsurf()
         fi
         popd > /dev/null
     else
-        echo -e "\033[31mERROR: can't find imgsurf's run script.\033[0m"
+        echo -e "\033[31m\nERROR: can't find river2D's run script.\033[0m"
     fi
 }
 
@@ -42,19 +42,19 @@ compileprep()
 
 if [[ $1 = "debug" ]]
 then
-    compile_imgsurf $1
+    compile_river2D $1
     compileprep
     pushd ./build/ > /dev/null
     make config=debug_linux
 elif [[ $1 = "release" ]]
 then
-    compile_imgsurf $1
+    compile_river2D $1
     compileprep
     pushd ./build/ > /dev/null
     make config=release_linux
 elif [[ $1 = "asan" ]]
 then
-    compile_imgsurf $1
+    compile_river2D $1
     compileprep
     pushd ./build/ > /dev/null
     make config=asan_linux
@@ -78,5 +78,5 @@ fi
 
 popd > /dev/null
 
-chmod +x ./bin/$1/river2Dmapedit
-./bin/$1/river2Dmapedit
+chmod +x ./bin/$1/mapedit
+./bin/$1/mapedit
