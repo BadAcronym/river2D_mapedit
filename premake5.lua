@@ -1,5 +1,6 @@
 ---@diagnostic disable: undefined-global, undefined-field
 require"vendor/premake-ecc/ecc"
+require"vendor/river2D/premake5"
 
 workspace("mapedit")
     configurations({"debug", "asan", "release"})
@@ -11,9 +12,9 @@ project("mapedit binary")
     language("C")
     cdialect("C99")
     warnings("Extra")
-    targetname("river2Dmapedit")
+    targetname("mapedit")
     libdirs({"./vendor/river2D/bin/%{cfg.buildcfg}/", "./vendor/river2D/vendor/imgsurf/bin/%{cfg.buildcfg}/"})
-    includedirs({"./include/", "/usr/include/", "./vendor/river2D/include", "./vendor/imgsurf/include/"})
+    includedirs({"./include/", "/usr/include/", "./vendor/river2D/include/"})
     debugdir("./")
 
     filter("configurations:debug or asan")
@@ -23,6 +24,7 @@ project("mapedit binary")
         optimize("Off")
 
     filter("configurations:release")
+        defines{"NDEBUG"}
         staticruntime("off")
         runtime("release")
         symbols("Off")
@@ -33,12 +35,12 @@ project("mapedit binary")
         defines("BUILD_LINUX")
         kind("ConsoleApp")
         targetdir("bin/%{cfg.buildcfg}")
-        objdir("obj/river2Dmapedit/")
-        files({"./src/linux_river2Dmapedit*",
-               "./include/linux_river2Dmapedit*",
-               "./src/river2Dmapedit*",
-               "./include/river2Dmapedit*" })
-        links("river2Dcommon:static", "imgsurf:static")
+        objdir("obj/%{cfg.buildcfg}")
+        files({"./src/linux_mapedit*",
+               "./include/linux_mapedit*",
+               "./src/mapedit_*",
+               "./include/mapedit_*"})
+        links({"river2Dcommon:static", "imgsurf:static"})
         linkoptions({"-lX11", "-fuse-ld=mold"})
         buildoptions({"-Wextra", "-Wall", "-Wpedantic"})
         toolset("clang")
@@ -48,13 +50,12 @@ project("mapedit binary")
         defines("BUILD_WINDOWS")
         targetdir("bin/%{cfg.buildcfg}")
         objdir("obj/")
-        files({ "./src/win32_river2Dmapedit*",
-                "./include/win32_river2Dmapedit*",
-                "./src/river2Dmapedit*",
-                "./include/river2Dmapedit*" })
-        libdirs({"./vendor/imgsurf/bin/%{cfg.buildcfg}/"})
+        files({"./src/win32_mapedit*",
+               "./include/win32_mapedit*",
+               "./src/mapedit_*",
+               "./include/mapedit_*"})
         links({"river2Dcommon.lib", "imgsurf.lib"})
-        buildoptions({"/wd4068"})
+        buildoptions{"/wd4068", "/wd4100"}
 
     filter({"platforms:Linux", "configurations:debug or asan"})
         buildoptions({"-gfull", "-O1"})
