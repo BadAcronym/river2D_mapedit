@@ -18,8 +18,10 @@
     #define LIBPATH "./vendor/river2D/bin/release/"
 #endif
 
-int main()
-{
+int main
+(
+    void
+){
     char *error = 0;
     void *software = dlopen(LIBPATH "libriver2Dsoftware.so", RTLD_NOW);
     if(!software)
