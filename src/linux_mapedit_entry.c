@@ -108,13 +108,27 @@ int main
             {
                 case KeyPress:
                 {
-                    mapedit_processControls(true, event.xkey.keycode, &engine.controls);
+                    mapedit_processKeys(true, event.xkey.keycode, &engine.controls);
                     break;
                 }
                 case KeyRelease:
                 {
-                    mapedit_processControls(false, event.xkey.keycode, &engine.controls);
+                    mapedit_processKeys(false, event.xkey.keycode, &engine.controls);
                     break;
+                }
+                case ButtonPress:
+                {
+                    mapedit_processButtons(true, event.xbutton.button, &engine.controls);
+                    break;
+                }
+                case ButtonRelease:
+                {
+                    mapedit_processButtons(false, event.xbutton.button, &engine.controls);
+                    break;
+                }
+                case MotionNotify:
+                {
+                    mapedit_processPointer(event.xmotion.x, event.xmotion.y);
                 }
                 case ClientMessage:
                 {
