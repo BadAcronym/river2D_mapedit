@@ -34,7 +34,7 @@ void mapedit_init
     river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_HUD0], " MAP EDITOR",  MAPEDIT_PLANE_FONT0, 16, 1, 0, 0);
     river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_HUD0], " NEW PROJECT", MAPEDIT_PLANE_FONT0, 16, 1, 0, 50);
     river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_HUD0], "LOAD PROJECT", MAPEDIT_PLANE_FONT0, 16, 1, 0, 74);
-    river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_HUD0], "    QUIT", MAPEDIT_PLANE_FONT0, 16, 1, 0, 126);
+    river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_HUD0], "    QUIT",     MAPEDIT_PLANE_FONT0, 16, 1, 0, 126);
 
     //transfer to mapedit_loadConfig at some point, when keybinds should be remappable
     engine->controls.keycodes[MAPEDIT_KEY_LEFTM]   = Button1;
@@ -61,13 +61,36 @@ void mapedit_update
                            engine->planes[MAPEDIT_PLANE_HUD0].width,
                            engine->planes[MAPEDIT_PLANE_HUD0].height);
 
+    //move this thang to somewhere more elegant at some point.
+    Area quitButtonArea = {0};
+    quitButtonArea.upperLeft.x  = 0.47f;
+    quitButtonArea.upperLeft.y  = 0.56f;
+    quitButtonArea.lowerLeft.x  = 0.47f;
+    quitButtonArea.lowerLeft.y  = 0.59f;
+    quitButtonArea.upperRight.x = 0.52f;
+    quitButtonArea.upperRight.y = 0.56f;
+    quitButtonArea.lowerRight.x = 0.52f;
+    quitButtonArea.lowerRight.y = 0.59f;
+
     if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
     {
+        // TODO: (mapedit #2) handle new project button
+        // then, handle load project button
 
+        // TODO: (mapedit #4) handle application state transitions
+
+        //TESTING:
+        fprintf(stderr, "\nmouse pressed @:\n");
+        fprintf(stderr, "x: %f\n", engine->controls.pointer.x);
+        fprintf(stderr, "y: %f\n", engine->controls.pointer.y);
+
+        if(river2D_insideArea(&engine->controls.pointer, &quitButtonArea))
+        {
+            engine->running = false;
+        }
     }
 }
 
-// TODO: (mapedit #2) handle buttons!
 // TODO: (mapedit #3) highlight buttons when hovered
 
 void mapedit_processKeys
