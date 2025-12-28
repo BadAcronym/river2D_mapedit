@@ -8,6 +8,7 @@
 void mapedit_init
 (
     EngineData *engine,
+    EditorData *editor,
     void (*river2D_loadText)(EngineData *engine, River2D_Image *image, const char *text,
                              uint8_t font, uint16_t charsize, uint32_t spacing,
                              uint32_t offsetY, uint32_t offsetX)
@@ -51,11 +52,27 @@ void mapedit_init
     engine->controls.keycodes[MAPEDIT_KEY_LEFTM]   = Button1;
     engine->controls.keycodes[MAPEDIT_KEY_MIDDLEM] = Button2;
     engine->controls.keycodes[MAPEDIT_KEY_RIGHTM]  = Button3;
+
+    editor->button_new.upperLeft.x  = 0.42f;
+    editor->button_new.upperLeft.y  = 0.45f;
+    editor->button_new.lowerRight.x = 0.57f;
+    editor->button_new.lowerRight.y = 0.485f;
+
+    editor->button_load.upperLeft.x  = 0.41f;
+    editor->button_load.upperLeft.y  = 0.49f;
+    editor->button_load.lowerRight.x = 0.57f;
+    editor->button_load.lowerRight.y = 0.515f;
+
+    editor->button_quit.upperLeft.x  = 0.47f;
+    editor->button_quit.upperLeft.y  = 0.56f;
+    editor->button_quit.lowerRight.x = 0.52f;
+    editor->button_quit.lowerRight.y = 0.59f;
 }
 
 void mapedit_update
 (
     EngineData *engine,
+    EditorData *editor,
     void (*river2D_compositeImage)(EngineData *engine,  River2D_Image *image, uint8_t pictop,
                                    uint32_t offsetDstX, uint32_t offsetDstY,  uint32_t offsetSrcX,
                                    uint32_t offsetSrcY, uint32_t cropWidth,   uint32_t cropHeight)
@@ -72,38 +89,37 @@ void mapedit_update
                            engine->planes[MAPEDIT_PLANE_MENU].width,
                            engine->planes[MAPEDIT_PLANE_MENU].height);
 
-    //move this thang to somewhere more elegant at some point.
-    Rect quitButton = {0};
-    quitButton.upperLeft.x  = 0.47f;
-    quitButton.upperLeft.y  = 0.56f;
-    quitButton.lowerRight.x = 0.52f;
-    quitButton.lowerRight.y = 0.59f;
+    if(river2D_insideRect(&engine->controls.pointer, &editor->button_new))
+    {
+        river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
-    if(river2D_insideRect(&engine->controls.pointer, &quitButton))
+        // TODO: (mapedit #2): handle new project button
+    }
+    else if(river2D_insideRect(&engine->controls.pointer, &editor->button_load))
+    {
+        river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+
+        // TODO: (mapedit #2): handle load project button
+    }
+    else if(river2D_insideRect(&engine->controls.pointer, &editor->button_quit))
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
         if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
         {
-            // TODO: (mapedit #2): handle new project button
-            // then, handle load project button
-
             // TODO: (mapedit #4): handle application state transitions
-
-            //TESTING:
-            fprintf(stderr, "\nmouse pressed @:\n");
-            fprintf(stderr, "x: %f\n", engine->controls.pointer.x);
-            fprintf(stderr, "y: %f\n", engine->controls.pointer.y);
 
             engine->running = false;
         }
     }
-    // else if()
-    // {
-    // }
     else
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
+
+        //TESTING:
+        fprintf(stderr, "mouse clicked @:\n");
+        fprintf(stderr, "x: %f\n", engine->controls.pointer.x);
+        fprintf(stderr, "y: %f\n", engine->controls.pointer.y);
     }
 }
 
