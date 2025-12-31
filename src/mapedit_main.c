@@ -35,6 +35,11 @@ void mapedit_init
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load hover cursor!\033[0m\n");
     }
+    river2D_loadImage("assets/cursor_place.qoi", &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE], RIVER2D_CHANNELS_BGRA, 8);
+    if(!engine->planes[MAPEDIT_PLANE_CURSOR_PLACE].data)
+    {
+        fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load place cursor!\033[0m\n");
+    }
 
     river2D_loadImage("assets/font_default_16.qoi", &engine->planes[MAPEDIT_PLANE_FONT16], RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_FONT16].data)
@@ -158,6 +163,9 @@ void mapedit_update
     }
     else if(editor->state == MAPEDIT_STATE_EDIT)
     {
+        river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE]);
+        // TODO: (mapedit #2):
+
         if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
         {
             editor->state = MAPEDIT_STATE_MENU;
