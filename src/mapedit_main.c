@@ -19,6 +19,12 @@ void mapedit_init
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load background image!\033[0m\n");
     }
 
+    river2D_loadImage("assets/black.qoi", &engine->planes[MAPEDIT_PLANE_VOID], RIVER2D_CHANNELS_BGRA, 8);
+    if(!engine->planes[MAPEDIT_PLANE_VOID].data)
+    {
+        fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load black image!\033[0m\n");
+    }
+
     river2D_loadImage("assets/highlight.qoi", &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_HIGHLIGHT].data)
     {
@@ -89,12 +95,13 @@ void mapedit_update
                                    uint32_t offsetDstX, uint32_t offsetDstY,  uint32_t offsetSrcX,
                                    uint32_t offsetSrcY, uint32_t cropWidth,   uint32_t cropHeight)
 ){
-    river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_BACKGROUND], RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
-                           engine->planes[MAPEDIT_PLANE_BACKGROUND].width,
-                           engine->planes[MAPEDIT_PLANE_BACKGROUND].height);
 
     if(editor->state == MAPEDIT_STATE_MENU)
     {
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_BACKGROUND], RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
+                               engine->planes[MAPEDIT_PLANE_BACKGROUND].width,
+                               engine->planes[MAPEDIT_PLANE_BACKGROUND].height);
+
         river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_MENU], RIVER2D_PICTOP_OVER,
                                engine->backbuffer.width  / 2 - engine->planes[MAPEDIT_PLANE_MENU].width  / 2,
                                engine->backbuffer.height / 2 - engine->planes[MAPEDIT_PLANE_MENU].height / 2,
@@ -165,6 +172,10 @@ void mapedit_update
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE]);
 
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_VOID], RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
+                               engine->planes[MAPEDIT_PLANE_VOID].width,
+                               engine->planes[MAPEDIT_PLANE_VOID].height);
+
         if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
         {
             editor->state = MAPEDIT_STATE_MENU;
@@ -179,6 +190,10 @@ void mapedit_update
     }
     else if(editor->state == MAPEDIT_STATE_LOAD)
     {
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_VOID], RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
+                               engine->planes[MAPEDIT_PLANE_VOID].width,
+                               engine->planes[MAPEDIT_PLANE_VOID].height);
+
         if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
         {
             editor->state = MAPEDIT_STATE_MENU;
