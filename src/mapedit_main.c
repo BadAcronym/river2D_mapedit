@@ -58,6 +58,7 @@ void mapedit_init
     engine->controls.keycodes[MAPEDIT_KEY_LEFTM]   = Button1;
     engine->controls.keycodes[MAPEDIT_KEY_MIDDLEM] = Button2;
     engine->controls.keycodes[MAPEDIT_KEY_RIGHTM]  = Button3;
+    engine->controls.keycodes[MAPEDIT_KEY_ESCAPE]  = 9;
 
     editor->button_new.upperLeft.x   = 0.428f;
     editor->button_new.upperLeft.y   = 0.455f;
@@ -146,7 +147,7 @@ void mapedit_update
         {
             river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
 
-            //TESTING: getting info on buttons
+            //TESTING: getting info on UI button locations
             if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
             {
                 fprintf(stderr, "mouse clicked @:\n");
@@ -174,6 +175,10 @@ void mapedit_processKeys
             controls->keymap &= ~MAPEDIT_BIT_ESCAPE;
         }
     }
+    // else
+    // {
+    //     fprintf(stderr, "key pressed: %lu\n", key);
+    // }
 }
 
 void mapedit_processButtons
