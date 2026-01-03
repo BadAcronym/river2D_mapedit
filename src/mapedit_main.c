@@ -66,10 +66,12 @@ void mapedit_init
     river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_MENU], "    QUIT",     MAPEDIT_PLANE_FONT16, 16, 1, 0, 126);
 
     //transfer to mapedit_loadConfig at some point, when keybinds should be remappable
-    engine->controls.keycodes[MAPEDIT_KEY_LEFTM]   = Button1;
-    engine->controls.keycodes[MAPEDIT_KEY_MIDDLEM] = Button2;
-    engine->controls.keycodes[MAPEDIT_KEY_RIGHTM]  = Button3;
-    engine->controls.keycodes[MAPEDIT_KEY_ESCAPE]  = 9;
+    engine->controls.keycodes[MAPEDIT_KEY_LEFTM]      = Button1;
+    engine->controls.keycodes[MAPEDIT_KEY_MIDDLEM]    = Button2;
+    engine->controls.keycodes[MAPEDIT_KEY_RIGHTM]     = Button3;
+    engine->controls.keycodes[MAPEDIT_KEY_ESCAPE]     = 9;
+    engine->controls.keycodes[MAPEDIT_KEY_QUIT]       = 24;
+    engine->controls.keycodes[MAPEDIT_KEY_TILEPICKER] = 41;
 
     editor->button_new.upperLeft.x   = 0.428f;
     editor->button_new.upperLeft.y   = 0.455f;
@@ -114,6 +116,13 @@ internal void checkMainMenuButtons
                                    uint32_t offsetDstX, uint32_t offsetDstY,  uint32_t offsetSrcX,
                                    uint32_t offsetSrcY, uint32_t cropWidth,   uint32_t cropHeight)
 ){
+    if(engine->controls.keymap & MAPEDIT_BIT_QUIT)
+    {
+        engine->running = false;
+        engine->controls.keymap &= ~MAPEDIT_BIT_QUIT;
+        return;
+    }
+
     if(river2D_insideRect(&engine->controls.pointer, &editor->button_new))
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
@@ -186,6 +195,7 @@ internal void drawEditor
     river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_VOID], RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
                            engine->planes[MAPEDIT_PLANE_VOID].width,
                            engine->planes[MAPEDIT_PLANE_VOID].height);
+
 }
 
 internal void checkEditorButtons
@@ -199,6 +209,7 @@ internal void checkEditorButtons
     if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
     {
         editor->state = MAPEDIT_STATE_MENU;
+        engine->controls.keymap &= ~MAPEDIT_BIT_ESCAPE;
         return;
     }
 
@@ -207,6 +218,24 @@ internal void checkEditorButtons
 
     // TODO: (mapedit #6): make backbuffer moveable,
     // move grid along with it (so it might be offset)
+
+    // TODO: (mapedit #2): add some descriptions or UI elements to delimit what mode one is in
+
+    if(engine->controls.keymap & MAPEDIT_BIT_TILEPICKER)
+    {
+        editor->editorflags ^= MAPEDIT_FLAG_BIT_TILEPICKER;
+        engine->controls.keymap &= ~MAPEDIT_BIT_TILEPICKER;
+    }
+
+    if(editor->editorflags & MAPEDIT_FLAG_BIT_TILEPICKER)
+    {
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_BACKGROUND], RIVER2D_PICTOP_OVER,
+                               engine->backbuffer.width  / 4,
+                               engine->backbuffer.height / 4,
+                               0, 0,
+                               engine->backbuffer.width  / 2,
+                               engine->backbuffer.height / 2);
+    }
 }
 
 internal void drawFilePicker
@@ -232,6 +261,7 @@ internal void checkFilePickerButtons
     if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
     {
         editor->state = MAPEDIT_STATE_MENU;
+        engine->controls.keymap &= ~MAPEDIT_BIT_ESCAPE;
         return;
     }
 
@@ -239,6 +269,7 @@ internal void checkFilePickerButtons
     // then after loading file, transition to editor state
 }
 
+// FIXME: let 'escape' from the main menu return to current state!
 void mapedit_update
 (
     EngineData *engine,
@@ -285,10 +316,32 @@ void mapedit_processKeys
             controls->keymap &= ~MAPEDIT_BIT_ESCAPE;
         }
     }
-    // else
-    // {
-    //     fprintf(stderr, "key pressed: %lu\n", key);
-    // }
+    else if(key == controls->keycodes[MAPEDIT_KEY_QUIT])
+    {
+        if(isDown)
+        {
+            controls->keymap |= MAPEDIT_BIT_QUIT;
+        }
+        else
+        {
+            controls->keymap &= ~MAPEDIT_BIT_QUIT;
+        }
+    }
+    else if(key == controls->keycodes[MAPEDIT_KEY_TILEPICKER])
+    {
+        if(isDown)
+        {
+            controls->keymap |= MAPEDIT_BIT_TILEPICKER;
+        }
+        else
+        {
+            controls->keymap &= ~MAPEDIT_BIT_TILEPICKER;
+        }
+    }
+    else
+    {
+        fprintf(stderr, "key pressed: %lu\n", key);
+    }
 }
 
 void mapedit_processButtons
