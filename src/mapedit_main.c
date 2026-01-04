@@ -322,16 +322,20 @@ internal void checkEditorButtons
         {
             river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_NULL]);
 
-            double deltaX = engine->controls.pointer.x - tilesheet.upperLeft.x;
-            double deltaY = engine->controls.pointer.y - tilesheet.upperLeft.y;
+            double  deltaX = engine->controls.pointer.x - tilesheet.upperLeft.x;
+            double  deltaY = engine->controls.pointer.y - tilesheet.upperLeft.y;
+            uint8_t tileX  = deltaX * engine->backbuffer.width  / tilesize;
+            uint8_t tileY  = deltaY * engine->backbuffer.height / tilesize;
 
-            // TODO: show reticle with current sprite size that is going to be selected
+            // TODO: show reticle (four corners) with current sprite size that is going to be selected
+            river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
+                                   (tilesheet.upperLeft.x + 0.0055f) * engine->backbuffer.width  + tileX * tilesize,
+                                   (tilesheet.upperLeft.y + 0.006f) * engine->backbuffer.height + tileY * tilesize,
+                                   800, 400, tilesize, tilesize);
 
             if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
             {
                 // TODO: compute which tile was selected and from which tilesheet... or fuse all tilesheets together?
-                // double deltaX = engine->controls.pointer.x - (double)((engine->backbuffer.width  / 10.0f + 32.0f) / (double)engine->backbuffer.width);
-                // double deltaY = engine->controls.pointer.y - (double)((engine->backbuffer.height / 10.0f + 32.0f) / (double)engine->backbuffer.height);
                 fprintf(stderr, "deltaX: %f\n", deltaX * engine->backbuffer.width);
                 fprintf(stderr, "deltaY: %f\n", deltaY * engine->backbuffer.height);
 
