@@ -321,6 +321,8 @@ internal void checkEditorButtons
             if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
             {
                 // TODO: compute which tile was selected and keep it safe somewhere!
+                uint32_t tilesize = 32;
+
                 editor->editorflags &= ~MAPEDIT_FLAG_BIT_TILEPICKER;
             }
         }
@@ -336,11 +338,6 @@ internal void checkEditorButtons
                 fprintf(stderr, "y: %f\n", engine->controls.pointer.y);
             }
         }
-
-        // TODO: display loaded tiles by tilesheet or 'all'. toggle between both tabs/views.
-
-        // TODO: allow adding new tilesheets to projects, load sheet, allow subdividing into different sizes of tiles.
-        // metadata is saved in the proj file, filepath + tilesize.
 
         // TODO: display current picked tile as (or right next to) the cursor.
 
