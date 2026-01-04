@@ -118,7 +118,7 @@ void mapedit_init
     editor->button_tilepicker_close.lowerRight.y = 0.89f;
 
     // WIP: load upfront for now
-    river2D_loadImage("assets/tiles/scenery.qoi", &engine->planes[MAPEDIT_PLANE_TILESHEET_0], RIVER2D_CHANNELS_BGRA, 8);
+    river2D_loadImage("assets/tiles/scenery.qoi", &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_CHANNELS_BGRA, 8);
 }
 
 internal void drawMainMenu
@@ -282,27 +282,27 @@ internal void checkEditorButtons
         // TODO: load each and every file that is in assets/tiles, then display their thumbnails 🤔
 
         // WIP: just load the one file for now and use it here... lmfao
-        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET_0], RIVER2D_PICTOP_OVER,
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_PICTOP_OVER,
                                engine->backbuffer.width  / 10 + 32,
                                engine->backbuffer.height / 10 + 32,
                                0, 0,
-                               engine->planes[MAPEDIT_PLANE_TILESHEET_0].width,
-                               engine->planes[MAPEDIT_PLANE_TILESHEET_0].height);
+                               engine->planes[MAPEDIT_PLANE_TILESHEET].width,
+                               engine->planes[MAPEDIT_PLANE_TILESHEET].height);
 
         Rect tilesheet = {0};
         tilesheet.upperLeft.x  = 0.095f + (double)(32.0f / (double)engine->backbuffer.width);
         tilesheet.upperLeft.y  = 0.095f + (double)(32.0f / (double)engine->backbuffer.height);
-        tilesheet.lowerRight.x = tilesheet.upperLeft.x + (double)engine->planes[MAPEDIT_PLANE_TILESHEET_0].width  / (double)engine->backbuffer.width;
-        tilesheet.lowerRight.y = tilesheet.upperLeft.y + (double)engine->planes[MAPEDIT_PLANE_TILESHEET_0].height / (double)engine->backbuffer.height;
+        tilesheet.lowerRight.x = tilesheet.upperLeft.x + (double)engine->planes[MAPEDIT_PLANE_TILESHEET].width  / (double)engine->backbuffer.width;
+        tilesheet.lowerRight.y = tilesheet.upperLeft.y + (double)engine->planes[MAPEDIT_PLANE_TILESHEET].height / (double)engine->backbuffer.height;
 
-        // if you click on a file, it will be loaded and your cursor will turn into a tile selector (32x32 default),
-        // scrollwheel changes size, 2x2 smallest, sheet height or width (whichever smallest) biggest
+        // TODO: load all files inside the specified folder, separate the spreadsheets visually but have them be one image
+
+        // TODO: river2D_appendImage (either by x or y) would be super handy to have in general
 
         // TODO: river2D_listFiles would be a great place to start, no? return a ; separated string as paths
 
+        // TODO: scrollwheel changes size, 2x2 smallest, 96x96 biggest? only limitation is the highlighting, lol
         uint32_t tilesize  = 16;
-        uint32_t selectedX = 0;
-        uint32_t selectedY = 0;
 
         if(river2D_insideRect(&engine->controls.pointer, &editor->button_tilepicker_close))
         {
@@ -327,20 +327,16 @@ internal void checkEditorButtons
             uint8_t tileX  = deltaX * engine->backbuffer.width  / tilesize;
             uint8_t tileY  = deltaY * engine->backbuffer.height / tilesize;
 
-            // TODO: show reticle (four corners) with current sprite size that is going to be selected
             river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
                                    (tilesheet.upperLeft.x + 0.0055f) * engine->backbuffer.width  + tileX * tilesize,
-                                   (tilesheet.upperLeft.y + 0.006f) * engine->backbuffer.height + tileY * tilesize,
-                                   800, 400, tilesize, tilesize);
+                                   (tilesheet.upperLeft.y + 0.006f)  * engine->backbuffer.height + tileY * tilesize,
+                                   1100, 600, tilesize, tilesize);
 
             if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
             {
                 // TODO: compute which tile was selected and from which tilesheet... or fuse all tilesheets together?
-                fprintf(stderr, "deltaX: %f\n", deltaX * engine->backbuffer.width);
-                fprintf(stderr, "deltaY: %f\n", deltaY * engine->backbuffer.height);
-
-                fprintf(stderr, "tile X: %f\n", deltaX * engine->backbuffer.width  / tilesize);
-                fprintf(stderr, "tile Y: %f\n", deltaY * engine->backbuffer.height / tilesize);
+                fprintf(stderr, "tile X: %u\n", tileX);
+                fprintf(stderr, "tile Y: %u\n", tileY);
 
                 editor->editorflags &= ~MAPEDIT_FLAG_BIT_TILEPICKER;
             }
@@ -369,6 +365,8 @@ internal void checkEditorButtons
         // sizing down, then back up.
 
         // TODO: wheel or menu of recently used tiles and a hotbar with specific ones, somewhere.
+
+        // TODO: allow switching between layers and layering tiles... at least like 4 layers lol
         return;
     }
 
