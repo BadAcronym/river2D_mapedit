@@ -119,6 +119,8 @@ void mapedit_init
 
     // WIP: load upfront for now
     river2D_loadImage("assets/tiles/scenery.qoi", &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_CHANNELS_BGRA, 8);
+
+    editor->tilesize = 16;
 }
 
 internal void drawMainMenu
@@ -302,7 +304,6 @@ internal void checkEditorButtons
         // TODO: river2D_listFiles would be a great place to start, no? return a ; separated string as paths
 
         // TODO: scrollwheel changes size, 2x2 smallest, 96x96 biggest? only limitation is the highlighting, lol
-        uint32_t tilesize  = 16;
 
         if(river2D_insideRect(&engine->controls.pointer, &editor->button_tilepicker_close))
         {
@@ -324,39 +325,27 @@ internal void checkEditorButtons
 
             double  deltaX = engine->controls.pointer.x - tilesheet.upperLeft.x;
             double  deltaY = engine->controls.pointer.y - tilesheet.upperLeft.y;
-            uint8_t tileX  = deltaX * engine->backbuffer.width  / tilesize;
-            uint8_t tileY  = deltaY * engine->backbuffer.height / tilesize;
+            uint8_t tileX = deltaX * engine->backbuffer.width  / editor->tilesize;
+            uint8_t tileY = deltaY * engine->backbuffer.height / editor->tilesize;
 
             river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
-                                   (tilesheet.upperLeft.x + 0.0055f) * engine->backbuffer.width  + tileX * tilesize,
-                                   (tilesheet.upperLeft.y + 0.006f)  * engine->backbuffer.height + tileY * tilesize,
-                                   1100, 600, tilesize, tilesize);
+                                   (tilesheet.upperLeft.x + 0.0055f) * engine->backbuffer.width  + tileX * editor->tilesize,
+                                   (tilesheet.upperLeft.y + 0.006f)  * engine->backbuffer.height + tileY * editor->tilesize,
+                                   1100, 600, editor->tilesize, editor->tilesize);
 
             if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
             {
-                // TODO: compute which tile was selected and from which tilesheet... or fuse all tilesheets together?
-                fprintf(stderr, "tile X: %u\n", tileX);
-                fprintf(stderr, "tile Y: %u\n", tileY);
-
+                editor->selectedX = tileX;
+                editor->selectedY = tileY;
                 editor->editorflags &= ~MAPEDIT_FLAG_BIT_TILEPICKER;
             }
         }
         else
         {
             river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
-
-            //TESTING: getting info on UI button locations
-            if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
-            {
-                fprintf(stderr, "mouse clicked @:\n");
-                fprintf(stderr, "x: %f\n", engine->controls.pointer.x);
-                fprintf(stderr, "y: %f\n", engine->controls.pointer.y);
-            }
         }
 
         // TODO: display current picked tile as (or right next to) the cursor.
-
-        // TODO: compute which tile was selected and from which tilesheet... or fuse all tilesheets together?
 
         // TODO: allow resizing the view to zoom in or out freely into the backbuffer.
 
@@ -369,6 +358,14 @@ internal void checkEditorButtons
         // TODO: allow switching between layers and layering tiles... at least like 4 layers lol
         return;
     }
+
+    uint8_t tileX = engine->controls.pointer.x * engine->backbuffer.width  / editor->tilesize;
+    uint8_t tileY = engine->controls.pointer.y * engine->backbuffer.height / editor->tilesize;
+
+    river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
+                           tileX * editor->tilesize,
+                           tileY * editor->tilesize,
+                           1100, 600, editor->tilesize, editor->tilesize);
 
     //if(river2D_insideRect(&engine->controls.pointer, &editor->100button_someothereditorbutton))
     // {
