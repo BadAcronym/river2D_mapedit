@@ -90,9 +90,10 @@ void mapedit_init
     river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_CLOSE], "CLOSE",  MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
 
     //transfer to mapedit_loadConfig at some point, when keybinds should be remappable
-    engine->controls.keycodes[MAPEDIT_KEY_LEFTM]      = Button1;
-    engine->controls.keycodes[MAPEDIT_KEY_MIDDLEM]    = Button2;
-    engine->controls.keycodes[MAPEDIT_KEY_RIGHTM]     = Button3;
+    // FIXME: dodn't work on windows... obviously
+    engine->controls.keycodes[MAPEDIT_KEY_LEFTM]      = 1;
+    engine->controls.keycodes[MAPEDIT_KEY_MIDDLEM]    = 2;
+    engine->controls.keycodes[MAPEDIT_KEY_RIGHTM]     = 3;
     engine->controls.keycodes[MAPEDIT_KEY_ESCAPE]     = 9;
     engine->controls.keycodes[MAPEDIT_KEY_QUIT]       = 24;
     engine->controls.keycodes[MAPEDIT_KEY_TILEPICKER] = 41;
