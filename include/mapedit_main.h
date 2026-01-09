@@ -36,17 +36,27 @@
 
 #define MAPEDIT_FLAG_BIT_TILEPICKER 1
 
+typedef struct Tile
+{
+    uint32_t x;
+    uint32_t y;
+}
+Tile;
+
 typedef struct EditorData
 {
-    Rect     button_new;
-    Rect     button_load;
-    Rect     button_quit;
-    Rect     button_tilepicker_close;
     uint8_t  state;
     uint8_t  tilesize;
     uint8_t  selectedX;
     uint8_t  selectedY;
+    uint32_t map_width;
+    uint32_t map_height;
+    Tile     *tiles;
     uint64_t editorflags;
+    Rect     button_new;
+    Rect     button_load;
+    Rect     button_quit;
+    Rect     button_tilepicker_close;
 }
 EditorData;
 
