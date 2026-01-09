@@ -21,7 +21,7 @@ if(-Not(Test-Path ".\bin\"))
 
 function Get-CompiledEngine()
 {
-    if(Test-Path ".\vendor\river2D\run")
+    if(Test-Path ".\vendor\river2D\run.ps1")
     {
         pushd ".\vendor\river2D\"
         .\run.ps1 $build --compile-only
@@ -33,7 +33,7 @@ function Get-CompiledEngine()
     }
     else
     {
-        Write-Host "\033[31m\nERROR: can't find river2D's run script.\033[0m"
+        Write-Host "\033[31m\nERROR: can't find river2D run script.\033[0m"
     }
 }
 
@@ -51,21 +51,21 @@ if($build -eq "debug")
     Get-CompiledEngine
     Get-Compileprep
     pushd ".\build\"
-    &MSBuild "river2D_mapedit.sln -p:Configuration=$build -p:Platform=windows"
+    &MSBuild river2D_mapedit.sln -p:Configuration=$build -p:Platform=windows
 }
-else if($build -eq "debug")
+elseif($build -eq "release")
 {
     Get-CompiledEngine
     Get-Compileprep
     pushd ".\build\"
-    &MSBuild "river2D_mapedit.sln -p:Configuration=$build -p:Platform=windows"
+    &MSBuild river2D_mapedit.sln -p:Configuration=$build -p:Platform=windows
 }
-else if($build -eq "asan")
+elseif($build -eq "asan")
 {
     Get-CompiledEngine
     Get-Compileprep
     pushd ".\build\"
-    &MSBuild "river2D_mapedit.sln -p:Configuration=$build -p:Platform=windows"
+    &MSBuild river2D_mapedit.sln -p:Configuration=$build -p:Platform=windows
 }
 else
 {
@@ -76,6 +76,7 @@ else
 if(0 -ne $LASTEXITCODE)
 {
     Write-Host "\033[31m\nERROR: failed to compile.\n\033[0m"
+    popd
     exit -1
 }
 
@@ -88,7 +89,7 @@ if($compile_only)
 
 popd
 
-if(0 -eq $LASTEXITCODE -and -not $compile)
+if(0 -eq $LASTEXITCODE -and -not $compile_only)
 {
     Write-Host "`nrunning $target..."
     Invoke-Expression $target
