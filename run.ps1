@@ -52,6 +52,7 @@ if($build -eq "debug")
     Get-Compileprep
     pushd ".\build\"
     &MSBuild river2D_mapedit.sln -p:Configuration=$build -p:Platform=windows
+    popd
 }
 elseif($build -eq "release")
 {
@@ -59,6 +60,7 @@ elseif($build -eq "release")
     Get-Compileprep
     pushd ".\build\"
     &MSBuild river2D_mapedit.sln -p:Configuration=$build -p:Platform=windows
+    popd
 }
 elseif($build -eq "asan")
 {
@@ -66,6 +68,7 @@ elseif($build -eq "asan")
     Get-Compileprep
     pushd ".\build\"
     &MSBuild river2D_mapedit.sln -p:Configuration=$build -p:Platform=windows
+    popd
 }
 else
 {
@@ -76,7 +79,6 @@ else
 if(0 -ne $LASTEXITCODE)
 {
     Write-Host "\033[31m\nERROR: failed to compile.\n\033[0m"
-    popd
     exit -1
 }
 
