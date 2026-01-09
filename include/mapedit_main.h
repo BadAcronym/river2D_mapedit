@@ -22,6 +22,10 @@
 #define MAPEDIT_KEY_ESCAPE     3
 #define MAPEDIT_KEY_QUIT       4
 #define MAPEDIT_KEY_TILEPICKER 5
+#define MAPEDIT_KEY_LAYER0     6
+#define MAPEDIT_KEY_LAYER1     7
+#define MAPEDIT_KEY_LAYER2     8
+#define MAPEDIT_KEY_LAYER3     9
 
 #define MAPEDIT_BIT_LEFTM      1
 #define MAPEDIT_BIT_RIGHTM     2
@@ -29,6 +33,10 @@
 #define MAPEDIT_BIT_ESCAPE     8
 #define MAPEDIT_BIT_QUIT       16
 #define MAPEDIT_BIT_TILEPICKER 32
+#define MAPEDIT_BIT_LAYER0     64
+#define MAPEDIT_BIT_LAYER1     128
+#define MAPEDIT_BIT_LAYER2     256
+#define MAPEDIT_BIT_LAYER3     512
 
 #define MAPEDIT_STATE_MENU  0
 #define MAPEDIT_STATE_EDIT  1
@@ -47,8 +55,10 @@ typedef struct EditorData
 {
     uint8_t  state;
     uint8_t  tilesize;
+    uint8_t  currentLayer;
     uint8_t  selectedX;
     uint8_t  selectedY;
+    uint8_t  layers;
     uint32_t map_width;
     uint32_t map_height;
     Tile     *tiles;

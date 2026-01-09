@@ -96,6 +96,10 @@ void mapedit_init
     engine->controls.keycodes[MAPEDIT_KEY_ESCAPE]     = 9;
     engine->controls.keycodes[MAPEDIT_KEY_QUIT]       = 24;
     engine->controls.keycodes[MAPEDIT_KEY_TILEPICKER] = 41;
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER0]     = 10;
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER1]     = 11;
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER2]     = 12;
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER3]     = 13;
 
     // TODO: create function that takes a top left point, width/height and some text.
     // + pass a button pointer where all info is written to.
@@ -130,15 +134,20 @@ void mapedit_init
     river2D_loadImage("assets/tiles/scenery.qoi", &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_CHANNELS_BGRA, 8);
 
     editor->tilesize = 16;
+    editor->layers   = 4;
+
+    editor->map_width  = engine->config.canvas_width  / editor->tilesize;
+    editor->map_height = engine->config.canvas_height / editor->tilesize;
+
+    uint64_t tilecount = editor->layers * editor->map_width * editor->map_height;
+
     // TODO: make sure to resize this image when needed (when canvas dims or tilesize changes)
-    editor->tiles = malloc(engine->config.canvas_width * engine->config.canvas_height / editor->tilesize * sizeof(Tile));
-    for(uint32_t i = 0; i < engine->config.canvas_width * engine->config.canvas_height / editor->tilesize; ++i)
+    editor->tiles = malloc(tilecount * sizeof(Tile));
+    for(uint32_t i = 0; i < tilecount; ++i)
     {
         editor->tiles[i].x = UINT32_MAX;
         editor->tiles[i].y = UINT32_MAX;
     }
-    editor->map_width  = engine->config.canvas_width  / editor->tilesize;
-    editor->map_height = engine->config.canvas_height / editor->tilesize;
 }
 
 internal void drawMainMenu
@@ -373,21 +382,22 @@ internal void checkEditorButtons
     // TODO: allow switching between layers and layering tiles... at least like 4 layers lol
     // TODO: display the current layer (maybe lil UI to the left).
 
-    // TODO: poll for keys 1 through 4, switch layers accordingly.
-
-    for(uint32_t x = 0; x < editor->map_width; ++x)
+    for(uint32_t z = 0; z < editor->layers; ++z)
     {
-        for(uint32_t y = 0; y < editor->map_height; ++y)
+        for(uint32_t x = 0; x < editor->map_width; ++x)
         {
-            uint64_t index = y * editor->map_width + x;
-            if(editor->tiles[index].x != UINT32_MAX && editor->tiles[index].y != UINT32_MAX)
+            for(uint32_t y = 0; y < editor->map_height; ++y)
             {
-                river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_PICTOP_OVER,
-                                       x * editor->tilesize,
-                                       y * editor->tilesize,
-                                       editor->tiles[index].x * editor->tilesize,
-                                       editor->tiles[index].y * editor->tilesize,
-                                       editor->tilesize, editor->tilesize);
+                uint64_t index = z * editor->map_width * editor->map_height + y * editor->map_width + x;
+                if(editor->tiles[index].x != UINT32_MAX && editor->tiles[index].y != UINT32_MAX)
+                {
+                    river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_PICTOP_OVER,
+                                           x * editor->tilesize,
+                                           y * editor->tilesize,
+                                           editor->tiles[index].x * editor->tilesize,
+                                           editor->tiles[index].y * editor->tilesize,
+                                           editor->tilesize, editor->tilesize);
+                }
             }
         }
     }
@@ -414,10 +424,36 @@ internal void checkEditorButtons
                            editor->selectedY * editor->tilesize,
                            editor->tilesize, editor->tilesize);
 
+    // WIP: set layer
+    // for(uint8_t i = 0; i < editor->layers; ++i)
+    // {
+    //     if(engine->controls.keymap & (MAPEDIT_BIT_LAYER0 >> i))
+    //     {
+    //         editor->currentLayer = i;
+    //     }
+    // }
+
+    if(engine->controls.keymap & MAPEDIT_BIT_LAYER0)
+    {
+        editor->currentLayer = 0;
+    }
+    else if(engine->controls.keymap & MAPEDIT_BIT_LAYER1)
+    {
+        editor->currentLayer = 1;
+    }
+    else if(engine->controls.keymap & MAPEDIT_BIT_LAYER2)
+    {
+        editor->currentLayer = 2;
+    }
+    else if(engine->controls.keymap & MAPEDIT_BIT_LAYER3)
+    {
+        editor->currentLayer = 3;
+    }
+
     if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
     {
-        editor->tiles[tileY * editor->map_width + tileX].x = editor->selectedX;
-        editor->tiles[tileY * editor->map_width + tileX].y = editor->selectedY;
+        editor->tiles[editor->currentLayer * editor->map_width * editor->map_height + tileY * editor->map_width + tileX].x = editor->selectedX;
+        editor->tiles[editor->currentLayer * editor->map_width * editor->map_height + tileY * editor->map_width + tileX].y = editor->selectedY;
     }
 
     //if(river2D_insideRect(&engine->controls.pointer, &editor->100button_someothereditorbutton))
@@ -528,6 +564,50 @@ void mapedit_processKeys
         else
         {
             controls->keymap &= ~MAPEDIT_BIT_TILEPICKER;
+        }
+    }
+    else if(key == controls->keycodes[MAPEDIT_KEY_LAYER0])
+    {
+        if(isDown)
+        {
+            controls->keymap |= MAPEDIT_BIT_LAYER0;
+        }
+        else
+        {
+            controls->keymap &= ~MAPEDIT_BIT_LAYER0;
+        }
+    }
+    else if(key == controls->keycodes[MAPEDIT_KEY_LAYER1])
+    {
+        if(isDown)
+        {
+            controls->keymap |= MAPEDIT_BIT_LAYER1;
+        }
+        else
+        {
+            controls->keymap &= ~MAPEDIT_BIT_LAYER1;
+        }
+    }
+    else if(key == controls->keycodes[MAPEDIT_KEY_LAYER2])
+    {
+        if(isDown)
+        {
+            controls->keymap |= MAPEDIT_BIT_LAYER2;
+        }
+        else
+        {
+            controls->keymap &= ~MAPEDIT_BIT_LAYER2;
+        }
+    }
+    else if(key == controls->keycodes[MAPEDIT_KEY_LAYER3])
+    {
+        if(isDown)
+        {
+            controls->keymap |= MAPEDIT_BIT_LAYER3;
+        }
+        else
+        {
+            controls->keymap &= ~MAPEDIT_BIT_LAYER3;
         }
     }
     else
