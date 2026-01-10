@@ -111,6 +111,15 @@ internal void loadRenderer_software
     }
 }
 
+#if defined(DEBUG) || defined(ASAN)
+int main
+(
+    void
+){
+    return WinMain(GetModuleHandleA(0), 0, GetCommandLineA(), 0);
+}
+#endif
+
 LRESULT CALLBACK win32WindowCallback
 (
     HWND   window,
@@ -170,15 +179,6 @@ LRESULT CALLBACK win32WindowCallback
 
     return 0;
 }
-
-#if defined(DEBUG) || defined(ASAN)
-int main
-(
-    void
-){
-    return WinMain(GetModuleHandleA(0), 0, GetCommandLineA(), 0);
-}
-#endif
 
 int CALLBACK WinMain
 (
