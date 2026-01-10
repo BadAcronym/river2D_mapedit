@@ -17,57 +17,46 @@ then
     mkdir ./bin/
 fi
 
-compile_river2D()
-{
+if [[ $1 = "" ]]
+then
+    build="release"
+else
+    build=$1
+fi
+
+if [[ $build = "asan" ]] || [[ $build = "debug" ]] || [[ $build = "release" ]]
+then
+
     if [[ -f "./vendor/river2D/run" ]]
     then
         pushd ./vendor/river2D/ > /dev/null
-        ./run $1 --compile-only
+        ./run $build --compile-only
         if [[ $? != 0 ]]
         then
+            echo -e "\033[31m\nERROR: failed to compile river2D.\033[0m"
             exit -1
         fi
         popd > /dev/null
     else
         echo -e "\033[31m\nERROR: can't find river2D's run script.\033[0m"
     fi
-}
 
-compileprep()
-{
     echo ""
     echo -e "\033[36mcompiling river2D...\033[0m"
     echo ""
     premake5 ecc
     premake5 gmake
-}
 
-if [[ $1 = "debug" ]]
-then
-    compile_river2D $1
-    compileprep
     pushd ./build/ > /dev/null
-    make config=debug_linux
-elif [[ $1 = "release" ]]
-then
-    compile_river2D $1
-    compileprep
-    pushd ./build/ > /dev/null
-    make config=release_linux
-elif [[ $1 = "asan" ]]
-then
-    compile_river2D $1
-    compileprep
-    pushd ./build/ > /dev/null
-    make config=asan_linux
+    make config=$build\_linux
 else
-    echo -e "\033[31m\nERROR: invalid make config: $1.\033[0m"
+    echo -e "\033[31m\nERROR: invalid make config: $build.\033[0m"
     exit -2;
 fi
 
 if [[ $? != 0 ]]
 then
-    echo -e "\033[31m\nERROR: failed to compile.\n\033[0m"
+    echo -e "\033[31m\nERROR: failed to compile mapedit.\n\033[0m"
     exit -1
 fi
 
@@ -80,5 +69,5 @@ fi
 
 popd > /dev/null
 
-chmod +x ./bin/$1/mapedit
-./bin/$1/mapedit
+chmod +x ./bin/$build/mapedit
+./bin/$build/mapedit
