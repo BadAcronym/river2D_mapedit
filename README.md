@@ -1,5 +1,9 @@
 # The river2D map editor!
 
+a preview:
+
+![assets/preview.gif]
+
 ## current state
 
 since I am currently working on a fairly small game (16x16 tiles on a 360p base canvas), the abilities of the editor reflect that right now.
