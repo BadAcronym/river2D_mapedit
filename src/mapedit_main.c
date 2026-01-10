@@ -127,8 +127,8 @@ void mapedit_init
     editor->button_quit.lowerRight.y = 0.67f;
 
     editor->button_tilepicker_close.upperLeft.x  = 0.1f;
-    editor->button_tilepicker_close.upperLeft.y  = 0.86f;
-    editor->button_tilepicker_close.lowerRight.x = 0.17f;
+    editor->button_tilepicker_close.upperLeft.y  = 0.84f;
+    editor->button_tilepicker_close.lowerRight.x = 0.25f;
     editor->button_tilepicker_close.lowerRight.y = 0.89f;
 
     // WIP: load upfront for now
@@ -251,6 +251,7 @@ internal void checkMainMenuButtons
 internal void drawEditor
 (
     EngineData *engine,
+    EditorData *editor,
     void (*river2D_compositeImage)(EngineData *engine,  River2D_Image *image, uint8_t pictop,
                                    uint32_t offsetDstX, uint32_t offsetDstY,  uint32_t offsetSrcX,
                                    uint32_t offsetSrcY, uint32_t cropWidth,   uint32_t cropHeight)
@@ -258,6 +259,26 @@ internal void drawEditor
     river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_VOID], RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
                            engine->planes[MAPEDIT_PLANE_VOID].width,
                            engine->planes[MAPEDIT_PLANE_VOID].height);
+
+    for(uint32_t z = 0; z < editor->layers; ++z)
+    {
+        for(uint32_t x = 0; x < editor->map_width; ++x)
+        {
+            for(uint32_t y = 0; y < editor->map_height; ++y)
+            {
+                uint64_t index = z * editor->map_width * editor->map_height + y * editor->map_width + x;
+                if(editor->tiles[index].x != UINT32_MAX && editor->tiles[index].y != UINT32_MAX)
+                {
+                    river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_PICTOP_OVER,
+                                           x * editor->tilesize,
+                                           y * editor->tilesize,
+                                           editor->tiles[index].x * editor->tilesize,
+                                           editor->tiles[index].y * editor->tilesize,
+                                           editor->tilesize, editor->tilesize);
+                }
+            }
+        }
+    }
 }
 
 internal void checkEditorButtons
@@ -384,26 +405,6 @@ internal void checkEditorButtons
 
     // BACKLOG: isolate view to a selected layer
 
-    for(uint32_t z = 0; z < editor->layers; ++z)
-    {
-        for(uint32_t x = 0; x < editor->map_width; ++x)
-        {
-            for(uint32_t y = 0; y < editor->map_height; ++y)
-            {
-                uint64_t index = z * editor->map_width * editor->map_height + y * editor->map_width + x;
-                if(editor->tiles[index].x != UINT32_MAX && editor->tiles[index].y != UINT32_MAX)
-                {
-                    river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_PICTOP_OVER,
-                                           x * editor->tilesize,
-                                           y * editor->tilesize,
-                                           editor->tiles[index].x * editor->tilesize,
-                                           editor->tiles[index].y * editor->tilesize,
-                                           editor->tilesize, editor->tilesize);
-                }
-            }
-        }
-    }
-
     // TODO: display current picked tile as (or right next to) the cursor.
 
     // TODO: allow resizing the view to zoom in or out freely into the backbuffer.
@@ -506,7 +507,7 @@ void mapedit_update
     }
     else if(editor->state == MAPEDIT_STATE_EDIT)
     {
-        drawEditor(engine, river2D_compositeImage);
+        drawEditor(engine, editor, river2D_compositeImage);
         checkEditorButtons(engine, editor, river2D_compositeImage);
     }
     else if(editor->state == MAPEDIT_STATE_LOAD)
@@ -605,7 +606,7 @@ void mapedit_processKeys
     }
     else
     {
-        fprintf(stderr, "key pressed: %llu\n", key);
+        fprintf(stderr, "key pressed: %" PRIx64 "\n", key);
     }
 }
 
