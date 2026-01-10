@@ -2,7 +2,7 @@
 
 a preview:
 
-![assets/preview.gif]
+![preview](assets/preview.gif)
 
 ## current state
 
