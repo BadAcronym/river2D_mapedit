@@ -90,17 +90,21 @@ void mapedit_init
     river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_CLOSE], "CLOSE",  MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
 
     //transfer to mapedit_loadConfig at some point, when keybinds should be remappable
-    // FIXME: dodn't work on windows... obviously
+    // FIXME: the mouse dodn't work like this on windows... obviously
     engine->controls.keycodes[MAPEDIT_KEY_LEFTM]      = 1;
     engine->controls.keycodes[MAPEDIT_KEY_MIDDLEM]    = 2;
     engine->controls.keycodes[MAPEDIT_KEY_RIGHTM]     = 3;
-    engine->controls.keycodes[MAPEDIT_KEY_ESCAPE]     = 9;
-    engine->controls.keycodes[MAPEDIT_KEY_QUIT]       = 24;
-    engine->controls.keycodes[MAPEDIT_KEY_TILEPICKER] = 41;
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER0]     = 10;
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER1]     = 11;
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER2]     = 12;
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER3]     = 13;
+    engine->controls.keycodes[MAPEDIT_KEY_ESCAPE]     = river2D_interpretCharAsKey(0x1b);
+    engine->controls.keycodes[MAPEDIT_KEY_QUIT]       = river2D_interpretCharAsKey('q');
+
+    // WIP: debug
+    fprintf(stderr, "key for quitting: %hhu", engine->controls.keycodes[MAPEDIT_KEY_QUIT]);
+
+    engine->controls.keycodes[MAPEDIT_KEY_TILEPICKER] = river2D_interpretCharAsKey('t');
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER0]     = river2D_interpretCharAsKey('1');
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER1]     = river2D_interpretCharAsKey('2');
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER2]     = river2D_interpretCharAsKey('3');
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER3]     = river2D_interpretCharAsKey('4');
 
     // TODO: create function that takes a top left point, width/height and some text.
     // + pass a button pointer where all info is written to.

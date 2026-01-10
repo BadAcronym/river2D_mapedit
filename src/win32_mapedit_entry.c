@@ -1,4 +1,5 @@
 #include <Windows.h>
+#include <Windowsx.h>
 #include <stdio.h>
 
 #include "river2D_main.h"
@@ -169,7 +170,13 @@ LRESULT CALLBACK win32WindowCallback
                 break;
             }
 
-            // mapedit_processKeys(isKeyDown, uint64_t key, River2D_ControlMap *controls)
+            mapedit_processKeys(isKeyDown, wParam, &global_engine->controls);
+            break;
+        }
+        case WM_MOUSEMOVE:
+        {
+            mapedit_processPointer(global_engine, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            break;
         }
         default:
         {
