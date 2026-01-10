@@ -91,15 +91,11 @@ void mapedit_init
 
     //transfer to mapedit_loadConfig at some point, when keybinds should be remappable
     // FIXME: the mouse dodn't work like this on windows... obviously
-    engine->controls.keycodes[MAPEDIT_KEY_LEFTM]      = 1;
-    engine->controls.keycodes[MAPEDIT_KEY_MIDDLEM]    = 2;
-    engine->controls.keycodes[MAPEDIT_KEY_RIGHTM]     = 3;
+    engine->controls.keycodes[MAPEDIT_KEY_LEFTM]      = RIVER2D_MOUSE1;
+    engine->controls.keycodes[MAPEDIT_KEY_MIDDLEM]    = RIVER2D_MOUSE2;
+    engine->controls.keycodes[MAPEDIT_KEY_RIGHTM]     = RIVER2D_MOUSE3;
     engine->controls.keycodes[MAPEDIT_KEY_ESCAPE]     = river2D_interpretCharAsKey(0x1b);
     engine->controls.keycodes[MAPEDIT_KEY_QUIT]       = river2D_interpretCharAsKey('q');
-
-    // WIP: debug
-    fprintf(stderr, "key for quitting: %hhu", engine->controls.keycodes[MAPEDIT_KEY_QUIT]);
-
     engine->controls.keycodes[MAPEDIT_KEY_TILEPICKER] = river2D_interpretCharAsKey('t');
     engine->controls.keycodes[MAPEDIT_KEY_LAYER0]     = river2D_interpretCharAsKey('1');
     engine->controls.keycodes[MAPEDIT_KEY_LAYER1]     = river2D_interpretCharAsKey('2');
@@ -652,6 +648,10 @@ void mapedit_processButtons
         {
             controls->keymap &= ~MAPEDIT_BIT_MIDDLEM;
         }
+    }
+    else
+    {
+        fprintf(stderr, "button pressed: %" PRIx64 "\n", button);
     }
 }
 

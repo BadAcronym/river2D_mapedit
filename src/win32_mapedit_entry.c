@@ -178,6 +178,36 @@ LRESULT CALLBACK win32WindowCallback
             mapedit_processPointer(global_engine, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
             break;
         }
+        case WM_LBUTTONDOWN:
+        {
+            mapedit_processButtons(true, RIVER2D_MOUSE1, &global_engine->controls);
+            break;
+        }
+        case WM_LBUTTONUP:
+        {
+            mapedit_processButtons(false, RIVER2D_MOUSE1, &global_engine->controls);
+            break;
+        }
+        case WM_RBUTTONDOWN:
+        {
+            mapedit_processButtons(true, RIVER2D_MOUSE2, &global_engine->controls);
+            break;
+        }
+        case WM_RBUTTONUP:
+        {
+            mapedit_processButtons(false, RIVER2D_MOUSE2, &global_engine->controls);
+            break;
+        }
+        case WM_MBUTTONDOWN:
+        {
+            mapedit_processButtons(true, RIVER2D_MOUSE3, &global_engine->controls);
+            break;
+        }
+        case WM_MBUTTONUP:
+        {
+            mapedit_processButtons(false, RIVER2D_MOUSE3, &global_engine->controls);
+            break;
+        }
         default:
         {
             return DefWindowProcA(window, message, wParam, lParam);
