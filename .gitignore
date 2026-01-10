@@ -9,5 +9,6 @@ compile_commands*
 *.raddbg
 *.log
 *river2Dconf
+river2D.ini
 assets/tiles/*
 PowerShellEditorServices.json
