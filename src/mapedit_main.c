@@ -369,6 +369,7 @@ internal void checkEditorButtons
             if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
             {
                 editor->editorflags &= ~MAPEDIT_FLAG_BIT_TILEPICKER;
+                engine->controls.keymap &= ~MAPEDIT_BIT_LEFTM;
             }
         }
         else if(river2D_insideRect(&engine->controls.pointer, &tilesheet))
