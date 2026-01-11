@@ -24,4 +24,9 @@ then
     rm ./build/ -rf
 fi
 
+if [[ -d ./packages/ ]]
+then
+    rm ./packages/ -rf
+fi
+
 echo -e "\033[32mcleaned mapedit!\n\033[0m"

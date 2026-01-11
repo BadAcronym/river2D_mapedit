@@ -1,0 +1,41 @@
+#!/bin/bash
+./clean
+
+if [[ $? != 0 ]]
+then
+    echo -e "\033[31m\nERROR: failed to package linux build.\n\033[0m"
+    exit -1
+fi
+
+if [[ $1 = "" ]]
+then
+    echo -e "\033[31m\nERROR: no tag specified. Try: 'package v0.0.1'\n\033[0m"
+    exit -2
+fi
+
+./run release --compile-only
+
+dir=./build/mapedit_$1\_linux
+
+echo -e "creating package folder under $dir...\n"
+
+mkdir $dir
+
+if [[ ! -d $dir ]]
+then
+    echo -e "\033[31m\nERROR: could not create package folder.\n\033[0m"
+    exit -2
+fi
+
+mkdir -p $dir/vendor/river2D/vendor/imgsurf/bin/release/
+mkdir -p $dir/vendor/river2D/bin/release/
+mkdir -p $dir/assets/tiles/
+mkdir -p $dir/bin/release/
+
+cp ./vendor/river2D/vendor/imgsurf/bin/release/libimgsurf.a $dir/vendor/river2D/vendor/imgsurf/bin/release/libimgsurf.a
+cp ./vendor/river2D/bin/release/libriver2Dcommon.a          $dir/vendor/river2D/bin/release/libriver2Dcommon.a
+cp ./vendor/river2D/bin/release/libriver2Dsoftware.so       $dir/vendor/river2D/bin/release/libriver2Dsoftware.so
+cp ./bin/release/mapedit                                    $dir/bin/release/mapedit
+cp ./.river2Dconf                                           $dir/.river2Dconf
+cp ./assets/*                                               $dir/assets/ # BACKLOG: create sample tilesheet so I can include assets/tiles/*
+cp ./mapedit                                                $dir/mapedit
