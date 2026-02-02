@@ -108,7 +108,7 @@ void mapedit_init
     editor->button_quit.lowerRight.x = 0.52f;
     editor->button_quit.lowerRight.y = 0.59f;
 
-    editor->button_tilepicker_close.upperLeft.x  = 0.09f;
+    editor->button_tilepicker_close.upperLeft.x  = 0.1f;
     editor->button_tilepicker_close.upperLeft.y  = 0.86f;
     editor->button_tilepicker_close.lowerRight.x = 0.17f;
     editor->button_tilepicker_close.lowerRight.y = 0.89f;
@@ -157,7 +157,7 @@ internal void checkMainMenuButtons
         river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
                                editor->button_new.upperLeft.x * engine->backbuffer.width,
                                editor->button_new.upperLeft.y * engine->backbuffer.height + 25,
-                               0, 0, 196, 5);
+                               800, 400, 196, 5);
 
         if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
         {
@@ -173,7 +173,7 @@ internal void checkMainMenuButtons
         river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
                                editor->button_load.upperLeft.x * engine->backbuffer.width,
                                editor->button_load.upperLeft.y * engine->backbuffer.height + 25,
-                               0, 0, 210, 5);
+                               800, 400, 210, 5);
 
         if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
         {
@@ -187,7 +187,7 @@ internal void checkMainMenuButtons
         river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
                                editor->button_quit.upperLeft.x * engine->backbuffer.width,
                                editor->button_quit.upperLeft.y * engine->backbuffer.height + 25,
-                               0, 0, 72, 5);
+                               800, 400, 72, 5);
 
         if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
         {
@@ -277,9 +277,9 @@ internal void checkEditorButtons
             river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
             river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
-                                   editor->button_tilepicker_close.upperLeft.x * engine->backbuffer.width,
+                                   editor->button_tilepicker_close.upperLeft.x * engine->backbuffer.width  + 6,
                                    editor->button_tilepicker_close.upperLeft.y * engine->backbuffer.height + 25,
-                                   0, 0, 120, 5);
+                                   800, 400, 92, 5);
 
             if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
             {
@@ -310,7 +310,7 @@ internal void checkEditorButtons
         return;
     }
 
-    //if(river2D_insideRect(&engine->controls.pointer, &editor->button_someothereditorbutton))
+    //if(river2D_insideRect(&engine->controls.pointer, &editor->100button_someothereditorbutton))
     // {
     //     river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
     // }
