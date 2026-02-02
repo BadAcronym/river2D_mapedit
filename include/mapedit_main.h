@@ -14,26 +14,33 @@
 #define MAPEDIT_PLANE_CURSOR_HOVER   9
 #define MAPEDIT_PLANE_CURSOR_PLACE   10
 
-#define MAPEDIT_KEY_LEFTM   0
-#define MAPEDIT_KEY_RIGHTM  1
-#define MAPEDIT_KEY_MIDDLEM 2
-#define MAPEDIT_KEY_ESCAPE  3
+#define MAPEDIT_KEY_LEFTM      0
+#define MAPEDIT_KEY_RIGHTM     1
+#define MAPEDIT_KEY_MIDDLEM    2
+#define MAPEDIT_KEY_ESCAPE     3
+#define MAPEDIT_KEY_QUIT       4
+#define MAPEDIT_KEY_TILEPICKER 5
 
-#define MAPEDIT_BIT_LEFTM   1
-#define MAPEDIT_BIT_RIGHTM  2
-#define MAPEDIT_BIT_MIDDLEM 4
-#define MAPEDIT_BIT_ESCAPE  8
+#define MAPEDIT_BIT_LEFTM      1
+#define MAPEDIT_BIT_RIGHTM     2
+#define MAPEDIT_BIT_MIDDLEM    4
+#define MAPEDIT_BIT_ESCAPE     8
+#define MAPEDIT_BIT_QUIT       16
+#define MAPEDIT_BIT_TILEPICKER 32
 
 #define MAPEDIT_STATE_MENU  0
 #define MAPEDIT_STATE_EDIT  1
 #define MAPEDIT_STATE_LOAD  2
 
+#define MAPEDIT_FLAG_BIT_TILEPICKER 1
+
 typedef struct EditorData
 {
-    Rect    button_new;
-    Rect    button_load;
-    Rect    button_quit;
-    uint8_t state;
+    Rect     button_new;
+    Rect     button_load;
+    Rect     button_quit;
+    uint8_t  state;
+    uint64_t editorflags;
 }
 EditorData;
 
