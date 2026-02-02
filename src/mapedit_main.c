@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <memory.h>
 
+// TODO: (mapedit #1) display main menu (with text buttons!)
+
 void mapedit_init
 (
     EngineData *engine
