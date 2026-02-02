@@ -729,7 +729,8 @@ void mapedit_update
 }
 
 // FIXME: fix scroll polling
-internal uint8_t processButton
+// reason we don't return is because of multiple actions assignable to the same key
+internal void processButton
 (
     River2D_ControlMap *controls,
     uint64_t           desired,
@@ -747,13 +748,10 @@ internal uint8_t processButton
         {
             controls->buttonmap &= ~bit;
         }
-        return 1;
     }
-
-    return 0;
 }
 
-internal uint8_t processKey
+internal void processKey
 (
     River2D_ControlMap *controls,
     uint64_t           desired,
@@ -771,10 +769,7 @@ internal uint8_t processKey
         {
             controls->keymap &= ~bit;
         }
-        return 1;
     }
-
-    return 0;
 }
 
 void mapedit_processButtons
@@ -783,11 +778,11 @@ void mapedit_processButtons
     uint64_t           button,
     bool               isDown
 ){
-    if(processButton(controls, MAPEDIT_BUTTON_SCROLLUP,   button, MAPEDIT_BIT_SCROLLUP,   isDown)) { return; }
-    if(processButton(controls, MAPEDIT_BUTTON_SCROLLDOWN, button, MAPEDIT_BIT_SCROLLDOWN, isDown)) { return; }
-    if(processButton(controls, MAPEDIT_BUTTON_LEFTM,      button, MAPEDIT_BIT_LEFTM,      isDown)) { return; }
-    if(processButton(controls, MAPEDIT_BUTTON_MIDDLEM,    button, MAPEDIT_BIT_MIDDLEM,    isDown)) { return; }
-    if(processButton(controls, MAPEDIT_BUTTON_RIGHTM,     button, MAPEDIT_BIT_RIGHTM,     isDown)) { return; }
+    processButton(controls, MAPEDIT_BUTTON_SCROLLUP,   button, MAPEDIT_BIT_SCROLLUP,   isDown);
+    processButton(controls, MAPEDIT_BUTTON_SCROLLDOWN, button, MAPEDIT_BIT_SCROLLDOWN, isDown);
+    processButton(controls, MAPEDIT_BUTTON_LEFTM,      button, MAPEDIT_BIT_LEFTM,      isDown);
+    processButton(controls, MAPEDIT_BUTTON_MIDDLEM,    button, MAPEDIT_BIT_MIDDLEM,    isDown);
+    processButton(controls, MAPEDIT_BUTTON_RIGHTM,     button, MAPEDIT_BIT_RIGHTM,     isDown);
 }
 
 void mapedit_processKeys
