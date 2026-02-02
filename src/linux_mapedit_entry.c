@@ -85,8 +85,8 @@ int main
                 }
                 case ConfigureNotify:
                 {
-                    resizeWidth    = event.xconfigure.width;
-                    resizeHeight   = event.xconfigure.height;
+                    resizeWidth  = event.xconfigure.width;
+                    resizeHeight = event.xconfigure.height;
 
                     if(resizeWidth != engine.config.window_width || resizeHeight != engine.config.window_height)
                     {
