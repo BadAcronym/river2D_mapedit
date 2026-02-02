@@ -164,18 +164,25 @@ void mapedit_update
     else if(editor->state == MAPEDIT_STATE_EDIT)
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE]);
-        // TODO: (mapedit #2):
 
         if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
         {
             editor->state = MAPEDIT_STATE_MENU;
+            return;
         }
+
+        // TODO: (mapedit #6): highlight in gridsize where cursor is currently
+        // grid starts from top left of backbuffer
+
+        // TODO: (mapedit #6): make backbuffer moveable,
+        // move grid along with it (so it might be offset)
     }
     else if(editor->state == MAPEDIT_STATE_LOAD)
     {
         if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
         {
             editor->state = MAPEDIT_STATE_MENU;
+            return;
         }
     }
     else
