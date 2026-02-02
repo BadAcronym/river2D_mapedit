@@ -1,13 +1,13 @@
 #include "mapedit_main.h"
 
-//TODO: future renderers
+// TODO: future renderers
 //river2D_vulkan.dll / libriver2D_vulkan.so
 //river2D_d3d.dll    / libriver2D_d3d.so
 //river2D_openGL.dll / libriver2D_opengl.so
 //
 //move the functions to their appropriate paths
 //
-//TODO: read tile size, tiles and animations, save them to some format which can then be read by the game
+// TODO: read tile size, tiles and animations, save them to some format which can then be read by the game
 
 #include <dlfcn.h>
 #include <stdio.h>
