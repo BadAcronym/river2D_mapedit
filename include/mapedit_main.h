@@ -43,6 +43,9 @@ typedef struct EditorData
     Rect     button_quit;
     Rect     button_tilepicker_close;
     uint8_t  state;
+    uint8_t  tilesize;
+    uint8_t  selectedX;
+    uint8_t  selectedY;
     uint64_t editorflags;
 }
 EditorData;
