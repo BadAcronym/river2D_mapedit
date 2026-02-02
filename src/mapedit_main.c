@@ -156,6 +156,24 @@ void mapedit_update
             }
         }
     }
+    else if(editor->state == MAPEDIT_STATE_EDIT)
+    {
+        if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
+        {
+            editor->state = MAPEDIT_STATE_MENU;
+        }
+    }
+    else if(editor->state == MAPEDIT_STATE_LOAD)
+    {
+        if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
+        {
+            editor->state = MAPEDIT_STATE_MENU;
+        }
+    }
+    else
+    {
+        fprintf(stderr, "\033[31;1;7mERROR: invalid state.\033[0m\n");
+    }
 }
 
 void mapedit_processKeys
