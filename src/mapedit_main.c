@@ -47,6 +47,10 @@ void mapedit_init
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load place cursor!\033[0m\n");
     }
 
+    engine->planes[MAPEDIT_PLANE_CURSOR_NULL].width  = 32;
+    engine->planes[MAPEDIT_PLANE_CURSOR_NULL].height = 32;
+    engine->planes[MAPEDIT_PLANE_CURSOR_NULL].data   = calloc(32 * 32 * RIVER2D_BPP, 1);
+
     river2D_loadImage("assets/font_default_16.qoi", &engine->planes[MAPEDIT_PLANE_FONT16], RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_FONT16].data)
     {
@@ -296,7 +300,9 @@ internal void checkEditorButtons
 
         // TODO: river2D_listFiles would be a great place to start, no? return a ; separated string as paths
 
-        // TODO: think about how to load file
+        uint32_t tilesize  = 16;
+        uint32_t selectedX = 0;
+        uint32_t selectedY = 0;
 
         if(river2D_insideRect(&engine->controls.pointer, &editor->button_tilepicker_close))
         {
@@ -314,14 +320,23 @@ internal void checkEditorButtons
         }
         else if(river2D_insideRect(&engine->controls.pointer, &tilesheet))
         {
-            river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+            river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_NULL]);
+
+            double deltaX = engine->controls.pointer.x - tilesheet.upperLeft.x;
+            double deltaY = engine->controls.pointer.y - tilesheet.upperLeft.y;
 
             // TODO: show reticle with current sprite size that is going to be selected
 
             if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
             {
                 // TODO: compute which tile was selected and from which tilesheet... or fuse all tilesheets together?
-                uint32_t tilesize = 32;
+                // double deltaX = engine->controls.pointer.x - (double)((engine->backbuffer.width  / 10.0f + 32.0f) / (double)engine->backbuffer.width);
+                // double deltaY = engine->controls.pointer.y - (double)((engine->backbuffer.height / 10.0f + 32.0f) / (double)engine->backbuffer.height);
+                fprintf(stderr, "deltaX: %f\n", deltaX * engine->backbuffer.width);
+                fprintf(stderr, "deltaY: %f\n", deltaY * engine->backbuffer.height);
+
+                fprintf(stderr, "tile X: %f\n", deltaX * engine->backbuffer.width  / tilesize);
+                fprintf(stderr, "tile Y: %f\n", deltaY * engine->backbuffer.height / tilesize);
 
                 editor->editorflags &= ~MAPEDIT_FLAG_BIT_TILEPICKER;
             }
@@ -341,6 +356,14 @@ internal void checkEditorButtons
 
         // TODO: display current picked tile as (or right next to) the cursor.
 
+        // TODO: compute which tile was selected and from which tilesheet... or fuse all tilesheets together?
+
+        // TODO: allow resizing the view to zoom in or out freely into the backbuffer.
+
+        // TODO: allow resizing the backbuffer itself to be smaller or bigger.
+        // always keep a copy of the largest backbuffer in memory, so data is not lost when
+        // sizing down, then back up.
+
         // TODO: wheel or menu of recently used tiles and a hotbar with specific ones, somewhere.
         return;
     }
@@ -354,12 +377,12 @@ internal void checkEditorButtons
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE]);
 
         //TESTING: getting info on UI button locations
-        if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
-        {
-            fprintf(stderr, "mouse clicked @:\n");
-            fprintf(stderr, "x: %f\n", engine->controls.pointer.x);
-            fprintf(stderr, "y: %f\n", engine->controls.pointer.y);
-        }
+        // if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+        // {
+        //     fprintf(stderr, "mouse clicked @:\n");
+        //     fprintf(stderr, "x: %f\n", engine->controls.pointer.x);
+        //     fprintf(stderr, "y: %f\n", engine->controls.pointer.y);
+        // }
     }
 }
 
