@@ -123,12 +123,14 @@ int main
         if(mapped)
         {
             mapedit_update(&engine, &editor);
-            River2D_Time now = river2D_queryTime();
-
+            River2D_Time now   = river2D_queryTime();
             River2D_Time delta = river2D_deltaTime(&editor.lastPresentTime);
-            if(delta.s == 0 && delta.ns < 4000000)
+
+            uint64_t nscount = 5000000;
+
+            if(delta.s == 0 && delta.ns < nscount)
             {
-                struct timespec duration = {0, 4000000 - delta.ns};
+                struct timespec duration = {0, nscount - delta.ns};
                 nanosleep(&duration, NULL);
             }
 
