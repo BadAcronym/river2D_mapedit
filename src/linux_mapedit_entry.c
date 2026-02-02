@@ -30,7 +30,7 @@ int main
 
     river2D_loadConfig(&engine.config);
     engine.config.choices |= RIVER2D_CHOICE_STATIC_CANVAS_BIT;
-    engine.windowName = "river2D map editor";
+    engine.windowName = "River2D Map Editor";
 
     engine.river2D_init(&engine, planes);
     mapedit_init(&engine, &editor);
