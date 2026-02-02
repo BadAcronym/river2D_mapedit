@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <memory.h>
 
+// TODO: write logging function (or library, lmfao) that writes to file, as well as stderr
+// copy some river3D code for that?
+
 void mapedit_init
 (
     EngineData *engine,
@@ -67,6 +70,8 @@ void mapedit_init
 
     //transfer to mapedit_loadConfig at some point, when keybinds should be remappable
     // TODO: add "save project" UI button in the menu, but only if a project is actually loaded
+
+    // TODO: handle each letter as itself, for typing...
     engine->controls.keycodes[MAPEDIT_KEY_LEFTM]      = RIVER2D_MOUSE1;
     engine->controls.keycodes[MAPEDIT_KEY_MIDDLEM]    = RIVER2D_MOUSE2;
     engine->controls.keycodes[MAPEDIT_KEY_RIGHTM]     = RIVER2D_MOUSE3;
