@@ -356,8 +356,8 @@ internal void checkEditorButtons
 
             double  deltaX = engine->controls.pointer.x - tilesheet.upperLeft.x;
             double  deltaY = engine->controls.pointer.y - tilesheet.upperLeft.y;
-            uint8_t tileX = deltaX * engine->backbuffer.width  / editor->tilesize;
-            uint8_t tileY = deltaY * engine->backbuffer.height / editor->tilesize;
+            uint8_t tileX  = (uint8_t)(deltaX * engine->backbuffer.width  / editor->tilesize);
+            uint8_t tileY  = (uint8_t)(deltaY * engine->backbuffer.height / editor->tilesize);
 
             river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
                                    (uint32_t)(engine->backbuffer.width  * (tilesheet.upperLeft.x + 0.0055f) + tileX * editor->tilesize),
