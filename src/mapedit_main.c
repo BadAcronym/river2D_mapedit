@@ -60,13 +60,13 @@ void mapedit_init
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load font image!\033[0m\n");
     }
 
-    engine->planes[MAPEDIT_PLANE_MAINMENU].width  = engine->backbuffer.width;
-    engine->planes[MAPEDIT_PLANE_MAINMENU].height = engine->backbuffer.height;
-    engine->planes[MAPEDIT_PLANE_MAINMENU].data   = calloc(engine->backbuffer.width * engine->backbuffer.height * RIVER2D_BPP, 1);
+    engine->planes[MAPEDIT_PLANE_MAINMENU].width    = engine->backbuffer.width;
+    engine->planes[MAPEDIT_PLANE_MAINMENU].height   = engine->backbuffer.height;
+    engine->planes[MAPEDIT_PLANE_MAINMENU].data     = calloc(engine->backbuffer.width * engine->backbuffer.height * RIVER2D_BPP, 1);
 
-    engine->planes[MAPEDIT_PLANE_PAUSEMENU].width  = engine->backbuffer.width;
-    engine->planes[MAPEDIT_PLANE_PAUSEMENU].height = engine->backbuffer.height;
-    engine->planes[MAPEDIT_PLANE_PAUSEMENU].data   = calloc(engine->backbuffer.width * engine->backbuffer.height * RIVER2D_BPP, 1);
+    engine->planes[MAPEDIT_PLANE_PAUSEMENU].width   = engine->backbuffer.width;
+    engine->planes[MAPEDIT_PLANE_PAUSEMENU].height  = engine->backbuffer.height;
+    engine->planes[MAPEDIT_PLANE_PAUSEMENU].data    = calloc(engine->backbuffer.width * engine->backbuffer.height * RIVER2D_BPP, 1);
 
     engine->planes[MAPEDIT_PLANE_SELECTTILE].width  = engine->backbuffer.width;
     engine->planes[MAPEDIT_PLANE_SELECTTILE].height = engine->backbuffer.height;
@@ -134,9 +134,6 @@ void mapedit_init
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],  "QUIT", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_quit, river2D_loadText);
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], "QUIT", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_quit, river2D_loadText);
 
-    point.x = 0.5f;
-    point.y = 0.14f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE], "SELECT TILE", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_tilepicker_close, river2D_loadText);
     point.x = 0.175f;
     point.y = 0.86f;
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE], "CLOSE", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_tilepicker_close, river2D_loadText);
@@ -444,15 +441,15 @@ internal void checkEditorButtons
 
         // HACK: just load the one file for now and use it here... lmfao
         river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_PICTOP_OVER,
-                               engine->backbuffer.width  / 10 + 32,
-                               engine->backbuffer.height / 10 + 32,
+                               engine->backbuffer.width  / 10 + editor->tilesize,
+                               engine->backbuffer.height / 10 + editor->tilesize,
                                0, 0,
                                engine->planes[MAPEDIT_PLANE_TILESHEET].width,
                                engine->planes[MAPEDIT_PLANE_TILESHEET].height);
 
         Rect tilesheet = {0};
-        tilesheet.upperLeft.x  = 0.095f + (double)(32.0f / (double)engine->backbuffer.width);
-        tilesheet.upperLeft.y  = 0.095f + (double)(32.0f / (double)engine->backbuffer.height);
+        tilesheet.upperLeft.x  = 0.095f + (double)((double)editor->tilesize / (double)engine->backbuffer.width);
+        tilesheet.upperLeft.y  = 0.095f + (double)((double)editor->tilesize / (double)engine->backbuffer.height);
         tilesheet.lowerRight.x = tilesheet.upperLeft.x + (double)engine->planes[MAPEDIT_PLANE_TILESHEET].width  / (double)engine->backbuffer.width;
         tilesheet.lowerRight.y = tilesheet.upperLeft.y + (double)engine->planes[MAPEDIT_PLANE_TILESHEET].height / (double)engine->backbuffer.height;
 
