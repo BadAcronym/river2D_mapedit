@@ -285,8 +285,6 @@ internal void checkMainMenuButtons
 ){
     if(engine->controls.keymap & MAPEDIT_BIT_QUIT)
     {
-        //TESTING:
-        fprintf(stderr, "keycode given: %hhu\n", engine->controls.keycodes[MAPEDIT_KEY_QUIT]);
         engine->running = false;
         engine->controls.keymap &= ~MAPEDIT_BIT_QUIT;
         return;
@@ -714,6 +712,8 @@ void mapedit_update
     }
 }
 
+// BACKLOG: allow clicking and scrolling at the same time.
+// Find a way to poll for scrolling and clicking that is exclusive.
 internal void processButton
 (
     River2D_ControlMap *controls,
@@ -722,14 +722,11 @@ internal void processButton
     uint64_t           bit,
     bool               isDown
 ){
-    // TODO: handle scroll seperately, because the polling is off currently
-
-    if(button == controls->buttoncodes[MAPEDIT_BUTTON_SCROLLUP] || button == controls->buttoncodes[MAPEDIT_BUTTON_SCROLLDOWN])
+    if(button == controls->buttoncodes[MAPEDIT_BUTTON_SCROLLUP])
     {
-        // fprintf(stderr, "currently trying to set scrolldown\n");
         if(isDown)
         {
-            controls->buttonmap |= bit;
+            controls->buttonmap      = MAPEDIT_BIT_SCROLLUP;
             controls->lastScrollTime = river2D_queryTime();
         }
         else
@@ -739,14 +736,29 @@ internal void processButton
 
             if(deltaMS > 10.0f)
             {
-                controls->buttonmap &= ~bit;
+                controls->buttonmap = 0;
             }
         }
-
-        return;
     }
+    else if(button == controls->buttoncodes[MAPEDIT_BUTTON_SCROLLDOWN])
+    {
+        if(isDown)
+        {
+            controls->buttonmap      = MAPEDIT_BIT_SCROLLDOWN;
+            controls->lastScrollTime = river2D_queryTime();
+        }
+        else
+        {
+            River2D_Time delta   = river2D_deltaTime(&controls->lastScrollTime);
+            double       deltaMS = (double)delta.s * 1e3f + (double)delta.ns / 1e6f;
 
-    if(button == controls->buttoncodes[desired])
+            if(deltaMS > 25.0f)
+            {
+                controls->buttonmap = 0;
+            }
+        }
+    }
+    else if(button == controls->buttoncodes[desired])
     {
         if(isDown)
         {
