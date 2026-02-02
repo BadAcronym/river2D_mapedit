@@ -235,11 +235,10 @@ int CALLBACK WinMain
     loadRenderer_software();
 
     engine.instance   = instance;
-    engine.windowName = "islescape";
+    engine.windowName = "river2D map editor";
 
     river2D_loadConfig(&engine.config);
     engine.config.choices |= RIVER2D_CHOICE_STATIC_CANVAS_BIT;
-    engine.windowName = "river2D map editor";
     river2D_init(&engine, planes);
     mapedit_init(&engine, &editor, river2D_loadText);
 
