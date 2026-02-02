@@ -10,3 +10,4 @@ compile_commands*
 *.log
 *river2Dconf
 assets/tiles/*
+PowerShellEditorServices.json
