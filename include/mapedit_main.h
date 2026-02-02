@@ -8,7 +8,7 @@
 #define MAPEDIT_PLANE_FONT16         3
 #define MAPEDIT_PLANE_MENU           4
 #define MAPEDIT_PLANE_SELECTTILE     5
-#define MAPEDIT_PLANE_CLOSE          6
+#define MAPEDIT_PLANE_HUD2           6
 #define MAPEDIT_PLANE_HUD3           7
 #define MAPEDIT_PLANE_CURSOR_DEFAULT 8
 #define MAPEDIT_PLANE_CURSOR_HOVER   9
