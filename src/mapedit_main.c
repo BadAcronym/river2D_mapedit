@@ -143,8 +143,8 @@ void mapedit_init
     // BACKLOG: allow replacing this tilesheet by selecting one or multiple files with a file browser...
     river2D_loadImage("assets/tiles/tilesheet.qoi", &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_CHANNELS_BGRA, 8);
 
-    // TODO: allow selecting multiple tiles at once
-    editor->tilesize = 8;
+    // TODO: allow selecting multiple tiles at once, setting one minimum tilesize per project (which actually saves the data)
+    editor->tilesize = 16;
 
     // allow 10 layers by default, any other layer you'd have to add to the UI selector
     editor->layers       = 10;
@@ -194,7 +194,25 @@ internal void changeState
     editor->current_state  = nextState;
 }
 
-// NOTE: need to validate string length of whatever user sets projectName to
+// TODO: save a header like follows:
+// const char header[8] = "r2Dtiles";
+// uint32_t   tilesheet_width;
+// uint32_t   tilesheet_height;
+// uint16_t   map_width;
+// uint16_t   map_height;
+// uint8_t    layers;
+//
+// **tilesheet**      (size tilesheet_width * tilesheet_height * RIVER2D_BPP)
+// **array of tiles** (size map_width * map_height * sizeof(Tile))
+// EOF
+//
+// when reading back, the size of the array can be reconstructed and no extra data must be read.
+// the tilesheet can be retrieved from the path?
+// or better yet, I can just embed the image into the file. Why the fuck not.
+// TODO: add RLE? lose 1 bit of the 32 for every tile, just to make some uint32_t's a repeat of the last placed tile
+// see if this is even worth it, it'd only be in exact runs
+// find another way to do RLE maybe, one that scales well with lots of pairs of 2, 4, short runs that is
+
 internal void saveCurrentProject
 (
     EditorData *editor
@@ -209,8 +227,6 @@ internal void saveCurrentProject
         free(filename);
         return;
     }
-
-    // BACKLOG: more sophisticated binary format, with RLE, at least, so sizes aren't as bloated
 
     uint64_t tilecount = editor->layers * editor->map_height * editor->map_width;
     fwrite(editor->tiles, sizeof(Tile), tilecount, file);
