@@ -51,7 +51,7 @@ if($build -eq "debug")
     Get-CompiledEngine
     Get-Compileprep
     pushd ".\build\"
-    &MSBuild river2D_mapedit.sln -p:Configuration=$build -p:Platform=windows
+    &MSBuild mapedit.sln -p:Configuration=$build -p:Platform=windows
     popd
 }
 elseif($build -eq "release")
@@ -59,7 +59,7 @@ elseif($build -eq "release")
     Get-CompiledEngine
     Get-Compileprep
     pushd ".\build\"
-    &MSBuild river2D_mapedit.sln -p:Configuration=$build -p:Platform=windows
+    &MSBuild mapedit.sln -p:Configuration=$build -p:Platform=windows
     popd
 }
 elseif($build -eq "asan")
@@ -67,7 +67,7 @@ elseif($build -eq "asan")
     Get-CompiledEngine
     Get-Compileprep
     pushd ".\build\"
-    &MSBuild river2D_mapedit.sln -p:Configuration=$build -p:Platform=windows
+    &MSBuild mapedit.sln -p:Configuration=$build -p:Platform=windows
     popd
 }
 else
@@ -93,7 +93,7 @@ popd
 
 if(0 -eq $LASTEXITCODE -and -not $compile_only)
 {
-    $target = ".\bin\$build\river2D_mapedit.exe"
+    $target = ".\bin\$build\mapedit.exe"
     Write-Host "`nrunning $target..."
     Invoke-Expression $target
 }
