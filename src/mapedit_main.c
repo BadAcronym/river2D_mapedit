@@ -59,10 +59,10 @@ void mapedit_init
     engine->controls.keycodes[MAPEDIT_KEY_MIDDLEM] = Button2;
     engine->controls.keycodes[MAPEDIT_KEY_RIGHTM]  = Button3;
 
-    editor->button_new.upperLeft.x  = 0.428f;
-    editor->button_new.upperLeft.y  = 0.455f;
-    editor->button_new.lowerRight.x = 0.57f;
-    editor->button_new.lowerRight.y = 0.485f;
+    editor->button_new.upperLeft.x   = 0.428f;
+    editor->button_new.upperLeft.y   = 0.455f;
+    editor->button_new.lowerRight.x  = 0.57f;
+    editor->button_new.lowerRight.y  = 0.485f;
 
     editor->button_load.upperLeft.x  = 0.415f;
     editor->button_load.upperLeft.y  = 0.49f;
@@ -87,6 +87,7 @@ void mapedit_update
                            engine->planes[MAPEDIT_PLANE_BACKGROUND].width,
                            engine->planes[MAPEDIT_PLANE_BACKGROUND].height);
 
+    // TODO: (mapedit #4): handle application state transitions
     //later moved to some conditional (if main menu or something.)
     river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_MENU], RIVER2D_PICTOP_OVER,
                            engine->backbuffer.width  / 2 - engine->planes[MAPEDIT_PLANE_MENU].width  / 2,
@@ -112,6 +113,7 @@ void mapedit_update
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
         // TODO: (mapedit #2): handle load project button
+        // TODO: (mapedit #4): handle application state transitions
 
         river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
                                editor->button_load.upperLeft.x * engine->backbuffer.width,
