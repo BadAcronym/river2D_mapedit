@@ -151,7 +151,7 @@ void mapedit_init
     // BACKLOG: allow replacing this tilesheet by selecting one or multiple files with a file browser...
     river2D_loadImage(engine, "assets/tiles/tilesheet.qoi", &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_CHANNELS_BGRA, 8);
 
-    // CURRENT: allow selecting multiple tiles at once, setting one minimum tilesize per project (which actually saves the data)
+    // BACKLOG: allow decreasing/increasing this minimum tilesize
     editor->tilesize   = 8;
     editor->selectSize = 1;
 
@@ -504,7 +504,7 @@ internal void checkEditorButtons
         {
             river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_NULL]);
 
-            // CURRENT: fix selecting tiles, actually select in powers of 2.
+            // CURRENT: fix actually selecting the selected tile(s)!
 
             double  deltaX = engine->controls.pointer.x - tilesheet.upperLeft.x;
             double  deltaY = engine->controls.pointer.y - tilesheet.upperLeft.y;
@@ -720,13 +720,13 @@ void mapedit_updateSelectSize
     EditorData *editor,
     bool       increase
 ){
-    if(increase && editor->selectSize < 5)
+    if(increase && editor->selectSize < 8)
     {
-        editor->selectSize *= 2;
+        ++editor->selectSize;
     }
     else if(!increase && editor->selectSize > 1)
     {
-        editor->selectSize /= 2;
+        --editor->selectSize;
     }
 }
 
