@@ -195,7 +195,6 @@ internal void drawEditor
     river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_VOID], RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
                            engine->planes[MAPEDIT_PLANE_VOID].width,
                            engine->planes[MAPEDIT_PLANE_VOID].height);
-
 }
 
 internal void checkEditorButtons
@@ -230,11 +229,18 @@ internal void checkEditorButtons
     if(editor->editorflags & MAPEDIT_FLAG_BIT_TILEPICKER)
     {
         river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_BACKGROUND], RIVER2D_PICTOP_OVER,
-                               engine->backbuffer.width  / 4,
-                               engine->backbuffer.height / 4,
+                               engine->backbuffer.width  / 10,
+                               engine->backbuffer.height / 10,
                                0, 0,
-                               engine->backbuffer.width  / 2,
-                               engine->backbuffer.height / 2);
+                               engine->backbuffer.width  / 1.25f,
+                               engine->backbuffer.height / 1.25f);
+
+        // TODO: display loaded tiles by tilesheet or 'all'. toggle between both tabs/views.
+
+        // TODO: allow adding new tilesheets to projects, load sheet, allow subdividing into different sizes of tiles.
+        // metadata is saved in the proj file, filepath + tilesize.
+
+        // TODO: display current picked tile as (or right next to) the cursor.
     }
 }
 
@@ -269,7 +275,7 @@ internal void checkFilePickerButtons
     // then after loading file, transition to editor state
 }
 
-// FIXME: let 'escape' from the main menu return to current state!
+// BACKLOG: let 'escape' from the main menu return to current state?
 void mapedit_update
 (
     EngineData *engine,
