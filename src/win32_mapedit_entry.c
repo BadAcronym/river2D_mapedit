@@ -55,10 +55,14 @@ global river2D_text_ *_river2D_text_ = River2D_text_Stub;
 
 clang_diagnostic_pop
 
-#ifdef DEBUG
-    #define LIBPATH "./vendor/river2D/bin/debug/"
+#ifdef ASAN
+    #define LIBPATH "./vendor/river2D/bin/asan/"
 #else
-    #define LIBPATH "./vendor/river2D/bin/release/"
+    #ifdef DEBUG
+        #define LIBPATH "./vendor/river2D/bin/debug/"
+    #else
+        #define LIBPATH "./vendor/river2D/bin/release/"
+    #endif
 #endif
 
 internal void loadRenderer_software
@@ -106,15 +110,6 @@ internal void loadRenderer_software
         return;
     }
 }
-
-#ifdef DEBUG
-int main
-(
-    void
-){
-    return WinMain(GetModuleHandleA(0), 0, GetCommandLineA(), 0);
-}
-#endif
 
 LRESULT CALLBACK win32WindowCallback
 (
@@ -187,8 +182,8 @@ int CALLBACK WinMain
     (void)cmdline;
     (void)prevInstance;
 
-    EditorData editor = {0};
-    EngineData engine = {0};
+    EditorData    editor = {0};
+    EngineData    engine = {0};
     River2D_Image planes[RIVER2D_MAX_PLANES] = {0};
 
     loadRenderer_software();
@@ -205,7 +200,7 @@ int CALLBACK WinMain
 
     // TODO: figure out the mapping window msgs
 
-    WNDCLASSA wc = {0};
+    WNDCLASSA wc     = {0};
     LPCSTR className = "IslescapeClass";
 
     wc.style         = CS_HREDRAW | CS_VREDRAW;
@@ -227,7 +222,6 @@ int CALLBACK WinMain
                                     WS_OVERLAPPEDWINDOW | WS_VISIBLE,
                                     x, y, width, height,
                                     0, 0, instance, 0);
-
     while(engine.running)
     {
         MSG message;
@@ -256,3 +250,12 @@ int CALLBACK WinMain
 
     return river2D_shutdown(&engine);
 }
+
+#ifdef DEBUG
+int main
+(
+    void
+){
+    return WinMain(GetModuleHandleA(0), 0, GetCommandLineA(), 0);
+}
+#endif
