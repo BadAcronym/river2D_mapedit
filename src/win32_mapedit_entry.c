@@ -113,6 +113,15 @@ LRESULT CALLBACK win32WindowCallback
             mapedit_processKeys(&global_engine->controls, RIVER2D_MOUSE3, false);
             break;
         }
+        case WM_SETCURSOR:
+        {
+            if(LOWORD(lParam) == HTCLIENT)
+            {
+                global_engine->currentCursor = 0;
+                river2D_changeCursor(global_engine, &global_engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
+                return 1;
+            }
+        }
         default:
         {
             return DefWindowProcA(window, message, wParam, lParam);
@@ -144,7 +153,6 @@ int CALLBACK WinMain
 
     river2D_loadConfig(&engine.config);
     engine.config.choices |= RIVER2D_CHOICE_STATIC_CANVAS_BIT;
-    engine.windowName = "river2D map editor";
     engine.river2D_init(&engine, planes);
     mapedit_init(&engine, &editor);
 
@@ -155,7 +163,7 @@ int CALLBACK WinMain
     // TODO: try to abstract this into river2D_openwindow without passing instance and shi, just what's already declared in the header
 
     WNDCLASSA wc     = {0};
-    LPCSTR className = "IslescapeClass";
+    LPCSTR className = "MapeditClass";
 
     wc.style         = CS_HREDRAW | CS_VREDRAW;
     wc.lpfnWndProc   = win32WindowCallback;
