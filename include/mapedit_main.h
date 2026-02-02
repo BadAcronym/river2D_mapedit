@@ -141,7 +141,7 @@ typedef struct EditorData
     uint8_t      layers;
     uint8_t      selectedX;
     uint8_t      selectedY;
-    uint8_t      selectSize;
+    uint8_t      selectMult;
     uint32_t     map_width;
     uint32_t     map_height;
     uint64_t     editorflags;
