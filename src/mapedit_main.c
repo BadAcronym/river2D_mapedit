@@ -19,6 +19,12 @@ void mapedit_init
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load background image!\033[0m\n");
     }
 
+    river2D_loadImage("assets/highlight.qoi", &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_CHANNELS_BGRA, 8);
+    if(!engine->planes[MAPEDIT_PLANE_HIGHLIGHT].data)
+    {
+        fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load highlight image!\033[0m\n");
+    }
+
     river2D_loadImage("assets/cursor_default.qoi", &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT], RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT].data)
     {
@@ -53,12 +59,12 @@ void mapedit_init
     engine->controls.keycodes[MAPEDIT_KEY_MIDDLEM] = Button2;
     engine->controls.keycodes[MAPEDIT_KEY_RIGHTM]  = Button3;
 
-    editor->button_new.upperLeft.x  = 0.42f;
-    editor->button_new.upperLeft.y  = 0.45f;
+    editor->button_new.upperLeft.x  = 0.428f;
+    editor->button_new.upperLeft.y  = 0.455f;
     editor->button_new.lowerRight.x = 0.57f;
     editor->button_new.lowerRight.y = 0.485f;
 
-    editor->button_load.upperLeft.x  = 0.41f;
+    editor->button_load.upperLeft.x  = 0.415f;
     editor->button_load.upperLeft.y  = 0.49f;
     editor->button_load.lowerRight.x = 0.57f;
     editor->button_load.lowerRight.y = 0.515f;
@@ -94,21 +100,35 @@ void mapedit_update
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
         // TODO: (mapedit #2): handle new project button
+        // TODO: (mapedit #4): handle application state transitions
+
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
+                               editor->button_new.upperLeft.x * engine->backbuffer.width,
+                               editor->button_new.upperLeft.y * engine->backbuffer.height + 25,
+                               0, 0, 196, 5);
     }
     else if(river2D_insideRect(&engine->controls.pointer, &editor->button_load))
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
         // TODO: (mapedit #2): handle load project button
+
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
+                               editor->button_load.upperLeft.x * engine->backbuffer.width,
+                               editor->button_load.upperLeft.y * engine->backbuffer.height + 25,
+                               0, 0, 210, 5);
     }
     else if(river2D_insideRect(&engine->controls.pointer, &editor->button_quit))
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
+                               editor->button_quit.upperLeft.x * engine->backbuffer.width,
+                               editor->button_quit.upperLeft.y * engine->backbuffer.height + 25,
+                               0, 0, 72, 5);
+
         if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
         {
-            // TODO: (mapedit #4): handle application state transitions
-
             engine->running = false;
         }
     }
@@ -116,14 +136,15 @@ void mapedit_update
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
 
-        //TESTING:
-        fprintf(stderr, "mouse clicked @:\n");
-        fprintf(stderr, "x: %f\n", engine->controls.pointer.x);
-        fprintf(stderr, "y: %f\n", engine->controls.pointer.y);
+        //TESTING: getting info on buttons
+        if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+        {
+            fprintf(stderr, "mouse clicked @:\n");
+            fprintf(stderr, "x: %f\n", engine->controls.pointer.x);
+            fprintf(stderr, "y: %f\n", engine->controls.pointer.y);
+        }
     }
 }
-
-// TODO: (mapedit #3) highlight buttons when hovered
 
 void mapedit_processKeys
 (
