@@ -26,7 +26,12 @@ fi
 
 for out in *.callgrind
 do
-    rm out
+    if [[ ! -f $out ]]
+    then
+        continue;
+    fi
+
+    rm $out
 done
 
 echo -e "\033[32mcleaned mapedit!\n\033[0m"
