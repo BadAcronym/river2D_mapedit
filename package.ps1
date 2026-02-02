@@ -32,11 +32,12 @@ if(-Not(Test-Path $dir))
 }
 
 mkdir -p "$dir\vendor\river2D\bin\release\"
-mkdir -p "$dir\assets\tiles\"
 mkdir -p "$dir\bin\release\"
+mkdir -p "$dir\assets\"
 
 cp ".\vendor\river2D\bin\release\river2Dsoftware.dll" "$dir\vendor\river2D\bin\release\river2Dsoftware.dll"
 cp ".\bin\release\mapedit.exe"                        "$dir\bin\release\mapedit.exe"
 cp ".\river2D.ini"                                    "$dir\river2D.ini"
 cp ".\assets\*"                                       "$dir\assets\"
+cp ".\assets\tiles\*"                                 "$dir\assets\tiles\"
 cp ".\mapedit.lnk"                                    "$dir\mapedit.lnk"
