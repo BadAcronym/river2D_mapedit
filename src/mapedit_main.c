@@ -65,8 +65,6 @@ void mapedit_init
     engine->controls.buttoncodes[MAPEDIT_BUTTON_LEFTM]      = RIVER2D_MOUSE1;
     engine->controls.buttoncodes[MAPEDIT_BUTTON_MIDDLEM]    = RIVER2D_MOUSE2;
     engine->controls.buttoncodes[MAPEDIT_BUTTON_RIGHTM]     = RIVER2D_MOUSE3;
-    engine->controls.buttoncodes[MAPEDIT_BUTTON_SCROLLUP]   = RIVER2D_MOUSE4;
-    engine->controls.buttoncodes[MAPEDIT_BUTTON_SCROLLDOWN] = RIVER2D_MOUSE5;
 
     engine->controls.keycodes[MAPEDIT_KEY_ESCAPE]     = river2D_interpretCharAsKey(0x1B);
     engine->controls.keycodes[MAPEDIT_KEY_QUIT]       = river2D_interpretCharAsKey('q');
@@ -510,29 +508,18 @@ internal void checkEditorButtons
 
             double  deltaX = engine->controls.pointer.x - tilesheet.upperLeft.x;
             double  deltaY = engine->controls.pointer.y - tilesheet.upperLeft.y;
-            uint8_t tileX  = (uint8_t)(deltaX * engine->backbuffer.width  / editor->tilesize);
-            uint8_t tileY  = (uint8_t)(deltaY * engine->backbuffer.height / editor->tilesize);
+            uint8_t tileX  = (uint8_t)(deltaX * engine->backbuffer.width  / (editor->tilesize * editor->selectSize));
+            uint8_t tileY  = (uint8_t)(deltaY * engine->backbuffer.height / (editor->tilesize * editor->selectSize));
 
-            // NOTE: current limit of 4
             if(engine->controls.keymap & MAPEDIT_BIT_INC_SIZE)
             {
-                if(editor->selectSize < 4)
-                {
-                    ++editor->selectSize;
-                }
-
-                fprintf(stderr, "increased tilesize to %hhu\n", editor->selectSize);
+                mapedit_updateSelectSize(editor, true);
                 engine->controls.keymap &= ~MAPEDIT_BIT_INC_SIZE;
             }
 
             if(engine->controls.keymap & MAPEDIT_BIT_RED_SIZE)
             {
-                if(editor->selectSize > 1)
-                {
-                    --editor->selectSize;
-                }
-
-                fprintf(stderr, "reduced tilesize to %hhu\n", editor->selectSize);
+                mapedit_updateSelectSize(editor, false);
                 engine->controls.keymap &= ~MAPEDIT_BIT_RED_SIZE;
             }
 
@@ -728,8 +715,21 @@ void mapedit_update
     }
 }
 
-// FIXME: fix scroll polling
-// reason we don't return is because of multiple actions assignable to the same key
+void mapedit_updateSelectSize
+(
+    EditorData *editor,
+    bool       increase
+){
+    if(increase && editor->selectSize < 5)
+    {
+        editor->selectSize *= 2;
+    }
+    else if(!increase && editor->selectSize > 1)
+    {
+        editor->selectSize /= 2;
+    }
+}
+
 internal void processButton
 (
     River2D_ControlMap *controls,
@@ -778,8 +778,6 @@ void mapedit_processButtons
     uint64_t           button,
     bool               isDown
 ){
-    processButton(controls, MAPEDIT_BUTTON_SCROLLUP,   button, MAPEDIT_BIT_SCROLLUP,   isDown);
-    processButton(controls, MAPEDIT_BUTTON_SCROLLDOWN, button, MAPEDIT_BIT_SCROLLDOWN, isDown);
     processButton(controls, MAPEDIT_BUTTON_LEFTM,      button, MAPEDIT_BIT_LEFTM,      isDown);
     processButton(controls, MAPEDIT_BUTTON_MIDDLEM,    button, MAPEDIT_BIT_MIDDLEM,    isDown);
     processButton(controls, MAPEDIT_BUTTON_RIGHTM,     button, MAPEDIT_BIT_RIGHTM,     isDown);

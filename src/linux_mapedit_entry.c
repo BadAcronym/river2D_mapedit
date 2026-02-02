@@ -63,6 +63,17 @@ int main
                 }
                 case ButtonPress:
                 {
+                    if(event.xbutton.button == RIVER2D_MOUSE4)
+                    {
+                        mapedit_updateSelectSize(&editor, true);
+                        break;
+                    }
+                    else if(event.xbutton.button == RIVER2D_MOUSE5)
+                    {
+                        mapedit_updateSelectSize(&editor, false);
+                        break;
+                    }
+
                     mapedit_processButtons(&engine.controls, event.xbutton.button, true);
                     break;
                 }

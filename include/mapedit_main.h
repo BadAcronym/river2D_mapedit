@@ -20,8 +20,6 @@
 #define MAPEDIT_BUTTON_LEFTM       0
 #define MAPEDIT_BUTTON_RIGHTM      1
 #define MAPEDIT_BUTTON_MIDDLEM     2
-#define MAPEDIT_BUTTON_SCROLLUP    3
-#define MAPEDIT_BUTTON_SCROLLDOWN  4
 
 #define MAPEDIT_KEY_ESCAPE     0
 #define MAPEDIT_KEY_SHIFT      1
@@ -72,8 +70,6 @@
 #define MAPEDIT_BIT_LEFTM      0x000000000001
 #define MAPEDIT_BIT_RIGHTM     0x000000000002
 #define MAPEDIT_BIT_MIDDLEM    0x000000000004
-#define MAPEDIT_BIT_SCROLLUP   0x000000000008
-#define MAPEDIT_BIT_SCROLLDOWN 0x000000000010
 
 #define MAPEDIT_BIT_ESCAPE     0x000000000001
 #define MAPEDIT_BIT_SHIFT      0x000000000002
@@ -174,6 +170,12 @@ extern void mapedit_update
 (
     EngineData *engine,
     EditorData *editor
+);
+
+extern void mapedit_updateSelectSize
+(
+    EditorData *editor,
+    bool       increase
 );
 
 extern void mapedit_processButtons
