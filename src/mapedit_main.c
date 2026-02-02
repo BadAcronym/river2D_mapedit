@@ -12,18 +12,18 @@ void mapedit_init
                              uint8_t font, uint16_t charsize, uint32_t spacing,
                              uint32_t offsetY, uint32_t offsetX)
 ){
-    river2D_loadImage("assets/black.qoi", &engine->planes[MAPEDIT_PLANE_BACKGROUND], RIVER2D_CHANNELS_BGRA, 8);
+    river2D_loadImage("assets/background.qoi", &engine->planes[MAPEDIT_PLANE_BACKGROUND], RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_BACKGROUND].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load background image!\033[0m\n");
     }
 
-    river2D_loadImage("assets/cursor_default.qoi", &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT], RIVER2D_CHANNELS_RGBA, 8);
+    river2D_loadImage("assets/cursor_default.qoi", &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT], RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load default cursor!\033[0m\n");
     }
-    river2D_loadImage("assets/cursor_hover.qoi", &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER],   RIVER2D_CHANNELS_RGBA, 8);
+    river2D_loadImage("assets/cursor_hover.qoi", &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER], RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_CURSOR_HOVER].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load hover cursor!\033[0m\n");
