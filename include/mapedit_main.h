@@ -127,23 +127,24 @@ Tile;
 
 typedef struct EditorData
 {
-    uint8_t    current_state;
-    uint8_t    previous_state;
-    uint8_t    tilesize;
-    uint8_t    currentLayer;
-    uint8_t    layers;
-    uint8_t    selectedX;
-    uint8_t    selectedY;
-    uint32_t   map_width;
-    uint32_t   map_height;
-    uint64_t   editorflags;
-    Rect       button_new;
-    Rect       button_load;
-    Rect       button_save;
-    Rect       button_quit;
-    Rect       button_tilepicker_close;
-    Tile       *tiles;
-    const char *projectName;
+    River2D_Time lastPresentTime;
+    uint8_t      current_state;
+    uint8_t      previous_state;
+    uint8_t      tilesize;
+    uint8_t      currentLayer;
+    uint8_t      layers;
+    uint8_t      selectedX;
+    uint8_t      selectedY;
+    uint32_t     map_width;
+    uint32_t     map_height;
+    uint64_t     editorflags;
+    Rect         button_new;
+    Rect         button_load;
+    Rect         button_save;
+    Rect         button_quit;
+    Rect         button_tilepicker_close;
+    Tile         *tiles;
+    const char   *projectName;
 }
 EditorData;
 
