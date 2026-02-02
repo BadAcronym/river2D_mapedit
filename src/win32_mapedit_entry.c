@@ -118,7 +118,6 @@ LRESULT CALLBACK win32WindowCallback
             if(LOWORD(lParam) == HTCLIENT)
             {
                 global_engine->currentCursor = 0;
-                river2D_changeCursor(global_engine, &global_engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
                 return 1;
             }
         }
