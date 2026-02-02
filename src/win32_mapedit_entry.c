@@ -209,6 +209,8 @@ int CALLBACK WinMain
 
     // TODO: figure out the mapping window msgs
 
+    // TODO: try to abstract this into river2D_openwindow without passing instance and shi, just what's already declared in the header
+
     WNDCLASSA wc     = {0};
     LPCSTR className = "IslescapeClass";
 
