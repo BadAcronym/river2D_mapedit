@@ -379,8 +379,9 @@ internal void checkEditorButtons
         return;
     }
 
-    // TODO: allow switching between layers and layering tiles... at least like 4 layers lol
     // TODO: display the current layer (maybe lil UI to the left).
+
+    // BACKLOG: isolate view to a selected layer
 
     for(uint32_t z = 0; z < editor->layers; ++z)
     {
@@ -422,16 +423,7 @@ internal void checkEditorButtons
                            tileY * editor->tilesize,
                            editor->selectedX * editor->tilesize,
                            editor->selectedY * editor->tilesize,
-                           editor->tilesize, editor->tilesize);
-
-    // WIP: set layer
-    // for(uint8_t i = 0; i < editor->layers; ++i)
-    // {
-    //     if(engine->controls.keymap & (MAPEDIT_BIT_LAYER0 >> i))
-    //     {
-    //         editor->currentLayer = i;
-    //     }
-    // }
+                           editor->tilesize,   editor->tilesize);
 
     if(engine->controls.keymap & MAPEDIT_BIT_LAYER0)
     {
