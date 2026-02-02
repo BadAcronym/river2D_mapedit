@@ -1,0 +1,25 @@
+if(Test-Path "./vendor/river2D/clean.ps1")
+{
+    Push-Location "./vendor/river2D"
+    &./clean.ps1
+    Pop-Location
+}
+
+$toDelete =
+    "./build/",
+    "./bin/",
+    "./obj/",
+    "./log/",
+    "./compile_commands.json"
+
+Write-Host "cleaning the build..."
+
+foreach($folder in $toDelete)
+{
+    if(Test-Path $folder)
+    {
+        Remove-Item $folder -Recurse -Force
+    }
+}
+
+Write-Host "all clean!" -ForegroundColor Green

@@ -24,7 +24,7 @@ function Get-CompiledEngine()
     if(Test-Path ".\vendor\river2D\run.ps1")
     {
         pushd ".\vendor\river2D\"
-        .\run.ps1 $build --compile-only
+        .\run.ps1 $build
         if(0 -ne $LASTEXITCODE)
         {
             exit -1
@@ -79,10 +79,13 @@ else
 if(0 -ne $LASTEXITCODE)
 {
     Write-Host "\033[31m\nERROR: failed to compile.\n\033[0m"
+    popd
     exit -1
 }
 
-Write-Host "\n"
+Write-Host "`n"
+
+popd
 
 if($compile_only)
 {
@@ -91,7 +94,7 @@ if($compile_only)
 
 popd
 
-if(0 -eq $LASTEXITCODE -and -not $compile_only)
+if(0 -eq $LASTEXITCODE)
 {
     $target = ".\bin\$build\mapedit.exe"
     Write-Host "`nrunning $target..."
