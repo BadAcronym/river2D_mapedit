@@ -62,15 +62,16 @@ void mapedit_update
                            engine->planes[MAPEDIT_PLANE_HUD0].height);
 
     //move this thang to somewhere more elegant at some point.
-    Area quitButtonArea = {0};
-    quitButtonArea.upperLeft.x  = 0.47f;
-    quitButtonArea.upperLeft.y  = 0.56f;
-    quitButtonArea.lowerLeft.x  = 0.47f;
-    quitButtonArea.lowerLeft.y  = 0.59f;
-    quitButtonArea.upperRight.x = 0.52f;
-    quitButtonArea.upperRight.y = 0.56f;
-    quitButtonArea.lowerRight.x = 0.52f;
-    quitButtonArea.lowerRight.y = 0.59f;
+    Area        quitButtonArea = {0};
+    Coordinates upperLeft      = {0};
+    Coordinates lowerRight     = {0};
+
+    upperLeft.x  = 0.47f;
+    upperLeft.y  = 0.56f;
+    lowerRight.x = 0.52f;
+    lowerRight.y = 0.59f;
+
+    river2D_completeRect(&quitButtonArea, &upperLeft, &lowerRight);
 
     if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
     {
