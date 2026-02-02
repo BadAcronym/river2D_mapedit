@@ -109,6 +109,7 @@ void mapedit_init
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE], "CLOSE", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_tilepicker_close, river2D_loadText);
 
     // HACK: load upfront for now
+    // TODO: load all .qoi files from folder, then append to one big tilesheet in memory
     river2D_loadImage("assets/tiles/tilesheet.qoi", &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_CHANNELS_BGRA, 8);
 
     // TODO: allow changing tilesize dynamically (but it's intentional, 1-tilesize-per-project type deal)
@@ -127,8 +128,8 @@ void mapedit_init
     editor->tiles = malloc(tilecount * sizeof(Tile));
     for(uint32_t i = 0; i < tilecount; ++i)
     {
-        editor->tiles[i].x = UINT32_MAX;
-        editor->tiles[i].y = UINT32_MAX;
+        editor->tiles[i].x = UINT16_MAX;
+        editor->tiles[i].y = UINT16_MAX;
     }
 
     if(!editor->projectName)
@@ -231,8 +232,8 @@ internal void checkMainMenuButtons
                 uint64_t tilecount = editor->layers * editor->map_height * editor->map_width;
                 for(uint32_t i = 0; i < tilecount; ++i)
                 {
-                    editor->tiles[i].x = UINT32_MAX;
-                    editor->tiles[i].y = UINT32_MAX;
+                    editor->tiles[i].x = UINT16_MAX;
+                    editor->tiles[i].y = UINT16_MAX;
                 }
             }
 
@@ -303,7 +304,7 @@ internal void drawEditor
             for(uint32_t y = 0; y < editor->map_height; ++y)
             {
                 uint64_t index = z * editor->map_width * editor->map_height + y * editor->map_width + x;
-                if(editor->tiles[index].x != UINT32_MAX && editor->tiles[index].y != UINT32_MAX)
+                if(editor->tiles[index].x != UINT16_MAX && editor->tiles[index].y != UINT16_MAX)
                 {
                     river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_PICTOP_OVER,
                                            x * editor->tilesize,
