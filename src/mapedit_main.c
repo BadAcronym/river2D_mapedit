@@ -163,6 +163,17 @@ void mapedit_processKeys
     uint64_t           key,
     River2D_ControlMap *controls
 ){
+    if(key == controls->keycodes[MAPEDIT_KEY_ESCAPE])
+    {
+        if(isDown)
+        {
+            controls->keymap |= MAPEDIT_BIT_ESCAPE;
+        }
+        else
+        {
+            controls->keymap &= ~MAPEDIT_BIT_ESCAPE;
+        }
+    }
 }
 
 void mapedit_processButtons
