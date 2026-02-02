@@ -428,21 +428,12 @@ internal void checkEditorButtons
                            editor->selectedY * editor->tilesize,
                            editor->tilesize,   editor->tilesize);
 
-    if(engine->controls.keymap & MAPEDIT_BIT_LAYER0)
+    for(uint8_t i = 0; i < editor->layers; ++i)
     {
-        editor->currentLayer = 0;
-    }
-    else if(engine->controls.keymap & MAPEDIT_BIT_LAYER1)
-    {
-        editor->currentLayer = 1;
-    }
-    else if(engine->controls.keymap & MAPEDIT_BIT_LAYER2)
-    {
-        editor->currentLayer = 2;
-    }
-    else if(engine->controls.keymap & MAPEDIT_BIT_LAYER3)
-    {
-        editor->currentLayer = 3;
+        if(engine->controls.keymap & (MAPEDIT_BIT_LAYER0 << i))
+        {
+            editor->currentLayer = i;
+        }
     }
 
     if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
