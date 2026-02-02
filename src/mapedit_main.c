@@ -1,4 +1,5 @@
 #include "mapedit_main.h"
+
 #include <stdio.h>
 #include <inttypes.h>
 #include <stdlib.h>
@@ -6,9 +7,14 @@
 
 void mapedit_init
 (
-    void
+    EngineData *engine
 ){
-    return;
+    river2D_loadImage("assets/black.qoi", &engine->planes[0],
+                      RIVER2D_CHANNELS_BGRA, 8);
+    if(!engine->planes[0].data)
+    {
+        fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load background image!\033[0m\n");
+    }
 }
 
 void mapedit_update
@@ -21,7 +27,9 @@ void mapedit_update
                              uint8_t font, uint16_t charsize, uint32_t spacing,
                              uint32_t offsetY, uint32_t offsetX)
 ){
-    return;
+    river2D_compositeImage(engine, &engine->planes[0], RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
+                           engine->planes[0].width,
+                           engine->planes[0].height);
 }
 
 void mapedit_processControls

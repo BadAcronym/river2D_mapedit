@@ -2,7 +2,10 @@
 
 #include "river2D_main.h"
 
-extern void mapedit_init(void);
+extern void mapedit_init
+(
+    EngineData *engine
+);
 
 extern void mapedit_update
 (
