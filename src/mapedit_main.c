@@ -132,6 +132,14 @@ void mapedit_init
     }
 }
 
+int32_t mapedit_shutdown
+(
+    EditorData *editor
+){
+    free(editor->tiles);
+    return 0;
+}
+
 internal void changeState
 (
     EditorData *editor,
@@ -228,6 +236,7 @@ internal void checkMainMenuButtons
         if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
         {
             changeState(editor, MAPEDIT_STATE_LOAD);
+            engine->controls.keymap &= ~MAPEDIT_BIT_LEFTM;
         }
     }
     else if(river2D_insideRect(&engine->controls.pointer, &editor->button_quit))
@@ -483,7 +492,70 @@ internal void checkFilePickerButtons
         return;
     }
 
-    // JANKY: load whatever file is "*.rte" in the current directory for now
+    // TODO: later, this will be a filepicker screen with recent files, etc, (aseprite esc)
+
+    // JANKY: load whatever file is "*.rte" in the current directory for now, instead of a filepicker
+    const char *dirlist = river2D_listFiles(".");
+    if(!dirlist)
+    {
+        fprintf(stderr, "\n\033[31;1;7mERROR: failed to list directory!\033[0m\n");
+        changeState(editor, MAPEDIT_STATE_EDIT);
+        return;
+    }
+
+    char     *filename  = 0;
+    uint32_t fileOffset = 0;
+    for(uint32_t i = 0; dirlist[i] != '\0'; ++i)
+    {
+        if(dirlist[i] == ';')
+        {
+            fileOffset = i + 1;
+            continue;
+        }
+
+        if(dirlist[i] == '\0' || dirlist[i + 1] == '\0' || dirlist[i + 2] == '\0' || dirlist[i + 3] == '\0')
+        {
+            break;
+        }
+
+        if(dirlist[i] == 'r' && dirlist[i + 1] == 't' && dirlist[i + 2] == 'e')
+        {
+            filename = (char*)malloc(255);
+
+            uint8_t j = 0;
+            for(; j < 255 && dirlist[fileOffset + j] != ';'; ++j)
+            {
+                filename[j] = dirlist[fileOffset + j];
+            }
+            filename[j] = '\0';
+
+            break;
+        }
+    }
+
+    FILE *file = fopen(filename, "rb");
+    if(!file)
+    {
+        fprintf(stderr, "\033[31;1;7mERROR: could not open file: %s.\033[0m\n", filename);
+        changeState(editor, MAPEDIT_STATE_EDIT);
+        return;
+    }
+
+    uint64_t tilecount = editor->layers * editor->map_width * editor->map_height;
+    int byte;
+    for(uint32_t i = 0; i < tilecount * 4 && ((byte = fgetc(file)) != EOF); ++i)
+    {
+        ((uint8_t*)editor->tiles)[i] = byte;
+    }
+
+    fclose(file);
+    free((void*)dirlist);
+
+    if(filename)
+    {
+        free((void*)filename);
+    }
+    changeState(editor, MAPEDIT_STATE_EDIT);
 }
 
 // BACKLOG: let 'escape' from the main menu return to current state
