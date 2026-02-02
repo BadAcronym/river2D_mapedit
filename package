@@ -34,5 +34,6 @@ mkdir -p $dir/bin/release/
 cp ./vendor/river2D/bin/release/libriver2Dsoftware.so       $dir/vendor/river2D/bin/release/libriver2Dsoftware.so
 cp ./bin/release/mapedit                                    $dir/bin/release/mapedit
 cp ./.river2Dconf                                           $dir/.river2Dconf
-cp ./assets/*                                               $dir/assets/ # BACKLOG: create sample tilesheet so I can include assets/tiles/*
+cp ./assets/*                                               $dir/assets/
+cp ./assets/tiles/*                                         $dir/assets/tiles/
 cp ./mapedit                                                $dir/mapedit
