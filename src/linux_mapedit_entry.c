@@ -97,14 +97,10 @@ int main
     Atom WM_DELETE = XInternAtom(engine.display, "WM_DELETE_WINDOW", false);
     XSetWMProtocols(engine.display, engine.window, &WM_DELETE, 1);
 
-    bool mapped  = false;
-    bool resize  = false;
-    bool present = true;
+    bool mapped = false;
 
     uint32_t resizeWidth  = engine.backbuffer.width;
     uint32_t resizeHeight = engine.backbuffer.height;
-
-    River2D_Time lastResizeTime = {0};
 
     while(engine.running)
     {
@@ -146,21 +142,16 @@ int main
                     }
                     break;
                 }
-                case Expose:
-                {
-                    if(event.xexpose.count == 0)
-                    {
-                        present = true;
-                    }
-                    break;
-                }
                 case ConfigureNotify:
                 {
-                    lastResizeTime = river2D_queryTime();
                     resizeWidth    = event.xconfigure.width;
                     resizeHeight   = event.xconfigure.height;
 
-                    resize = true;
+                    if(resizeWidth != engine.config.window_width || resizeHeight != engine.config.window_height)
+                    {
+                        engine.config.window_width  = resizeWidth;
+                        engine.config.window_height = resizeHeight;
+                    }
                     break;
                 }
                 case UnmapNotify:
@@ -171,35 +162,15 @@ int main
                 case MapNotify:
                 {
                     mapped  = true;
-                    present = true;
                     break;
                 }
             }
         }
 
         mapedit_update(&engine, &editor, river2D_compositeImage);
-
-        if(resize)
-        {
-            River2D_Time now = river2D_queryTime();
-
-            if(
-                // (now.ns - lastResizeTime.ns > 20000000 || now.s - lastResizeTime.s > 0) &&
-                (resizeWidth != engine.config.window_width || resizeHeight != engine.config.window_height)
-            ){
-                engine.config.window_width  = resizeWidth;
-                engine.config.window_height = resizeHeight;
-
-                present = true;
-            }
-
-            resize = false;
-        }
-
-        if(mapped && present)
+        if(mapped)
         {
             river2D_bltBuffer(&engine);
-            // present = false;
         }
     }
 
