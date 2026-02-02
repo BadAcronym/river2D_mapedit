@@ -87,63 +87,72 @@ void mapedit_update
                            engine->planes[MAPEDIT_PLANE_BACKGROUND].width,
                            engine->planes[MAPEDIT_PLANE_BACKGROUND].height);
 
-    // TODO: (mapedit #4): handle application state transitions
-    //later moved to some conditional (if main menu or something.)
-    river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_MENU], RIVER2D_PICTOP_OVER,
-                           engine->backbuffer.width  / 2 - engine->planes[MAPEDIT_PLANE_MENU].width  / 2,
-                           engine->backbuffer.height / 2 - engine->planes[MAPEDIT_PLANE_MENU].height / 2,
-                           0, 0,
-                           engine->planes[MAPEDIT_PLANE_MENU].width,
-                           engine->planes[MAPEDIT_PLANE_MENU].height);
-
-    if(river2D_insideRect(&engine->controls.pointer, &editor->button_new))
+    if(editor->state == MAPEDIT_STATE_MENU)
     {
-        river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_MENU], RIVER2D_PICTOP_OVER,
+                               engine->backbuffer.width  / 2 - engine->planes[MAPEDIT_PLANE_MENU].width  / 2,
+                               engine->backbuffer.height / 2 - engine->planes[MAPEDIT_PLANE_MENU].height / 2,
+                               0, 0,
+                               engine->planes[MAPEDIT_PLANE_MENU].width,
+                               engine->planes[MAPEDIT_PLANE_MENU].height);
 
-        // TODO: (mapedit #2): handle new project button
-        // TODO: (mapedit #4): handle application state transitions
-
-        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
-                               editor->button_new.upperLeft.x * engine->backbuffer.width,
-                               editor->button_new.upperLeft.y * engine->backbuffer.height + 25,
-                               0, 0, 196, 5);
-    }
-    else if(river2D_insideRect(&engine->controls.pointer, &editor->button_load))
-    {
-        river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
-
-        // TODO: (mapedit #2): handle load project button
-        // TODO: (mapedit #4): handle application state transitions
-
-        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
-                               editor->button_load.upperLeft.x * engine->backbuffer.width,
-                               editor->button_load.upperLeft.y * engine->backbuffer.height + 25,
-                               0, 0, 210, 5);
-    }
-    else if(river2D_insideRect(&engine->controls.pointer, &editor->button_quit))
-    {
-        river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
-
-        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
-                               editor->button_quit.upperLeft.x * engine->backbuffer.width,
-                               editor->button_quit.upperLeft.y * engine->backbuffer.height + 25,
-                               0, 0, 72, 5);
-
-        if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+        if(river2D_insideRect(&engine->controls.pointer, &editor->button_new))
         {
-            engine->running = false;
+            river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+
+            // TODO: (mapedit #2): handle new project button
+
+            river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
+                                   editor->button_new.upperLeft.x * engine->backbuffer.width,
+                                   editor->button_new.upperLeft.y * engine->backbuffer.height + 25,
+                                   0, 0, 196, 5);
+
+            if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+            {
+                editor->state = MAPEDIT_STATE_EDIT;
+            }
         }
-    }
-    else
-    {
-        river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
-
-        //TESTING: getting info on buttons
-        if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+        else if(river2D_insideRect(&engine->controls.pointer, &editor->button_load))
         {
-            fprintf(stderr, "mouse clicked @:\n");
-            fprintf(stderr, "x: %f\n", engine->controls.pointer.x);
-            fprintf(stderr, "y: %f\n", engine->controls.pointer.y);
+            river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+
+            // TODO: (mapedit #2): handle load project button
+
+            river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
+                                   editor->button_load.upperLeft.x * engine->backbuffer.width,
+                                   editor->button_load.upperLeft.y * engine->backbuffer.height + 25,
+                                   0, 0, 210, 5);
+
+            if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+            {
+                editor->state = MAPEDIT_STATE_LOAD;
+            }
+        }
+        else if(river2D_insideRect(&engine->controls.pointer, &editor->button_quit))
+        {
+            river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+
+            river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
+                                   editor->button_quit.upperLeft.x * engine->backbuffer.width,
+                                   editor->button_quit.upperLeft.y * engine->backbuffer.height + 25,
+                                   0, 0, 72, 5);
+
+            if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+            {
+                engine->running = false;
+            }
+        }
+        else
+        {
+            river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
+
+            //TESTING: getting info on buttons
+            if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+            {
+                fprintf(stderr, "mouse clicked @:\n");
+                fprintf(stderr, "x: %f\n", engine->controls.pointer.x);
+                fprintf(stderr, "y: %f\n", engine->controls.pointer.y);
+            }
         }
     }
 }

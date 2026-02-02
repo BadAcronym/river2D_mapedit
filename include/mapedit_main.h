@@ -20,11 +20,16 @@
 #define MAPEDIT_BIT_RIGHTM  2
 #define MAPEDIT_BIT_MIDDLEM 4
 
+#define MAPEDIT_STATE_MENU  0
+#define MAPEDIT_STATE_EDIT  1
+#define MAPEDIT_STATE_LOAD  2
+
 typedef struct EditorData
 {
-    Rect button_new;
-    Rect button_load;
-    Rect button_quit;
+    Rect    button_new;
+    Rect    button_load;
+    Rect    button_quit;
+    uint8_t state;
 }
 EditorData;
 
