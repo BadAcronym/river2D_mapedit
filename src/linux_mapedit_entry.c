@@ -85,6 +85,7 @@ int main
                 case MotionNotify:
                 {
                     mapedit_processPointer(&engine, event.xmotion.x, event.xmotion.y);
+                    break;
                 }
                 case ClientMessage:
                 {
