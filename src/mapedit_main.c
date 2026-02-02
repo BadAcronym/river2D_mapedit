@@ -71,10 +71,10 @@ void mapedit_init
     total_width  = 13 * charsize;
     total_height = charsize + 10;
 
-    engine->planes[MAPEDIT_PLANE_SELECTSHEET].width  = total_width;
-    engine->planes[MAPEDIT_PLANE_SELECTSHEET].height = total_height;
-    engine->planes[MAPEDIT_PLANE_SELECTSHEET].data   = calloc(total_width * total_height * RIVER2D_BPP, 1);
-    river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_SELECTSHEET], "SELECT SHEET",  MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
+    engine->planes[MAPEDIT_PLANE_SELECTTILE].width  = total_width;
+    engine->planes[MAPEDIT_PLANE_SELECTTILE].height = total_height;
+    engine->planes[MAPEDIT_PLANE_SELECTTILE].data   = calloc(total_width * total_height * RIVER2D_BPP, 1);
+    river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE], "SELECT TILE",  MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
 
     charsize     = 16;
     total_width  = 6 * charsize;
@@ -261,12 +261,12 @@ internal void checkEditorButtons
                                engine->backbuffer.width  / 1.25f,
                                engine->backbuffer.height / 1.25f);
 
-        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_SELECTSHEET], RIVER2D_PICTOP_OVER,
-                               engine->backbuffer.width  / 2 - engine->planes[MAPEDIT_PLANE_SELECTSHEET].width  / 2,
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE], RIVER2D_PICTOP_OVER,
+                               engine->backbuffer.width  / 2 - engine->planes[MAPEDIT_PLANE_SELECTTILE].width  / 2,
                                engine->backbuffer.height / 9,
                                0, 0,
-                               engine->planes[MAPEDIT_PLANE_SELECTSHEET].width,
-                               engine->planes[MAPEDIT_PLANE_SELECTSHEET].height);
+                               engine->planes[MAPEDIT_PLANE_SELECTTILE].width,
+                               engine->planes[MAPEDIT_PLANE_SELECTTILE].height);
 
         river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_CLOSE], RIVER2D_PICTOP_OVER,
                                engine->backbuffer.width / 10 + 10,
@@ -320,7 +320,7 @@ internal void checkEditorButtons
 
             if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
             {
-                // TODO: compute which tile was selected and keep it safe somewhere!
+                // TODO: compute which tile was selected and from which tilesheet... or fuse all tilesheets together?
                 uint32_t tilesize = 32;
 
                 editor->editorflags &= ~MAPEDIT_FLAG_BIT_TILEPICKER;
