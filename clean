@@ -2,7 +2,7 @@
 
 if [[ -f ./vendor/river2D/clean ]]
 then
-    pushd ./vendor/river2D > /dev/null
+    pushd ./vendor/river2D/ > /dev/null
     ./clean
     popd > /dev/null
 fi
@@ -24,9 +24,9 @@ then
     rm ./build/ -rf
 fi
 
-if [[ -d ./packages/ ]]
-then
-    rm ./packages/ -rf
-fi
+for out in *.callgrind
+do
+    rm out
+done
 
 echo -e "\033[32mcleaned mapedit!\n\033[0m"
