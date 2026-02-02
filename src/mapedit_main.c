@@ -132,7 +132,7 @@ void mapedit_init
     editor->button_tilepicker_close.lowerRight.y = 0.89f;
 
     // WIP: load upfront for now
-    river2D_loadImage("assets/tiles/scenery.qoi", &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_CHANNELS_BGRA, 8);
+    river2D_loadImage("assets/tiles/tilesheet.qoi", &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_CHANNELS_BGRA, 8);
 
     editor->tilesize = 16;
     editor->layers   = 4;
