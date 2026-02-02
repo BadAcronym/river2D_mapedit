@@ -117,29 +117,23 @@ void mapedit_init
     engine->controls.keycodes[MAPEDIT_KEY_Y]          = river2D_interpretCharAsKey('y');
     engine->controls.keycodes[MAPEDIT_KEY_Z]          = river2D_interpretCharAsKey('z');
 
-    // JANKY: I'm loading text by creating a button, then overwriting it. maybe allow for float-centric text loading in the future?
+    // JANKY: I'm loading text by creating a button, then overwriting it.
+    // maybe allow for float-centric text loading in the future?
     Coordinates point = { .x = 0.5f, .y = 0.2f };
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU], "RIVER2D MAP EDITOR",  MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_new, river2D_loadText);
-    point.y = 0.4f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU], "NEW PROJECT",  MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_new, river2D_loadText);
-    point.y = 0.5f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU], "LOAD PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_load, river2D_loadText);
-    point.y = 0.8f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU], "QUIT", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_quit, river2D_loadText);
-
-    point.x = 0.5f;
-    point.y = 0.2f;
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],  "RIVER2D MAP EDITOR",  MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_new, river2D_loadText);
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], "RIVER2D MAP EDITOR",  MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_new, river2D_loadText);
     point.y = 0.4f;
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],  "NEW PROJECT",  MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_new, river2D_loadText);
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], "NEW PROJECT",  MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_new, river2D_loadText);
     point.y = 0.5f;
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],  "LOAD PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_load, river2D_loadText);
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], "LOAD PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_load, river2D_loadText);
     point.y = 0.6f;
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], "SAVE PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_save, river2D_loadText);
     point.y = 0.8f;
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],  "QUIT", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_quit, river2D_loadText);
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], "QUIT", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_quit, river2D_loadText);
 
-    // TODO: parametrize the rest of the buttons & text
     point.x = 0.5f;
     point.y = 0.14f;
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE], "SELECT TILE", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_tilepicker_close, river2D_loadText);
@@ -151,7 +145,7 @@ void mapedit_init
     // TODO: load all .qoi files from folder, then append to one big tilesheet in memory
     river2D_loadImage("assets/tiles/tilesheet.qoi", &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_CHANNELS_BGRA, 8);
 
-    // TODO: allow changing tilesize dynamically (but it's intentional, 1-tilesize-per-project type deal)
+    // TODO: allow changing tilesize dynamically (but there is a user-defined lower limit, say standard 8x8)
     editor->tilesize = 16;
 
     // allow 10 layers by default, any other layer you'd have to add to the UI selector
@@ -163,7 +157,7 @@ void mapedit_init
 
     uint64_t tilecount = editor->layers * editor->map_width * editor->map_height;
 
-    // TODO: make sure to resize this image when needed (when canvas dims or tilesize changes)
+    // TODO: make sure to resize this image when needed (when canvas dims or tilesize change)
     editor->tiles = malloc(tilecount * sizeof(Tile));
     for(uint32_t i = 0; i < tilecount; ++i)
     {
@@ -203,8 +197,6 @@ internal void changeState
 }
 
 // NOTE: need to validate string length of whatever user sets projectName to
-// TODO: some user indication (notification) that the project has been saved
-// create mapedit_notify type deal, input amount of ms that it'd stay on screen and where (float center), etc
 internal void saveCurrentProject
 (
     EditorData *editor
@@ -216,13 +208,21 @@ internal void saveCurrentProject
     if(!file)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: could not open file for saving: %s.\033[0m\n", editor->projectName);
+        free(filename);
+        return;
     }
 
     // BACKLOG: more sophisticated binary format, with RLE, at least, so sizes aren't as bloated
 
     uint64_t tilecount = editor->layers * editor->map_height * editor->map_width;
-    fwrite(editor->tiles, sizeof(editor->tiles), tilecount, file);
+    fwrite(editor->tiles, sizeof(Tile), tilecount, file);
     fclose(file);
+
+    // TODO: some user indication (notification) that the project has been saved
+    // create mapedit_notify type deal, input amount of ms that it'd stay on screen and where (float center), etc
+
+    free(filename);
+    fprintf(stdout, "Project saved successfully.\n");
 }
 
 // CURRENT: add "save project" UI button in the menu, but only if a project is actually loaded
@@ -333,11 +333,19 @@ internal void checkMainMenuButtons
     }
     else if(editor->previous_state && river2D_insideRect(&engine->controls.pointer, &editor->button_save))
     {
+        river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+
         double length = editor->button_save.lowerRight.x - editor->button_save.upperLeft.x;
         river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
                                (uint32_t)(editor->button_save.upperLeft.x * engine->backbuffer.width),
                                (uint32_t)(editor->button_save.upperLeft.y * engine->backbuffer.height + 20),
                                0, 0, length * engine->backbuffer.width, 5);
+
+        if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+        {
+            saveCurrentProject(editor);
+            engine->controls.keymap &= ~MAPEDIT_BIT_LEFTM;
+        }
     }
     else
     {
@@ -406,8 +414,6 @@ internal void checkEditorButtons
     {
         saveCurrentProject(editor);
         engine->controls.keymap &= ~MAPEDIT_BIT_SAVE;
-
-        fprintf(stdout, "Project saved successfully.\n");
     }
 
     // TODO: (mapedit #6): make backbuffer moveable,
