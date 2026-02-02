@@ -22,6 +22,9 @@ int main
 (
     void
 ){
+    // TODO: get rid of this function pointer loading nonsense, just pass the libpath and wanted renderer :p
+    // think about where this would go, Engine or app side function pointer struct.
+
     char *error = 0;
     void *software = dlopen(LIBPATH "libriver2Dsoftware.so", RTLD_NOW);
     if(!software)
@@ -31,6 +34,7 @@ int main
         fprintf(stderr, "\033[0m\n");
         return -1;
     }
+
     void (*river2D_init)(EngineData *engine, River2D_Image *planes);
     *(void**)&river2D_init = dlsym(software, "river2D_init");
     if((error = dlerror()))
