@@ -24,7 +24,7 @@ then
     rm ./build/ -rf
 fi
 
-for out in *.callgrind
+for out in callgrind.*
 do
     if [[ ! -f $out ]]
     then
