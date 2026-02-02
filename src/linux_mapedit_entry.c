@@ -122,22 +122,22 @@ int main
             {
                 case KeyPress:
                 {
-                    mapedit_processKeys(true, event.xkey.keycode, &engine.controls);
+                    mapedit_processKeys(&engine.controls, event.xkey.keycode, true);
                     break;
                 }
                 case KeyRelease:
                 {
-                    mapedit_processKeys(false, event.xkey.keycode, &engine.controls);
+                    mapedit_processKeys(&engine.controls, event.xkey.keycode, false);
                     break;
                 }
                 case ButtonPress:
                 {
-                    mapedit_processButtons(true, event.xbutton.button, &engine.controls);
+                    mapedit_processKeys(&engine.controls, event.xbutton.button, true);
                     break;
                 }
                 case ButtonRelease:
                 {
-                    mapedit_processButtons(false, event.xbutton.button, &engine.controls);
+                    mapedit_processKeys(&engine.controls, event.xbutton.button, false);
                     break;
                 }
                 case MotionNotify:

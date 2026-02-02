@@ -170,16 +170,9 @@ extern void mapedit_update
 
 extern void mapedit_processKeys
 (
-    bool               isDown,
+    River2D_ControlMap *controls,
     uint64_t           key,
-    River2D_ControlMap *controls
-);
-
-extern void mapedit_processButtons
-(
-    bool               isDown,
-    uint64_t           button,
-    River2D_ControlMap *controls
+    bool               isDown
 );
 
 extern void mapedit_processPointer

@@ -170,7 +170,7 @@ LRESULT CALLBACK win32WindowCallback
                 break;
             }
 
-            mapedit_processKeys(isKeyDown, wParam, &global_engine->controls);
+            mapedit_processKeys(&global_engine->controls, wParam, isKeyDown);
             break;
         }
         case WM_MOUSEMOVE:
@@ -180,32 +180,32 @@ LRESULT CALLBACK win32WindowCallback
         }
         case WM_LBUTTONDOWN:
         {
-            mapedit_processButtons(true, RIVER2D_MOUSE1, &global_engine->controls);
+            mapedit_processKeys(&global_engine->controls, RIVER2D_MOUSE1, true);
             break;
         }
         case WM_LBUTTONUP:
         {
-            mapedit_processButtons(false, RIVER2D_MOUSE1, &global_engine->controls);
+            mapedit_processKeys(&global_engine->controls, RIVER2D_MOUSE1, false);
             break;
         }
         case WM_RBUTTONDOWN:
         {
-            mapedit_processButtons(true, RIVER2D_MOUSE2, &global_engine->controls);
+            mapedit_processKeys(&global_engine->controls, RIVER2D_MOUSE2, true);
             break;
         }
         case WM_RBUTTONUP:
         {
-            mapedit_processButtons(false, RIVER2D_MOUSE2, &global_engine->controls);
+            mapedit_processKeys(&global_engine->controls, RIVER2D_MOUSE2, false);
             break;
         }
         case WM_MBUTTONDOWN:
         {
-            mapedit_processButtons(true, RIVER2D_MOUSE3, &global_engine->controls);
+            mapedit_processKeys(&global_engine->controls, RIVER2D_MOUSE3, true;
             break;
         }
         case WM_MBUTTONUP:
         {
-            mapedit_processButtons(false, RIVER2D_MOUSE3, &global_engine->controls);
+            mapedit_processKeys(&global_engine->controls, RIVER2D_MOUSE3, false);
             break;
         }
         default:
