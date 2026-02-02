@@ -171,6 +171,15 @@ LRESULT CALLBACK win32WindowCallback
     return 0;
 }
 
+#if defined(DEBUG) || defined(ASAN)
+int main
+(
+    void
+){
+    return WinMain(GetModuleHandleA(0), 0, GetCommandLineA(), 0);
+}
+#endif
+
 int CALLBACK WinMain
 (
     HINSTANCE instance,
@@ -250,12 +259,3 @@ int CALLBACK WinMain
 
     return river2D_shutdown(&engine);
 }
-
-#ifdef DEBUG
-int main
-(
-    void
-){
-    return WinMain(GetModuleHandleA(0), 0, GetCommandLineA(), 0);
-}
-#endif
