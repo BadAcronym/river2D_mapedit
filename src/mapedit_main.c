@@ -68,7 +68,7 @@ void mapedit_init
     engine->planes[MAPEDIT_PLANE_SELECTTILE].height = engine->backbuffer.height;
     engine->planes[MAPEDIT_PLANE_SELECTTILE].data   = calloc(engine->backbuffer.width * engine->backbuffer.height * RIVER2D_BPP, 1);
 
-    //transfer to mapedit_loadConfig at some point, when keybinds should be remappable
+    // BACKLOG: transfer to mapedit_loadConfig at some point, when keybinds should be remappable
     // TODO: add "save project" UI button in the menu, but only if a project is actually loaded
 
     // TODO: handle each letter as itself, for typing...
