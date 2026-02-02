@@ -116,8 +116,7 @@ int main
             River2D_Time delta = river2D_deltaTime(&editor.lastPresentTime);
             if(delta.s == 0 && delta.ns < 4000000)
             {
-                struct timespec duration = {0};
-                duration.tv_nsec = 4000000 - delta.ns;
+                struct timespec duration = {0, 4000000 - delta.ns};
                 nanosleep(&duration, NULL);
             }
 
