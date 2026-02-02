@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # BACKLOG: switch to CMake. it can natively export compile commands!
+# BACKLOG: add automatic release script
 
 if [[ ! -d "./obj/" ]]
 then
