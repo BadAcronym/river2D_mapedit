@@ -156,7 +156,7 @@ internal void changeState
 }
 
 // NOTE: need to validate string length of whatever user sets projectName to
-void saveCurrentProject
+internal void saveCurrentProject
 (
     EditorData *editor
 ){
@@ -367,8 +367,6 @@ internal void checkEditorButtons
 
         // TODO: river2D_appendImage (either by x or y) would be super handy to have in general
 
-        // TODO: river2D_listFiles would be a great place to start, no? return a ; separated string as paths
-
         // TODO: scrollwheel changes size, 2x2 smallest, 96x96 biggest? only limitation is the highlighting, lol
 
         if(river2D_insideRect(&engine->controls.pointer, &editor->button_tilepicker_close))
@@ -493,7 +491,6 @@ internal void checkFilePickerButtons
     }
 
     // TODO: later, this will be a filepicker screen with recent files, etc, (aseprite esc)
-
     // JANKY: load whatever file is "*.rte" in the current directory for now, instead of a filepicker
     const char *dirlist = river2D_listFiles(".");
     if(!dirlist)
