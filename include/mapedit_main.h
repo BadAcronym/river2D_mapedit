@@ -3,11 +3,21 @@
 #include "river2D_main.h"
 
 #define MAPEDIT_PLANE_BG0   0
+
 #define MAPEDIT_PLANE_FONT0 1
+
 #define MAPEDIT_PLANE_HUD0  2
 #define MAPEDIT_PLANE_HUD1  3
 #define MAPEDIT_PLANE_HUD2  4
 #define MAPEDIT_PLANE_HUD3  5
+
+#define MAPEDIT_KEY_LEFTM   0
+#define MAPEDIT_KEY_RIGHTM  1
+#define MAPEDIT_KEY_MIDDLEM 2
+
+#define MAPEDIT_BIT_LEFTM   1
+#define MAPEDIT_BIT_RIGHTM  2
+#define MAPEDIT_BIT_MIDDLEM 4
 
 extern void mapedit_init
 (
@@ -25,9 +35,23 @@ extern void mapedit_update
                                    uint32_t offsetSrcY, uint32_t cropWidth,  uint32_t cropHeight)
 );
 
-extern void mapedit_processControls
+extern void mapedit_processKeys
 (
     bool               isDown,
     uint64_t           key,
     River2D_ControlMap *controls
+);
+
+extern void mapedit_processButtons
+(
+    bool               isDown,
+    uint64_t           button,
+    River2D_ControlMap *controls
+);
+
+extern void mapedit_processPointer
+(
+    EngineData *engine,
+    uint32_t   x,
+    uint32_t   y
 );
