@@ -373,7 +373,6 @@ internal void checkMainMenuButtons
     }
     else
     {
-        // TODO: only call changeCursor on actual UI state change, not every update. (if win32 causes issues/lag)
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
 
         #ifdef DEBUG
