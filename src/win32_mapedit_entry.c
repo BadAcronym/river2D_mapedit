@@ -56,7 +56,7 @@ LRESULT CALLBACK win32WindowCallback
             PAINTSTRUCT paintStruct;
             global_engine->context = BeginPaint(window, &paintStruct);
 
-            global_engine->river2D_bltBuffer(global_engine);
+            global_engine->bltBuffer(global_engine);
 
             EndPaint(window, &paintStruct);
             ReleaseDC(global_engine->window, global_engine->context);
@@ -204,7 +204,7 @@ int CALLBACK WinMain
         engine.context = GetDC(engine.window);
         // if(mapped)
         // {
-            engine.river2D_bltBuffer(&engine);
+            engine.bltBuffer(&engine);
         // }
         ReleaseDC(engine.window, engine.context);
     }

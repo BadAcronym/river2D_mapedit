@@ -32,7 +32,7 @@ int main
     engine.config.choices |= RIVER2D_CHOICE_STATIC_CANVAS_BIT;
     engine.windowName = "River2D Map Editor";
 
-    engine.river2D_init(&engine, planes);
+    engine.init(&engine, planes);
     mapedit_init(&engine, &editor);
 
     Atom WM_DELETE = XInternAtom(engine.display, "WM_DELETE_WINDOW", false);
@@ -111,10 +111,10 @@ int main
         if(mapped)
         {
             mapedit_update(&engine, &editor);
-            engine.river2D_bltBuffer(&engine);
+            engine.bltBuffer(&engine);
         }
     }
 
-    engine.river2D_shutdown(&engine);
+    engine.shutdown(&engine);
     return mapedit_shutdown(&editor);
 }
