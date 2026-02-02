@@ -77,8 +77,7 @@ project("mapedit binary")
 
     filter({"platforms:Windows", "configurations:asan"})
         editandcontinue("Off")
-        debugformat("c7")
-        buildoptions({"/fsanitize=address"})
+        buildoptions({"/fsanitize=address", "/Zi", "/INCREMENTAL:NO"})
 
     filter({"platforms:Windows", "configurations:release"})
         kind("WindowedApp")
