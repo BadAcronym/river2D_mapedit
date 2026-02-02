@@ -13,3 +13,4 @@ compile_flags*
 river2D.ini
 PowerShellEditorServices.json
 *.rte
+callgrind.*
