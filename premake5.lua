@@ -17,8 +17,13 @@ project("mapedit binary")
     includedirs({"./include/", "/usr/include/", "./vendor/river2D/include/"})
     debugdir("./")
 
-    filter("configurations:debug or asan")
+    filter("configurations:asan")
+        defines{"ASAN"}
+
+    filter("configurations:debug")
         defines{"DEBUG"}
+
+    filter("configurations:debug or asan")
         runtime("debug")
         symbols("On")
         optimize("Off")
