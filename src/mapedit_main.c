@@ -128,8 +128,10 @@ void mapedit_init
 
     if(!editor->projectName)
     {
-        editor->projectName = "unnamed";
+        editor->projectName = "unnamed_project";
     }
+
+    editor->current_state = MAPEDIT_STATE_MENU;
 }
 
 int32_t mapedit_shutdown
@@ -219,6 +221,16 @@ internal void checkMainMenuButtons
 
         if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
         {
+            if(editor->previous_state != MAPEDIT_STATE_NULL && editor->tiles)
+            {
+                uint64_t tilecount = editor->layers * editor->map_height * editor->map_width;
+                for(uint32_t i = 0; i < tilecount; ++i)
+                {
+                    editor->tiles[i].x = UINT32_MAX;
+                    editor->tiles[i].y = UINT32_MAX;
+                }
+            }
+
             changeState(editor, MAPEDIT_STATE_EDIT);
             engine->controls.keymap &= ~MAPEDIT_BIT_LEFTM;
         }
