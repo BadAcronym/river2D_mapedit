@@ -1,3 +1,6 @@
 [submodule "vendor/river2D"]
 	path = vendor/river2D
 	url = git@github.com:FlyMandi/river2D
+[submodule "vendor/premake-ecc"]
+	path = vendor/premake-ecc
+	url = git@github.com:mattbystrin/premake-ecc
