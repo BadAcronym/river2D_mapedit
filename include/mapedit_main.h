@@ -89,6 +89,11 @@ extern void mapedit_init
                              uint32_t offsetX, uint32_t offsetY)
 );
 
+int32_t mapedit_shutdown
+(
+    EditorData *editor
+);
+
 extern void mapedit_update
 (
     EngineData *engine,

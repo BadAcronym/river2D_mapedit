@@ -12,10 +12,14 @@
 #include <dlfcn.h>
 #include <stdio.h>
 
-#ifdef DEBUG
-    #define LIBPATH "./vendor/river2D/bin/debug/"
+#ifdef ASAN
+        #define LIBPATH "./vendor/river2D/bin/asan/"
 #else
-    #define LIBPATH "./vendor/river2D/bin/release/"
+    #ifdef DEBUG
+        #define LIBPATH "./vendor/river2D/bin/debug/"
+    #else
+        #define LIBPATH "./vendor/river2D/bin/release/"
+    #endif
 #endif
 
 int main
@@ -179,5 +183,6 @@ int main
         }
     }
 
-    return river2D_shutdown(&engine);
+    river2D_shutdown(&engine);
+    return mapedit_shutdown(&editor);
 }
