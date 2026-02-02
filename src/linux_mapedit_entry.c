@@ -93,12 +93,10 @@ int main
     river2D_init(&engine, planes);
     mapedit_init(&engine, river2D_loadText);
 
-    bool running = true;
-
     Atom WM_DELETE = XInternAtom(engine.display, "WM_DELETE_WINDOW", false);
     XSetWMProtocols(engine.display, engine.window, &WM_DELETE, 1);
 
-    while(running)
+    while(engine.running)
     {
         while(XPending(engine.display) > 0)
         {
@@ -134,7 +132,7 @@ int main
                 {
                     if(event.xclient.data.l[0] == (long)WM_DELETE)
                     {
-                        running = false;
+                        engine.running = false;
                     }
                     break;
                 }
