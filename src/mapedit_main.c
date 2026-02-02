@@ -66,25 +66,33 @@ void mapedit_init
     engine->planes[MAPEDIT_PLANE_SELECTTILE].data   = calloc(engine->backbuffer.width * engine->backbuffer.height * RIVER2D_BPP, 1);
 
     //transfer to mapedit_loadConfig at some point, when keybinds should be remappable
+    // TODO: add "save project" UI button in the menu, but only if a project is actually loaded
     engine->controls.keycodes[MAPEDIT_KEY_LEFTM]      = RIVER2D_MOUSE1;
     engine->controls.keycodes[MAPEDIT_KEY_MIDDLEM]    = RIVER2D_MOUSE2;
     engine->controls.keycodes[MAPEDIT_KEY_RIGHTM]     = RIVER2D_MOUSE3;
     engine->controls.keycodes[MAPEDIT_KEY_ESCAPE]     = river2D_interpretCharAsKey(0x1b);
     engine->controls.keycodes[MAPEDIT_KEY_QUIT]       = river2D_interpretCharAsKey('q');
+    engine->controls.keycodes[MAPEDIT_KEY_SAVE]       = river2D_interpretCharAsKey('s');
     engine->controls.keycodes[MAPEDIT_KEY_TILEPICKER] = river2D_interpretCharAsKey('t');
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER0]     = river2D_interpretCharAsKey('1');
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER1]     = river2D_interpretCharAsKey('2');
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER2]     = river2D_interpretCharAsKey('3');
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER3]     = river2D_interpretCharAsKey('4');
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER0]     = river2D_interpretCharAsKey('0');
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER1]     = river2D_interpretCharAsKey('1');
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER2]     = river2D_interpretCharAsKey('2');
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER3]     = river2D_interpretCharAsKey('3');
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER4]     = river2D_interpretCharAsKey('4');
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER5]     = river2D_interpretCharAsKey('5');
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER6]     = river2D_interpretCharAsKey('6');
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER7]     = river2D_interpretCharAsKey('7');
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER8]     = river2D_interpretCharAsKey('8');
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER9]     = river2D_interpretCharAsKey('9');
 
     // JANKY: I'm loading text by creating a button, then overwriting it. maybe allow for float-centric text loading in the future?
-    Coordinates point = { .x = 0.5f, .y = 0.3f };
+    Coordinates point = { .x = 0.5f, .y = 0.2f };
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MENU], "RIVER2D MAP EDITOR",  MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_new, river2D_loadText);
-    point.y = 0.5f;
+    point.y = 0.4f;
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MENU], "NEW PROJECT",  MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_new, river2D_loadText);
-    point.y = 0.6f;
+    point.y = 0.5f;
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MENU], "LOAD PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_load, river2D_loadText);
-    point.y = 0.75f;
+    point.y = 0.7f;
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MENU], "QUIT", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_quit, river2D_loadText);
 
     // TODO: parametrize the rest of the buttons & text
@@ -98,8 +106,12 @@ void mapedit_init
     // HACK: load upfront for now
     river2D_loadImage("assets/tiles/tilesheet.qoi", &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_CHANNELS_BGRA, 8);
 
+    // TODO: allow changing tilesize dynamically (but it's intentional, 1-tilesize-per-project type deal)
     editor->tilesize = 16;
-    editor->layers   = 4;
+
+    // allow 10 layers by default, any other layer you'd have to add to the UI selector
+    editor->layers       = 10;
+    editor->currentLayer = 1;
 
     editor->map_width  = engine->config.canvas_width  / editor->tilesize;
     editor->map_height = engine->config.canvas_height / editor->tilesize;
@@ -113,6 +125,21 @@ void mapedit_init
         editor->tiles[i].x = UINT32_MAX;
         editor->tiles[i].y = UINT32_MAX;
     }
+}
+
+internal void changeState
+(
+    EditorData *editor,
+    uint8_t    nextState
+){
+    if(editor->current_state == nextState)
+    {
+        fprintf(stderr, "\n\033[33;1;7mWARNING: trying to change state to the same state.\033[0m\n");
+        return;
+    }
+
+    editor->previous_state = editor->current_state;
+    editor->current_state  = nextState;
 }
 
 internal void drawMainMenu
@@ -158,15 +185,13 @@ internal void checkMainMenuButtons
 
         if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
         {
-            editor->state = MAPEDIT_STATE_EDIT;
+            changeState(editor, MAPEDIT_STATE_EDIT);
             engine->controls.keymap &= ~MAPEDIT_BIT_LEFTM;
         }
     }
     else if(river2D_insideRect(&engine->controls.pointer, &editor->button_load))
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
-
-        // TODO: (mapedit #2): handle load project button
 
         double length = editor->button_load.lowerRight.x - editor->button_load.upperLeft.x;
         river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
@@ -176,7 +201,7 @@ internal void checkMainMenuButtons
 
         if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
         {
-            editor->state = MAPEDIT_STATE_LOAD;
+            changeState(editor, MAPEDIT_STATE_LOAD);
         }
     }
     else if(river2D_insideRect(&engine->controls.pointer, &editor->button_quit))
@@ -250,13 +275,10 @@ internal void checkEditorButtons
 ){
     if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
     {
-        editor->state = MAPEDIT_STATE_MENU;
+        changeState(editor, MAPEDIT_STATE_MENU);
         engine->controls.keymap &= ~MAPEDIT_BIT_ESCAPE;
         return;
     }
-
-    // TODO: (mapedit #6): highlight in gridsize where cursor is currently
-    // grid starts from top left of backbuffer
 
     // TODO: (mapedit #6): make backbuffer moveable,
     // move grid along with it (so it might be offset)
@@ -356,8 +378,6 @@ internal void checkEditorButtons
 
     // BACKLOG: allow isolating view to a selected layer
 
-    // TODO: display current picked tile as (or right next to) the cursor.
-
     // TODO: allow resizing the view to zoom in or out freely into the backbuffer.
 
     // TODO: allow resizing the backbuffer itself to be smaller or bigger.
@@ -369,7 +389,7 @@ internal void checkEditorButtons
     uint8_t tileX = (uint8_t)(engine->controls.pointer.x * engine->backbuffer.width  / editor->tilesize);
     uint8_t tileY = (uint8_t)(engine->controls.pointer.y * engine->backbuffer.height / editor->tilesize);
 
-    // TODO: display outline around the current selected tile?
+    // TODO: display outline around the current selected tile? pulsating, maybe
 
     river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_PICTOP_OVER,
                            tileX * editor->tilesize,
@@ -424,7 +444,7 @@ internal void checkFilePickerButtons
 ){
     if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
     {
-        editor->state = MAPEDIT_STATE_MENU;
+        changeState(editor, MAPEDIT_STATE_MENU);
         engine->controls.keymap &= ~MAPEDIT_BIT_ESCAPE;
         return;
     }
@@ -433,7 +453,7 @@ internal void checkFilePickerButtons
     // then after loading file, transition to editor state
 }
 
-// BACKLOG: let 'escape' from the main menu return to current state?
+// BACKLOG: let 'escape' from the main menu return to current state
 void mapedit_update
 (
     EngineData *engine,
@@ -442,17 +462,17 @@ void mapedit_update
                                    uint32_t offsetDstX, uint32_t offsetDstY,  uint32_t offsetSrcX,
                                    uint32_t offsetSrcY, uint32_t cropWidth,   uint32_t cropHeight)
 ){
-    if(editor->state == MAPEDIT_STATE_MENU)
+    if(editor->current_state == MAPEDIT_STATE_MENU)
     {
         drawMainMenu(engine, river2D_compositeImage);
         checkMainMenuButtons(engine, editor, river2D_compositeImage);
     }
-    else if(editor->state == MAPEDIT_STATE_EDIT)
+    else if(editor->current_state == MAPEDIT_STATE_EDIT)
     {
         drawEditor(engine, editor, river2D_compositeImage);
         checkEditorButtons(engine, editor, river2D_compositeImage);
     }
-    else if(editor->state == MAPEDIT_STATE_LOAD)
+    else if(editor->current_state == MAPEDIT_STATE_LOAD)
     {
         drawFilePicker(engine, river2D_compositeImage);
         checkFilePickerButtons(engine, editor, river2D_compositeImage);

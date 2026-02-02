@@ -21,11 +21,18 @@
 #define MAPEDIT_KEY_MIDDLEM    2
 #define MAPEDIT_KEY_ESCAPE     3
 #define MAPEDIT_KEY_QUIT       4
-#define MAPEDIT_KEY_TILEPICKER 5
-#define MAPEDIT_KEY_LAYER0     6
-#define MAPEDIT_KEY_LAYER1     7
-#define MAPEDIT_KEY_LAYER2     8
-#define MAPEDIT_KEY_LAYER3     9
+#define MAPEDIT_KEY_SAVE       5
+#define MAPEDIT_KEY_TILEPICKER 6
+#define MAPEDIT_KEY_LAYER0     7
+#define MAPEDIT_KEY_LAYER1     8
+#define MAPEDIT_KEY_LAYER2     9
+#define MAPEDIT_KEY_LAYER3     10
+#define MAPEDIT_KEY_LAYER4     11
+#define MAPEDIT_KEY_LAYER5     12
+#define MAPEDIT_KEY_LAYER6     13
+#define MAPEDIT_KEY_LAYER7     14
+#define MAPEDIT_KEY_LAYER8     15
+#define MAPEDIT_KEY_LAYER9     16
 
 #define MAPEDIT_BIT_LEFTM      1
 #define MAPEDIT_BIT_RIGHTM     2
@@ -53,7 +60,8 @@ Tile;
 
 typedef struct EditorData
 {
-    uint8_t  state;
+    uint8_t  current_state;
+    uint8_t  previous_state;
     uint8_t  tilesize;
     uint8_t  currentLayer;
     uint8_t  selectedX;
