@@ -223,7 +223,6 @@ internal void saveCurrentProject
     fprintf(stdout, "Project saved successfully.\n");
 }
 
-// CURRENT: add "save project" UI button in the menu, but only if a project is actually loaded
 internal void drawMainMenu
 (
     EngineData *engine,
