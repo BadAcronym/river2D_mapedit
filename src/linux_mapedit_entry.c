@@ -63,12 +63,12 @@ int main
                 }
                 case ButtonPress:
                 {
-                    mapedit_processKeys(&engine.controls, event.xbutton.button, true);
+                    mapedit_processButtons(&engine.controls, event.xbutton.button, true);
                     break;
                 }
                 case ButtonRelease:
                 {
-                    mapedit_processKeys(&engine.controls, event.xbutton.button, false);
+                    mapedit_processButtons(&engine.controls, event.xbutton.button, false);
                     break;
                 }
                 case MotionNotify:

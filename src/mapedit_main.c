@@ -62,9 +62,12 @@ void mapedit_init
     river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE], engine->backbuffer.width, engine->backbuffer.height);
 
     // BACKLOG: transfer to mapedit_loadConfig at some point, when keybinds should be remappable
-    engine->controls.keycodes[MAPEDIT_KEY_LEFTM]      = RIVER2D_MOUSE1;
-    engine->controls.keycodes[MAPEDIT_KEY_MIDDLEM]    = RIVER2D_MOUSE2;
-    engine->controls.keycodes[MAPEDIT_KEY_RIGHTM]     = RIVER2D_MOUSE3;
+    engine->controls.buttoncodes[MAPEDIT_BUTTON_LEFTM]      = RIVER2D_MOUSE1;
+    engine->controls.buttoncodes[MAPEDIT_BUTTON_MIDDLEM]    = RIVER2D_MOUSE2;
+    engine->controls.buttoncodes[MAPEDIT_BUTTON_RIGHTM]     = RIVER2D_MOUSE3;
+    engine->controls.buttoncodes[MAPEDIT_BUTTON_SCROLLUP]   = RIVER2D_MOUSE4;
+    engine->controls.buttoncodes[MAPEDIT_BUTTON_SCROLLDOWN] = RIVER2D_MOUSE5;
+
     engine->controls.keycodes[MAPEDIT_KEY_ESCAPE]     = river2D_interpretCharAsKey(0x1b);
     engine->controls.keycodes[MAPEDIT_KEY_QUIT]       = river2D_interpretCharAsKey('q');
     engine->controls.keycodes[MAPEDIT_KEY_SAVE]       = river2D_interpretCharAsKey('s');
@@ -148,8 +151,8 @@ void mapedit_init
     // BACKLOG: allow replacing this tilesheet by selecting one or multiple files with a file browser...
     river2D_loadImage(engine, "assets/tiles/tilesheet.qoi", &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_CHANNELS_BGRA, 8);
 
-    // TODO: allow selecting multiple tiles at once, setting one minimum tilesize per project (which actually saves the data)
-    editor->tilesize = 16;
+    // CURRENT: allow selecting multiple tiles at once, setting one minimum tilesize per project (which actually saves the data)
+    editor->tilesize = 8;
 
     // allow 10 layers by default, any other layer you'd have to add to the UI selector
     // PERF: start with 1 layer, only poll and draw that layer, until there's any data written to the other layers 🤔
@@ -174,8 +177,11 @@ void mapedit_init
         editor->projectName = "unnamed_project";
     }
 
-    editor->current_state   = MAPEDIT_STATE_MENU;
-    editor->lastPresentTime = river2D_queryTime();
+    River2D_Time now                = river2D_queryTime();
+    editor->lastPresentTime         = now;
+    engine->controls.lastScrollTime = now;
+
+    editor->current_state = MAPEDIT_STATE_MENU;
 }
 
 int32_t mapedit_shutdown
@@ -279,6 +285,8 @@ internal void checkMainMenuButtons
 ){
     if(engine->controls.keymap & MAPEDIT_BIT_QUIT)
     {
+        //TESTING:
+        fprintf(stderr, "keycode given: %hhu\n", engine->controls.keycodes[MAPEDIT_KEY_QUIT]);
         engine->running = false;
         engine->controls.keymap &= ~MAPEDIT_BIT_QUIT;
         return;
@@ -301,7 +309,7 @@ internal void checkMainMenuButtons
                                (uint32_t)(editor->button_new.upperLeft.y * engine->backbuffer.height + 20),
                                0, 0, length * engine->backbuffer.width, 5);
 
-        if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
             if(editor->previous_state != MAPEDIT_STATE_NULL && editor->tiles)
             {
@@ -314,7 +322,7 @@ internal void checkMainMenuButtons
             }
 
             changeState(editor, MAPEDIT_STATE_EDIT);
-            engine->controls.keymap &= ~MAPEDIT_BIT_LEFTM;
+            engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
         }
     }
     else if(river2D_insideRect(&engine->controls.pointer, &editor->button_load))
@@ -327,10 +335,10 @@ internal void checkMainMenuButtons
                                (uint32_t)(editor->button_load.upperLeft.y * engine->backbuffer.height + 20),
                                0, 0, length * engine->backbuffer.width, 5);
 
-        if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
             changeState(editor, MAPEDIT_STATE_LOAD);
-            engine->controls.keymap &= ~MAPEDIT_BIT_LEFTM;
+            engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
         }
     }
     else if(river2D_insideRect(&engine->controls.pointer, &editor->button_quit))
@@ -343,7 +351,7 @@ internal void checkMainMenuButtons
                                (uint32_t)(editor->button_quit.upperLeft.y * engine->backbuffer.height + 20),
                                0, 0, length * engine->backbuffer.width, 5);
 
-        if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
             engine->running = false;
         }
@@ -358,10 +366,10 @@ internal void checkMainMenuButtons
                                (uint32_t)(editor->button_save.upperLeft.y * engine->backbuffer.height + 20),
                                0, 0, length * engine->backbuffer.width, 5);
 
-        if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
             saveCurrentProject(editor);
-            engine->controls.keymap &= ~MAPEDIT_BIT_LEFTM;
+            engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
         }
     }
     else
@@ -369,10 +377,10 @@ internal void checkMainMenuButtons
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
 
         #ifdef DEBUG
-        if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
             fprintf(stderr, "clicked @ X: %f Y: %f\n", engine->controls.pointer.x, engine->controls.pointer.y);
-            engine->controls.keymap &= ~MAPEDIT_BIT_LEFTM;
+            engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
         }
         #endif
     }
@@ -487,10 +495,10 @@ internal void checkEditorButtons
                                    (uint32_t)(editor->button_tilepicker_close.upperLeft.y * engine->backbuffer.height + 20),
                                    0, 0, length * engine->backbuffer.width, 5);
 
-            if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+            if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
             {
                 editor->editorflags &= ~MAPEDIT_FLAG_BIT_TILEPICKER;
-                engine->controls.keymap &= ~MAPEDIT_BIT_LEFTM;
+                engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
             }
         }
         else if(river2D_insideRect(&engine->controls.pointer, &tilesheet))
@@ -502,17 +510,31 @@ internal void checkEditorButtons
             uint8_t tileX  = (uint8_t)(deltaX * engine->backbuffer.width  / editor->tilesize);
             uint8_t tileY  = (uint8_t)(deltaY * engine->backbuffer.height / editor->tilesize);
 
+            // CURRENT: allow not only selecting 1 tile
+
+            // WIP: DEBUG
+
+            if(engine->controls.buttonmap & MAPEDIT_BIT_SCROLLUP)
+            {
+                fprintf(stderr, "currently scrolling up\n");
+            }
+
+            if(engine->controls.buttonmap & MAPEDIT_BIT_SCROLLDOWN)
+            {
+                fprintf(stderr, "currently scrolling down\n");
+            }
+
             engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
                                    (uint32_t)(engine->backbuffer.width  * (tilesheet.upperLeft.x + 0.0055f) + tileX * editor->tilesize),
                                    (uint32_t)(engine->backbuffer.height * (tilesheet.upperLeft.y + 0.006f)  + tileY * editor->tilesize),
                                    0, 0, editor->tilesize, editor->tilesize);
 
-            if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+            if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
             {
                 editor->selectedX        = tileX;
                 editor->selectedY        = tileY;
                 editor->editorflags     &= ~MAPEDIT_FLAG_BIT_TILEPICKER;
-                engine->controls.keymap &= ~MAPEDIT_BIT_LEFTM;
+                engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
             }
         }
         else
@@ -564,7 +586,7 @@ internal void checkEditorButtons
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE]);
 
-        if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
             editor->tiles[editor->currentLayer * editor->map_width * editor->map_height + tileY * editor->map_width + tileX].x = editor->selectedX;
             editor->tiles[editor->currentLayer * editor->map_width * editor->map_height + tileY * editor->map_width + tileX].y = editor->selectedY;
@@ -692,6 +714,51 @@ void mapedit_update
     }
 }
 
+internal void processButton
+(
+    River2D_ControlMap *controls,
+    uint64_t           desired,
+    uint64_t           button,
+    uint64_t           bit,
+    bool               isDown
+){
+    // TODO: handle scroll seperately, because the polling is off currently
+
+    if(button == controls->buttoncodes[MAPEDIT_BUTTON_SCROLLUP] || button == controls->buttoncodes[MAPEDIT_BUTTON_SCROLLDOWN])
+    {
+        // fprintf(stderr, "currently trying to set scrolldown\n");
+        if(isDown)
+        {
+            controls->buttonmap |= bit;
+            controls->lastScrollTime = river2D_queryTime();
+        }
+        else
+        {
+            River2D_Time delta   = river2D_deltaTime(&controls->lastScrollTime);
+            double       deltaMS = (double)delta.s * 1e3f + (double)delta.ns / 1e6f;
+
+            if(deltaMS > 10.0f)
+            {
+                controls->buttonmap &= ~bit;
+            }
+        }
+
+        return;
+    }
+
+    if(button == controls->buttoncodes[desired])
+    {
+        if(isDown)
+        {
+            controls->buttonmap |= bit;
+        }
+        else
+        {
+            controls->buttonmap &= ~bit;
+        }
+    }
+}
+
 internal void processKey
 (
     River2D_ControlMap *controls,
@@ -713,15 +780,25 @@ internal void processKey
     }
 }
 
+void mapedit_processButtons
+(
+    River2D_ControlMap *controls,
+    uint64_t           button,
+    bool               isDown
+){
+    processButton(controls, MAPEDIT_BUTTON_LEFTM,      button, MAPEDIT_BIT_LEFTM,      isDown);
+    processButton(controls, MAPEDIT_BUTTON_MIDDLEM,    button, MAPEDIT_BIT_MIDDLEM,    isDown);
+    processButton(controls, MAPEDIT_BUTTON_RIGHTM,     button, MAPEDIT_BIT_RIGHTM,     isDown);
+    processButton(controls, MAPEDIT_BUTTON_SCROLLUP,   button, MAPEDIT_BIT_SCROLLUP,   isDown);
+    processButton(controls, MAPEDIT_BUTTON_SCROLLDOWN, button, MAPEDIT_BIT_SCROLLDOWN, isDown);
+}
+
 void mapedit_processKeys
 (
     River2D_ControlMap *controls,
     uint64_t           key,
     bool               isDown
 ){
-    processKey(controls, MAPEDIT_KEY_LEFTM,      key, MAPEDIT_BIT_LEFTM,      isDown);
-    processKey(controls, MAPEDIT_KEY_MIDDLEM,    key, MAPEDIT_BIT_MIDDLEM,    isDown);
-    processKey(controls, MAPEDIT_KEY_RIGHTM,     key, MAPEDIT_BIT_RIGHTM,     isDown);
     processKey(controls, MAPEDIT_KEY_ESCAPE,     key, MAPEDIT_BIT_ESCAPE,     isDown);
     processKey(controls, MAPEDIT_KEY_SHIFT,      key, MAPEDIT_BIT_SHIFT,      isDown);
     processKey(controls, MAPEDIT_KEY_SAVE,       key, MAPEDIT_BIT_SAVE,       isDown);
