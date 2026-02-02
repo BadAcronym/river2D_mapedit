@@ -3,15 +3,16 @@
 #include "river2D_main.h"
 
 #define MAPEDIT_PLANE_BACKGROUND     0
-#define MAPEDIT_PLANE_HIGHLIGHT      1
-#define MAPEDIT_PLANE_FONT16         2
-#define MAPEDIT_PLANE_MENU           3
-#define MAPEDIT_PLANE_HUD1           4
-#define MAPEDIT_PLANE_HUD2           5
-#define MAPEDIT_PLANE_HUD3           6
-#define MAPEDIT_PLANE_CURSOR_DEFAULT 7
-#define MAPEDIT_PLANE_CURSOR_HOVER   8
-#define MAPEDIT_PLANE_CURSOR_PLACE   9
+#define MAPEDIT_PLANE_VOID           1
+#define MAPEDIT_PLANE_HIGHLIGHT      2
+#define MAPEDIT_PLANE_FONT16         3
+#define MAPEDIT_PLANE_MENU           4
+#define MAPEDIT_PLANE_HUD1           5
+#define MAPEDIT_PLANE_HUD2           6
+#define MAPEDIT_PLANE_HUD3           7
+#define MAPEDIT_PLANE_CURSOR_DEFAULT 8
+#define MAPEDIT_PLANE_CURSOR_HOVER   9
+#define MAPEDIT_PLANE_CURSOR_PLACE   10
 
 #define MAPEDIT_KEY_LEFTM   0
 #define MAPEDIT_KEY_RIGHTM  1
