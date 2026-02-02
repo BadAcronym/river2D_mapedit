@@ -12,3 +12,4 @@ compile_commands*
 river2D.ini
 assets/tiles/*
 PowerShellEditorServices.json
+*.rte
