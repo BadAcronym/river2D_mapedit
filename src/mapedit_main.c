@@ -57,40 +57,21 @@ void mapedit_init
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load font image!\033[0m\n");
     }
 
-    // BACKLOG: move this garbo somewhere lol
+    engine->planes[MAPEDIT_PLANE_MENU].width  = engine->backbuffer.width;
+    engine->planes[MAPEDIT_PLANE_MENU].height = engine->backbuffer.height;
+    engine->planes[MAPEDIT_PLANE_MENU].data   = calloc(engine->backbuffer.width * engine->backbuffer.height * RIVER2D_BPP, 1);
 
-    uint32_t charsize     = 16;
-    uint32_t total_width  = 13 * charsize;
-    uint32_t total_height = 6  * (charsize + 10);
-
-    engine->planes[MAPEDIT_PLANE_MENU].width  = total_width;
-    engine->planes[MAPEDIT_PLANE_MENU].height = total_height;
-    engine->planes[MAPEDIT_PLANE_MENU].data   = calloc(total_width * total_height * RIVER2D_BPP, 1);
-    river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_MENU], " MAP EDITOR",  MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
-    river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_MENU], " NEW PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, 0, 50);
-    river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_MENU], "LOAD PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, 0, 74);
-    river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_MENU], "    QUIT",     MAPEDIT_PLANE_FONT16, 16, 1, 0, 126);
-
-    charsize     = 16;
-    total_width  = 13 * charsize;
-    total_height = charsize + 10;
-
-    engine->planes[MAPEDIT_PLANE_SELECTTILE].width  = total_width;
-    engine->planes[MAPEDIT_PLANE_SELECTTILE].height = total_height;
-    engine->planes[MAPEDIT_PLANE_SELECTTILE].data   = calloc(total_width * total_height * RIVER2D_BPP, 1);
+    engine->planes[MAPEDIT_PLANE_SELECTTILE].width  = engine->backbuffer.width;
+    engine->planes[MAPEDIT_PLANE_SELECTTILE].height = engine->backbuffer.height;
+    engine->planes[MAPEDIT_PLANE_SELECTTILE].data   = calloc(engine->backbuffer.width * engine->backbuffer.height * RIVER2D_BPP, 1);
     river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE], "SELECT TILE",  MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
 
-    charsize     = 16;
-    total_width  = 6 * charsize;
-    total_height = charsize + 10;
-
-    engine->planes[MAPEDIT_PLANE_CLOSE].width  = total_width;
-    engine->planes[MAPEDIT_PLANE_CLOSE].height = total_height;
-    engine->planes[MAPEDIT_PLANE_CLOSE].data   = calloc(total_width * total_height * RIVER2D_BPP, 1);
+    engine->planes[MAPEDIT_PLANE_CLOSE].width  = engine->backbuffer.width;
+    engine->planes[MAPEDIT_PLANE_CLOSE].height = engine->backbuffer.height;
+    engine->planes[MAPEDIT_PLANE_CLOSE].data   = calloc(engine->backbuffer.width * engine->backbuffer.height * RIVER2D_BPP, 1);
     river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_CLOSE], "CLOSE",  MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
 
     //transfer to mapedit_loadConfig at some point, when keybinds should be remappable
-    // FIXME: the mouse dodn't work like this on windows... obviously
     engine->controls.keycodes[MAPEDIT_KEY_LEFTM]      = RIVER2D_MOUSE1;
     engine->controls.keycodes[MAPEDIT_KEY_MIDDLEM]    = RIVER2D_MOUSE2;
     engine->controls.keycodes[MAPEDIT_KEY_RIGHTM]     = RIVER2D_MOUSE3;
@@ -102,36 +83,23 @@ void mapedit_init
     engine->controls.keycodes[MAPEDIT_KEY_LAYER2]     = river2D_interpretCharAsKey('3');
     engine->controls.keycodes[MAPEDIT_KEY_LAYER3]     = river2D_interpretCharAsKey('4');
 
-    // TODO: create function that takes a top left point, width/height and some text.
-    // + pass a button pointer where all info is written to.
-    // + pass an image, where the text that was given to the function is now.
-    // + pass the fontsize and the function should scale the size of the area correctly, so that it
-    // is backbuffer size agnostic. the only thing that should change is the (centered) passed coordinate
-    // of the desired button.
+    // JANKY: I'm loading text by creating a button, then overwriting it. maybe allow for float-centric text loading in the future?
+    Coordinates point = { .x = 0.5f, .y = 0.3f };
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MENU], "RIVER2D MAP EDITOR",  MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_new, river2D_loadText);
+    point.y = 0.5f;
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MENU], "NEW PROJECT",  MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_new, river2D_loadText);
+    point.y = 0.6f;
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MENU], "LOAD PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_load, river2D_loadText);
+    point.y = 0.75f;
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MENU], "QUIT", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_quit, river2D_loadText);
 
-    // FIXME: make canvas size agnostic
-
-    editor->button_new.upperLeft.x   = 0.36f;
-    editor->button_new.upperLeft.y   = 0.42;
-    editor->button_new.lowerRight.x  = 0.65f;
-    editor->button_new.lowerRight.y  = 0.46f;
-
-    editor->button_load.upperLeft.x  = 0.33f;
-    editor->button_load.upperLeft.y  = 0.49f;
-    editor->button_load.lowerRight.x = 0.64f;
-    editor->button_load.lowerRight.y = 0.53f;
-
-    editor->button_quit.upperLeft.x  = 0.44f;
-    editor->button_quit.upperLeft.y  = 0.63f;
-    editor->button_quit.lowerRight.x = 0.54f;
-    editor->button_quit.lowerRight.y = 0.67f;
-
+    // TODO: parametrize the rest of the buttons & text
     editor->button_tilepicker_close.upperLeft.x  = 0.1f;
     editor->button_tilepicker_close.upperLeft.y  = 0.84f;
     editor->button_tilepicker_close.lowerRight.x = 0.25f;
     editor->button_tilepicker_close.lowerRight.y = 0.89f;
 
-    // WIP: load upfront for now
+    // HACK: load upfront for now
     river2D_loadImage("assets/tiles/tilesheet.qoi", &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_CHANNELS_BGRA, 8);
 
     editor->tilesize = 16;
@@ -162,12 +130,16 @@ internal void drawMainMenu
                            engine->planes[MAPEDIT_PLANE_BACKGROUND].width,
                            engine->planes[MAPEDIT_PLANE_BACKGROUND].height);
 
-    river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_MENU], RIVER2D_PICTOP_OVER,
-                           engine->backbuffer.width  / 2 - engine->planes[MAPEDIT_PLANE_MENU].width  / 2,
-                           engine->backbuffer.height / 2 - engine->planes[MAPEDIT_PLANE_MENU].height / 2,
-                           0, 0,
+    river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_MENU], RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
                            engine->planes[MAPEDIT_PLANE_MENU].width,
                            engine->planes[MAPEDIT_PLANE_MENU].height);
+
+    // river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_MENU], RIVER2D_PICTOP_OVER,
+    //                        engine->backbuffer.width  / 2 - engine->planes[MAPEDIT_PLANE_MENU].width  / 2,
+    //                        engine->backbuffer.height / 2 - engine->planes[MAPEDIT_PLANE_MENU].height / 2,
+    //                        0, 0,
+    //                        engine->planes[MAPEDIT_PLANE_MENU].width,
+    //                        engine->planes[MAPEDIT_PLANE_MENU].height);
 }
 
 internal void checkMainMenuButtons
@@ -404,7 +376,7 @@ internal void checkEditorButtons
 
     // TODO: display the current layer (maybe lil UI to the left).
 
-    // BACKLOG: isolate view to a selected layer
+    // BACKLOG: allow isolating view to a selected layer
 
     // TODO: display current picked tile as (or right next to) the cursor.
 
@@ -436,12 +408,6 @@ internal void checkEditorButtons
         }
     }
 
-    if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
-    {
-        editor->tiles[editor->currentLayer * editor->map_width * editor->map_height + tileY * editor->map_width + tileX].x = editor->selectedX;
-        editor->tiles[editor->currentLayer * editor->map_width * editor->map_height + tileY * editor->map_width + tileX].y = editor->selectedY;
-    }
-
     //if(river2D_insideRect(&engine->controls.pointer, &editor->100button_someothereditorbutton))
     // {
     //     river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
@@ -449,6 +415,12 @@ internal void checkEditorButtons
     // else
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE]);
+
+        if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+        {
+            editor->tiles[editor->currentLayer * editor->map_width * editor->map_height + tileY * editor->map_width + tileX].x = editor->selectedX;
+            editor->tiles[editor->currentLayer * editor->map_width * editor->map_height + tileY * editor->map_width + tileX].y = editor->selectedY;
+        }
     }
 }
 
