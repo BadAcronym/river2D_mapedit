@@ -6,15 +6,16 @@
 #define MAPEDIT_PLANE_VOID            1
 #define MAPEDIT_PLANE_HIGHLIGHT       2
 #define MAPEDIT_PLANE_FONT16          3
-#define MAPEDIT_PLANE_MENU            4
-#define MAPEDIT_PLANE_SELECTTILE      5
-#define MAPEDIT_PLANE_HUD2            6
-#define MAPEDIT_PLANE_HUD3            7
-#define MAPEDIT_PLANE_CURSOR_DEFAULT  8
-#define MAPEDIT_PLANE_CURSOR_HOVER    9
-#define MAPEDIT_PLANE_CURSOR_PLACE   10
-#define MAPEDIT_PLANE_CURSOR_NULL    11
-#define MAPEDIT_PLANE_TILESHEET      12
+#define MAPEDIT_PLANE_MAINMENU        4
+#define MAPEDIT_PLANE_PAUSEMENU       5
+#define MAPEDIT_PLANE_SELECTTILE      6
+#define MAPEDIT_PLANE_HUD2            7
+#define MAPEDIT_PLANE_HUD3            8
+#define MAPEDIT_PLANE_CURSOR_DEFAULT  9
+#define MAPEDIT_PLANE_CURSOR_HOVER   10
+#define MAPEDIT_PLANE_CURSOR_PLACE   11
+#define MAPEDIT_PLANE_CURSOR_NULL    12
+#define MAPEDIT_PLANE_TILESHEET      13
 
 #define MAPEDIT_KEY_LEFTM       0
 #define MAPEDIT_KEY_RIGHTM      1
@@ -138,6 +139,7 @@ typedef struct EditorData
     uint64_t   editorflags;
     Rect       button_new;
     Rect       button_load;
+    Rect       button_save;
     Rect       button_quit;
     Rect       button_tilepicker_close;
     Tile       *tiles;

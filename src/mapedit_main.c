@@ -60,9 +60,13 @@ void mapedit_init
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load font image!\033[0m\n");
     }
 
-    engine->planes[MAPEDIT_PLANE_MENU].width  = engine->backbuffer.width;
-    engine->planes[MAPEDIT_PLANE_MENU].height = engine->backbuffer.height;
-    engine->planes[MAPEDIT_PLANE_MENU].data   = calloc(engine->backbuffer.width * engine->backbuffer.height * RIVER2D_BPP, 1);
+    engine->planes[MAPEDIT_PLANE_MAINMENU].width  = engine->backbuffer.width;
+    engine->planes[MAPEDIT_PLANE_MAINMENU].height = engine->backbuffer.height;
+    engine->planes[MAPEDIT_PLANE_MAINMENU].data   = calloc(engine->backbuffer.width * engine->backbuffer.height * RIVER2D_BPP, 1);
+
+    engine->planes[MAPEDIT_PLANE_PAUSEMENU].width  = engine->backbuffer.width;
+    engine->planes[MAPEDIT_PLANE_PAUSEMENU].height = engine->backbuffer.height;
+    engine->planes[MAPEDIT_PLANE_PAUSEMENU].data   = calloc(engine->backbuffer.width * engine->backbuffer.height * RIVER2D_BPP, 1);
 
     engine->planes[MAPEDIT_PLANE_SELECTTILE].width  = engine->backbuffer.width;
     engine->planes[MAPEDIT_PLANE_SELECTTILE].height = engine->backbuffer.height;
@@ -115,13 +119,25 @@ void mapedit_init
 
     // JANKY: I'm loading text by creating a button, then overwriting it. maybe allow for float-centric text loading in the future?
     Coordinates point = { .x = 0.5f, .y = 0.2f };
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MENU], "RIVER2D MAP EDITOR",  MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_new, river2D_loadText);
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU], "RIVER2D MAP EDITOR",  MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_new, river2D_loadText);
     point.y = 0.4f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MENU], "NEW PROJECT",  MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_new, river2D_loadText);
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU], "NEW PROJECT",  MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_new, river2D_loadText);
     point.y = 0.5f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MENU], "LOAD PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_load, river2D_loadText);
-    point.y = 0.7f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MENU], "QUIT", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_quit, river2D_loadText);
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU], "LOAD PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_load, river2D_loadText);
+    point.y = 0.8f;
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU], "QUIT", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_quit, river2D_loadText);
+
+    point.x = 0.5f;
+    point.y = 0.2f;
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], "RIVER2D MAP EDITOR",  MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_new, river2D_loadText);
+    point.y = 0.4f;
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], "NEW PROJECT",  MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_new, river2D_loadText);
+    point.y = 0.5f;
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], "LOAD PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_load, river2D_loadText);
+    point.y = 0.6f;
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], "SAVE PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_save, river2D_loadText);
+    point.y = 0.8f;
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], "QUIT", MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_quit, river2D_loadText);
 
     // TODO: parametrize the rest of the buttons & text
     point.x = 0.5f;
@@ -209,9 +225,11 @@ internal void saveCurrentProject
     fclose(file);
 }
 
+// CURRENT: add "save project" UI button in the menu, but only if a project is actually loaded
 internal void drawMainMenu
 (
     EngineData *engine,
+    EditorData *editor,
     void (*river2D_compositeImage)(EngineData *engine,  River2D_Image *image, uint8_t  pictop,
                                    uint32_t offsetDstX, uint32_t offsetDstY,  uint32_t offsetSrcX,
                                    uint32_t offsetSrcY, uint32_t cropWidth,   uint32_t cropHeight)
@@ -220,9 +238,18 @@ internal void drawMainMenu
                            engine->planes[MAPEDIT_PLANE_BACKGROUND].width,
                            engine->planes[MAPEDIT_PLANE_BACKGROUND].height);
 
-    river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_MENU], RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
-                           engine->planes[MAPEDIT_PLANE_MENU].width,
-                           engine->planes[MAPEDIT_PLANE_MENU].height);
+    if(!editor->previous_state)
+    {
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU], RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
+                               engine->planes[MAPEDIT_PLANE_MAINMENU].width,
+                               engine->planes[MAPEDIT_PLANE_MAINMENU].height);
+    }
+    else
+    {
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
+                               engine->planes[MAPEDIT_PLANE_PAUSEMENU].width,
+                               engine->planes[MAPEDIT_PLANE_PAUSEMENU].height);
+    }
 }
 
 internal void checkMainMenuButtons
@@ -246,8 +273,6 @@ internal void checkMainMenuButtons
         engine->controls.keymap &= ~MAPEDIT_BIT_ESCAPE;
         return;
     }
-
-    // CURRENT: add "save project" UI button in the menu, but only if a project is actually loaded
 
     if(river2D_insideRect(&engine->controls.pointer, &editor->button_new))
     {
@@ -306,16 +331,26 @@ internal void checkMainMenuButtons
             engine->running = false;
         }
     }
+    else if(editor->previous_state && river2D_insideRect(&engine->controls.pointer, &editor->button_save))
+    {
+        double length = editor->button_save.lowerRight.x - editor->button_save.upperLeft.x;
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
+                               (uint32_t)(editor->button_save.upperLeft.x * engine->backbuffer.width),
+                               (uint32_t)(editor->button_save.upperLeft.y * engine->backbuffer.height + 20),
+                               0, 0, length * engine->backbuffer.width, 5);
+    }
     else
     {
+        // TODO: only call changeCursor on actual UI state change, not every update. (if win32 causes issues/lag)
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
 
-        // TESTING:
+        #ifdef DEBUG
         if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
         {
             fprintf(stderr, "clicked @ X: %f Y: %f\n", engine->controls.pointer.x, engine->controls.pointer.y);
             engine->controls.keymap &= ~MAPEDIT_BIT_LEFTM;
         }
+        #endif
     }
 }
 
@@ -624,7 +659,7 @@ void mapedit_update
 ){
     if(editor->current_state == MAPEDIT_STATE_MENU)
     {
-        drawMainMenu(engine, river2D_compositeImage);
+        drawMainMenu(engine, editor, river2D_compositeImage);
         checkMainMenuButtons(engine, editor, river2D_compositeImage);
     }
     else if(editor->current_state == MAPEDIT_STATE_EDIT)
