@@ -542,6 +542,13 @@ internal void checkFilePickerButtons
         }
     }
 
+    if(!filename)
+    {
+        fprintf(stderr, "\n\033[31;1;7mERROR: failed to find .rte file to load!\nlist: %s\n\n\033[0m\n", dirlist);
+        changeState(editor, MAPEDIT_STATE_EDIT);
+        return;
+    }
+
     FILE *file = fopen(filename, "rb");
     if(!file)
     {
