@@ -591,7 +591,7 @@ internal void checkFilePickerButtons
 
     uint64_t tilecount = editor->layers * editor->map_width * editor->map_height;
     int byte;
-    for(uint32_t i = 0; i < tilecount * 2 && ((byte = fgetc(file)) != EOF); ++i)
+    for(uint32_t i = 0; i < tilecount * 4 && ((byte = fgetc(file)) != EOF); ++i)
     {
         ((uint8_t*)editor->tiles)[i] = byte;
     }
