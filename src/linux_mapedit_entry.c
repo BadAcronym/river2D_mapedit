@@ -85,13 +85,14 @@ int main
         return -1;
     }
 
+    EditorData    editor = {0};
     EngineData    engine = {0};
     River2D_Image planes[RIVER2D_MAX_PLANES] = {0};
 
     river2D_loadConfig(&engine.config);
     engine.config.choices |= RIVER2D_CHOICE_STATIC_CANVAS_BIT;
     river2D_init(&engine, planes);
-    mapedit_init(&engine, river2D_loadText);
+    mapedit_init(&engine, &editor, river2D_loadText);
 
     Atom WM_DELETE = XInternAtom(engine.display, "WM_DELETE_WINDOW", false);
     XSetWMProtocols(engine.display, engine.window, &WM_DELETE, 1);
@@ -138,13 +139,13 @@ int main
                 }
                 case Expose:
                 {
-                    mapedit_update(&engine, river2D_compositeImage);
+                    mapedit_update(&engine, &editor, river2D_compositeImage);
                     river2D_bltBuffer(&engine);
                     break;
                 }
                 case GraphicsExpose:
                 {
-                    mapedit_update(&engine, river2D_compositeImage);
+                    mapedit_update(&engine, &editor, river2D_compositeImage);
                     river2D_bltBuffer(&engine);
                     break;
                 }
@@ -162,7 +163,7 @@ int main
                 }
             }
         }
-        mapedit_update(&engine, river2D_compositeImage);
+        mapedit_update(&engine, &editor, river2D_compositeImage);
         river2D_bltBuffer(&engine);
     }
 
