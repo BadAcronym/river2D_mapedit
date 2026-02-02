@@ -164,6 +164,7 @@ internal void changeState
 }
 
 // NOTE: need to validate string length of whatever user sets projectName to
+// TODO: some user indication (notification) that the project has been saved
 internal void saveCurrentProject
 (
     EditorData *editor
