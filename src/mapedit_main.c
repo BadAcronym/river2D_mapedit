@@ -140,10 +140,11 @@ void mapedit_init
 
     // HACK: load upfront for now
     // TODO: load all .qoi files from folder, then append to one big tilesheet in memory
+    // BACKLOG: allow replacing this tilesheet by selecting one or multiple files with a file browser...
     river2D_loadImage("assets/tiles/tilesheet.qoi", &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_CHANNELS_BGRA, 8);
 
-    // TODO: allow changing tilesize dynamically (but there is a user-defined lower limit, say standard 8x8)
-    editor->tilesize = 16;
+    // TODO: allow selecting multiple tiles at once
+    editor->tilesize = 8;
 
     // allow 10 layers by default, any other layer you'd have to add to the UI selector
     editor->layers       = 10;
@@ -153,8 +154,6 @@ void mapedit_init
     editor->map_height = engine->config.canvas_height / editor->tilesize;
 
     uint64_t tilecount = editor->layers * editor->map_width * editor->map_height;
-
-    // TODO: make sure to resize this image when needed (when canvas dims or tilesize change)
     editor->tiles = malloc(tilecount * sizeof(Tile));
     for(uint32_t i = 0; i < tilecount; ++i)
     {
@@ -491,8 +490,8 @@ internal void checkEditorButtons
 
             if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
             {
-                editor->selectedX       =  tileX;
-                editor->selectedY       =  tileY;
+                editor->selectedX        = tileX;
+                editor->selectedY        = tileY;
                 editor->editorflags     &= ~MAPEDIT_FLAG_BIT_TILEPICKER;
                 engine->controls.keymap &= ~MAPEDIT_BIT_LEFTM;
             }
