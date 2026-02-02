@@ -1,13 +1,14 @@
 #include "mapedit_main.h"
 
-// TODO: future renderers
+// BACKLOG: future renderers
 //river2D_vulkan.dll / libriver2D_vulkan.so
 //river2D_d3d.dll    / libriver2D_d3d.so
 //river2D_openGL.dll / libriver2D_opengl.so
 //
 //move the functions to their appropriate paths
-//
-// TODO: read tile size, tiles and animations, save them to some format which can then be read by the game
+
+// TODO: load/save animated tiles, not just static ones!
+// TODO: for this, allow animating tiles in the first place. How to store that info?
 
 #include <dlfcn.h>
 #include <stdio.h>
