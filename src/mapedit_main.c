@@ -153,7 +153,7 @@ void mapedit_init
 
     // BACKLOG: allow decreasing/increasing this minimum tilesize
     editor->tilesize   = 8;
-    editor->selectSize = 1;
+    editor->selectMult = 1;
 
     // allow 10 layers by default, any other layer you'd have to add to the UI selector
     // PERF: start with 1 layer, only poll and draw that layer, until there's any data written to the other layers 🤔
@@ -208,27 +208,13 @@ internal void changeState
     editor->current_state  = nextState;
 }
 
-// TODO: save a header like follows:
-// const char header[8] = "r2Dtiles";
-// uint32_t   tilesheet_width;
-// uint32_t   tilesheet_height;
-// uint16_t   map_width;
-// uint16_t   map_height;
-// uint8_t    layers;
-//
-// **tilesheet**      (size tilesheet_width * tilesheet_height * RIVER2D_BPP)
-// **array of tiles** (size map_width * map_height * sizeof(Tile))
-// EOF
-//
-// when reading back, the size of the array can be reconstructed and no extra data must be read.
-// the tilesheet can be retrieved from the path?
-// or better yet, I can just embed the image into the file. Why the fuck not.
 // TODO: add RLE? lose 1 bit of the 32 for every tile, just to make some uint32_t's a repeat of the last placed tile
 // see if this is even worth it, it'd only be in exact runs
 // find another way to do RLE maybe, one that scales well with lots of pairs of 2, 4, short runs that is
 
 internal void saveCurrentProject
 (
+    EngineData *engine,
     EditorData *editor
 ){
     char *filename = malloc(256);
@@ -243,7 +229,43 @@ internal void saveCurrentProject
     }
 
     uint64_t tilecount = editor->layers * editor->map_height * editor->map_width;
+
+    const char header[9] = "r2Dtiles";
+    fwrite(header, sizeof(header) - 1, 1, file);
+
+    size_t elements = 0;
+
+    if((elements = fwrite(&engine->planes[MAPEDIT_PLANE_TILESHEET].width, 4, 1, file)) != 1)
+    {
+        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
+        return;
+    }
+    if((elements = fwrite(&engine->planes[MAPEDIT_PLANE_TILESHEET].height, 4, 1, file)) != 1)
+    {
+        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
+        return;
+    }
+    if((elements = fwrite(&editor->map_width, 2, 1, file)) != 1)
+    {
+        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
+        return;
+    }
+    if((elements = fwrite(&editor->map_height, 2, 1, file)) != 1)
+    {
+        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
+        return;
+    }
+    if((elements = fwrite(&editor->layers, 1, 1, file)) != 1)
+    {
+        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile.\033[0m\n");
+        return;
+    }
+
+    // TODO: **tilesheet** (size tilesheet_width * tilesheet_height * RIVER2D_BPP)
+
     fwrite(editor->tiles, sizeof(Tile), tilecount, file);
+
+    // NOTE: add extra sure EOF, like QOI?
     fclose(file);
 
     // TODO: some user indication (notification) that the project has been saved
@@ -367,7 +389,9 @@ internal void checkMainMenuButtons
 
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
-            saveCurrentProject(editor);
+            saveCurrentProject(engine, editor);
+            changeState(editor, MAPEDIT_STATE_EDIT);
+            engine->controls.keymap    &= ~MAPEDIT_BIT_SAVE;
             engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
         }
     }
@@ -431,8 +455,10 @@ internal void checkEditorButtons
 
     if(engine->controls.keymap & MAPEDIT_BIT_SAVE)
     {
-        saveCurrentProject(editor);
+        saveCurrentProject(engine, editor);
+        changeState(editor, MAPEDIT_STATE_EDIT);
         engine->controls.keymap &= ~MAPEDIT_BIT_SAVE;
+        return;
     }
 
     // TODO: (mapedit #6): make backbuffer moveable,
@@ -504,12 +530,12 @@ internal void checkEditorButtons
         {
             river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_NULL]);
 
-            // CURRENT: fix actually selecting the selected tile(s)!
+            // TODO: allow selecting same size at weird (min tilesize) offsets
 
             double  deltaX = engine->controls.pointer.x - tilesheet.upperLeft.x;
             double  deltaY = engine->controls.pointer.y - tilesheet.upperLeft.y;
-            uint8_t tileX  = (uint8_t)(deltaX * engine->backbuffer.width  / (editor->tilesize * editor->selectSize));
-            uint8_t tileY  = (uint8_t)(deltaY * engine->backbuffer.height / (editor->tilesize * editor->selectSize));
+            uint8_t tileX  = (uint8_t)(deltaX * engine->backbuffer.width  / (editor->tilesize * editor->selectMult));
+            uint8_t tileY  = (uint8_t)(deltaY * engine->backbuffer.height / (editor->tilesize * editor->selectMult));
 
             if(engine->controls.keymap & MAPEDIT_BIT_INC_SIZE)
             {
@@ -524,16 +550,16 @@ internal void checkEditorButtons
             }
 
             engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
-                                   (uint32_t)(engine->backbuffer.width  * (tilesheet.upperLeft.x + 0.0055f) + tileX * editor->tilesize * editor->selectSize),
-                                   (uint32_t)(engine->backbuffer.height * (tilesheet.upperLeft.y + 0.006f)  + tileY * editor->tilesize * editor->selectSize),
+                                   (uint32_t)(engine->backbuffer.width  * (tilesheet.upperLeft.x + 0.0055f) + tileX * editor->tilesize * editor->selectMult),
+                                   (uint32_t)(engine->backbuffer.height * (tilesheet.upperLeft.y + 0.006f)  + tileY * editor->tilesize * editor->selectMult),
                                    0, 0,
-                                   editor->tilesize * editor->selectSize,
-                                   editor->tilesize * editor->selectSize);
+                                   editor->tilesize * editor->selectMult,
+                                   editor->tilesize * editor->selectMult);
 
             if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
             {
-                editor->selectedX          =  tileX;
-                editor->selectedY          =  tileY;
+                editor->selectedX          =  tileX * editor->selectMult;
+                editor->selectedY          =  tileY * editor->selectMult;
                 editor->editorflags        &= ~MAPEDIT_FLAG_BIT_TILEPICKER;
                 engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
             }
@@ -569,7 +595,8 @@ internal void checkEditorButtons
                            tileY * editor->tilesize,
                            editor->selectedX * editor->tilesize,
                            editor->selectedY * editor->tilesize,
-                           editor->tilesize,   editor->tilesize);
+                           editor->tilesize  * editor->selectMult,
+                           editor->tilesize  * editor->selectMult);
 
     for(uint8_t i = 0; i < editor->layers; ++i)
     {
@@ -589,8 +616,15 @@ internal void checkEditorButtons
 
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
-            editor->tiles[editor->currentLayer * editor->map_width * editor->map_height + tileY * editor->map_width + tileX].x = editor->selectedX;
-            editor->tiles[editor->currentLayer * editor->map_width * editor->map_height + tileY * editor->map_width + tileX].y = editor->selectedY;
+            uint64_t topLeft = editor->currentLayer * editor->map_width * editor->map_height + tileY * editor->map_width + tileX;
+            for(uint8_t y = 0; y < editor->selectMult; ++y)
+            {
+                for(uint8_t x = 0; x < editor->selectMult; ++x)
+                {
+                    editor->tiles[topLeft + y * editor->map_width + x].x = editor->selectedX + x;
+                    editor->tiles[topLeft + y * editor->map_width + x].y = editor->selectedY + y;
+                }
+            }
         }
     }
 }
@@ -605,17 +639,15 @@ internal void drawFilePicker
                            engine->planes[MAPEDIT_PLANE_VOID].height);
 }
 
-internal void checkFilePickerButtons
+internal void loadProject
 (
     EngineData *engine,
     EditorData *editor
 ){
-    if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
-    {
-        changeState(editor, MAPEDIT_STATE_MENU);
-        engine->controls.keymap &= ~MAPEDIT_BIT_ESCAPE;
-        return;
-    }
+    // if(engine->planes[MAPEDIT_PLANE_TILESHEET].data)
+    // {
+    //     river2D_destroyImage(&engine->planes[MAPEDIT_PLANE_TILESHEET]);
+    // }
 
     // TODO: later, this will be a filepicker screen with recent files, etc, (aseprite esc)
     // JANKY: load whatever file is "*.rte" in the current directory for now, instead of a filepicker
@@ -673,7 +705,51 @@ internal void checkFilePickerButtons
     }
 
     uint64_t tilecount = editor->layers * editor->map_width * editor->map_height;
+
+    const char header[9] = "r2Dtiles";
     int byte;
+
+    for(uint8_t i = 0; i < 8 && ((byte = fgetc(file)) != EOF); ++i)
+    {
+        if(byte != header[i])
+        {
+            fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
+            return;
+        }
+    }
+
+    size_t elements = 0;
+
+    if((elements = fread(&engine->planes[MAPEDIT_PLANE_TILESHEET].width, 4, 1, file)) != 1)
+    {
+        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
+        return;
+    }
+    if((elements = fread(&engine->planes[MAPEDIT_PLANE_TILESHEET].height, 4, 1, file)) != 1)
+    {
+        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
+        return;
+    }
+    if((elements = fread(&editor->map_width, 2, 1, file)) != 1)
+    {
+        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
+        return;
+    }
+    if((elements = fread(&editor->map_height, 2, 1, file)) != 1)
+    {
+        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
+        return;
+    }
+
+    if((byte = fgetc(file)) == EOF)
+    {
+        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
+        return;
+    }
+    editor->layers = (uint8_t)byte;
+
+    // TODO: read the tilesheet with imgsurf_read into engine->planes[MAPEDIT_PLANE_TILESHEET].
+
     for(uint32_t i = 0; i < tilecount * 4 && ((byte = fgetc(file)) != EOF); ++i)
     {
         ((uint8_t*)editor->tiles)[i] = byte;
@@ -686,6 +762,21 @@ internal void checkFilePickerButtons
     {
         free((void*)filename);
     }
+}
+
+internal void checkFilePickerButtons
+(
+    EngineData *engine,
+    EditorData *editor
+){
+    if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
+    {
+        changeState(editor, MAPEDIT_STATE_MENU);
+        engine->controls.keymap &= ~MAPEDIT_BIT_ESCAPE;
+        return;
+    }
+
+    loadProject(engine, editor);
     changeState(editor, MAPEDIT_STATE_EDIT);
 }
 
@@ -720,13 +811,13 @@ void mapedit_updateSelectSize
     EditorData *editor,
     bool       increase
 ){
-    if(increase && editor->selectSize < 8)
+    if(increase && editor->selectMult < 8)
     {
-        ++editor->selectSize;
+        ++editor->selectMult;
     }
-    else if(!increase && editor->selectSize > 1)
+    else if(!increase && editor->selectMult > 1)
     {
-        --editor->selectSize;
+        --editor->selectMult;
     }
 }
 
