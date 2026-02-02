@@ -2,6 +2,8 @@
 require"vendor/premake-ecc/ecc"
 require"vendor/river2D/premake5"
 
+--TODO: turn on implicit cast warnings
+
 workspace("mapedit")
     configurations({"debug", "asan", "release"})
     platforms({"linux", "windows"})
