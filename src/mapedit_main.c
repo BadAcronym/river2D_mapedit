@@ -154,6 +154,7 @@ void mapedit_init
     editor->map_height = engine->config.canvas_height / editor->tilesize;
 
     uint64_t tilecount = editor->layers * editor->map_width * editor->map_height;
+    // TODO: resize this when user decides to expand canvas, set map_width & _height
     editor->tiles = malloc(tilecount * sizeof(Tile));
     for(uint32_t i = 0; i < tilecount; ++i)
     {
@@ -161,6 +162,7 @@ void mapedit_init
         editor->tiles[i].y = UINT16_MAX;
     }
 
+    // TODO: allow changing project name with a menu item or hotkey, pop-up textbox and user keyboard input
     if(!editor->projectName)
     {
         editor->projectName = "unnamed_project";
@@ -509,6 +511,7 @@ internal void checkEditorButtons
     // BACKLOG: allow isolating view to a selected layer
 
     // TODO: allow resizing the view to zoom in or out freely into the backbuffer.
+    // TODO: allow scrolling and panning the view, as well as expanding the tilemap
 
     // TODO: allow resizing the backbuffer itself to be smaller or bigger.
     // always keep a copy of the largest backbuffer in memory, so data is not lost when
