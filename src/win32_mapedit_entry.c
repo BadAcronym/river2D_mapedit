@@ -7,57 +7,8 @@
 
 global EngineData *global_engine;
 
-clang_ignore_unused
-
-#define RIVER2D_INIT(name) void name(EngineData *engine, River2D_Image *planes)
-typedef RIVER2D_INIT(river2D_init_);
-RIVER2D_INIT(River2D_init_Stub)
-{
-    return;
-}
-global river2D_init_ *_river2D_init_ = River2D_init_Stub;
-#define river2D_init _river2D_init_
-
-#define RIVER2D_SHUT(name) int32_t name(EngineData *engine)
-typedef RIVER2D_SHUT(river2D_shut_);
-RIVER2D_SHUT(River2D_shut_Stub)
-{
-    return -1;
-}
-global river2D_shut_ *_river2D_shut_ = River2D_shut_Stub;
-#define river2D_shutdown _river2D_shut_
-
-#define RIVER2D_BLT(name) void name(EngineData *engine)
-typedef RIVER2D_BLT(river2D_blt_);
-RIVER2D_BLT(River2D_blt_Stub)
-{
-    return;
-}
-global river2D_blt_ *_river2D_blt_ = River2D_blt_Stub;
-#define river2D_bltBuffer _river2D_blt_
-
-#define RIVER2D_COMP(name) void name (EngineData *engine, River2D_Image *image, uint8_t pictop, uint32_t offsetDstX, uint32_t offsetDstY, uint32_t offsetSrcX, uint32_t offsetSrcY, uint32_t cropWidth,  uint32_t cropHeight)
-typedef RIVER2D_COMP(river2D_comp_);
-RIVER2D_COMP(River2D_comp_Stub)
-{
-    return;
-}
-global river2D_comp_ *_river2D_comp_ = River2D_comp_Stub;
-#define river2D_compositeImage _river2D_comp_
-
-#define RIVER2D_LOADTEXT(name) void name(EngineData *engine, River2D_Image *image, const char *text, uint8_t font, uint16_t  charsize, uint32_t spacing, uint32_t offsetY, uint32_t offsetX)
-typedef RIVER2D_LOADTEXT(river2D_text_);
-RIVER2D_LOADTEXT(River2D_text_Stub)
-{
-    return;
-}
-global river2D_text_ *_river2D_text_ = River2D_text_Stub;
-#define river2D_loadText _river2D_text_
-
-clang_diagnostic_pop
-
 #ifdef ASAN
-    #define LIBPATH "./vendor/river2D/bin/asan/"
+        #define LIBPATH "./vendor/river2D/bin/asan/"
 #else
     #ifdef DEBUG
         #define LIBPATH "./vendor/river2D/bin/debug/"
@@ -65,52 +16,6 @@ clang_diagnostic_pop
         #define LIBPATH "./vendor/river2D/bin/release/"
     #endif
 #endif
-
-internal void loadRenderer_software
-(
-    void
-){
-    SetDllDirectoryA(LIBPATH);
-    HMODULE software = LoadLibraryA("river2Dsoftware.dll");
-    if(!software)
-    {
-        fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load software renderer!\n");
-        fprintf(stderr, "Tried to load from library path:" LIBPATH);
-        fprintf(stderr, "\033[0m\n");
-        return;
-    }
-
-    river2D_init = (river2D_init_*)GetProcAddress(software, "river2D_init");
-    if(!river2D_init)
-    {
-        fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load symbol river2D_init!\033[0m\n");
-        return;
-    }
-    river2D_shutdown = (river2D_shut_*)GetProcAddress(software, "river2D_shutdown");
-    if(!river2D_shutdown)
-    {
-        fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load symbol river2D_shutdown!\033[0m\n");
-        return;
-    }
-    river2D_bltBuffer = (river2D_blt_*)GetProcAddress(software, "river2D_bltBuffer");
-    if(!river2D_bltBuffer)
-    {
-        fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load symbol river2D_bltBuffer!\033[0m\n");
-        return;
-    }
-    river2D_compositeImage = (river2D_comp_*)GetProcAddress(software, "river2D_compositeImage");
-    if(!river2D_compositeImage)
-    {
-        fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load symbol river2D_compositeImage!\033[0m\n");
-        return;
-    }
-    river2D_loadText = (river2D_text_*)GetProcAddress(software, "river2D_loadText");
-    if(!river2D_loadText)
-    {
-        fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load symbol river2D_loadText!\033[0m\n");
-        return;
-    }
-}
 
 #if defined(DEBUG) || defined(ASAN)
 int main
@@ -151,7 +56,7 @@ LRESULT CALLBACK win32WindowCallback
             PAINTSTRUCT paintStruct;
             global_engine->context = BeginPaint(window, &paintStruct);
 
-            river2D_bltBuffer(global_engine);
+            global_engine->river2D_bltBuffer(global_engine);
 
             EndPaint(window, &paintStruct);
             ReleaseDC(global_engine->window, global_engine->context);
@@ -200,7 +105,7 @@ LRESULT CALLBACK win32WindowCallback
         }
         case WM_MBUTTONDOWN:
         {
-            mapedit_processKeys(&global_engine->controls, RIVER2D_MOUSE3, true;
+            mapedit_processKeys(&global_engine->controls, RIVER2D_MOUSE3, true);
             break;
         }
         case WM_MBUTTONUP:
@@ -232,15 +137,16 @@ int CALLBACK WinMain
     EngineData    engine = {0};
     River2D_Image planes[RIVER2D_MAX_PLANES] = {0};
 
-    loadRenderer_software();
+    river2D_resolveRenderer(&engine, LIBPATH, RIVER2D_RENDERER_SOFTWARE);
 
     engine.instance   = instance;
     engine.windowName = "river2D map editor";
 
     river2D_loadConfig(&engine.config);
     engine.config.choices |= RIVER2D_CHOICE_STATIC_CANVAS_BIT;
-    river2D_init(&engine, planes);
-    mapedit_init(&engine, &editor, river2D_loadText);
+    engine.windowName = "river2D map editor";
+    engine.river2D_init(&engine, planes);
+    mapedit_init(&engine, &editor);
 
     global_engine = &engine;
 
@@ -286,15 +192,15 @@ int CALLBACK WinMain
             DispatchMessageA(&message);
         }
 
-        mapedit_update(&engine, &editor, river2D_compositeImage);
+        mapedit_update(&engine, &editor);
 
         engine.context = GetDC(engine.window);
         // if(mapped)
         // {
-            river2D_bltBuffer(&engine);
+            engine.river2D_bltBuffer(&engine);
         // }
         ReleaseDC(engine.window, engine.context);
     }
 
-    return river2D_shutdown(&engine);
+    return engine.river2D_shutdown(&engine);
 }
