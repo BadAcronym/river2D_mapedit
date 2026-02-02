@@ -112,6 +112,9 @@ void mapedit_init
     editor->button_tilepicker_close.upperLeft.y  = 0.86f;
     editor->button_tilepicker_close.lowerRight.x = 0.17f;
     editor->button_tilepicker_close.lowerRight.y = 0.89f;
+
+    // WIP: load upfront for now
+    river2D_loadImage("assets/tiles/scenery.qoi", &engine->planes[MAPEDIT_PLANE_TILESHEET_0], RIVER2D_CHANNELS_BGRA, 8);
 }
 
 internal void drawMainMenu
@@ -272,6 +275,29 @@ internal void checkEditorButtons
                                engine->planes[MAPEDIT_PLANE_CLOSE].width,
                                engine->planes[MAPEDIT_PLANE_CLOSE].height);
 
+        // TODO: load each and every file that is in assets/tiles, then display their thumbnails 🤔
+
+        // WIP: just load the one file for now and use it here... lmfao
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET_0], RIVER2D_PICTOP_OVER,
+                               engine->backbuffer.width  / 10 + 32,
+                               engine->backbuffer.height / 10 + 32,
+                               0, 0,
+                               engine->planes[MAPEDIT_PLANE_TILESHEET_0].width,
+                               engine->planes[MAPEDIT_PLANE_TILESHEET_0].height);
+
+        Rect tilesheet = {0};
+        tilesheet.upperLeft.x  = 0.095f + (double)(32.0f / (double)engine->backbuffer.width);
+        tilesheet.upperLeft.y  = 0.095f + (double)(32.0f / (double)engine->backbuffer.height);
+        tilesheet.lowerRight.x = tilesheet.upperLeft.x + (double)engine->planes[MAPEDIT_PLANE_TILESHEET_0].width  / (double)engine->backbuffer.width;
+        tilesheet.lowerRight.y = tilesheet.upperLeft.y + (double)engine->planes[MAPEDIT_PLANE_TILESHEET_0].height / (double)engine->backbuffer.height;
+
+        // if you click on a file, it will be loaded and your cursor will turn into a tile selector (32x32 default),
+        // scrollwheel changes size, 2x2 smallest, sheet height or width (whichever smallest) biggest
+
+        // TODO: river2D_listFiles would be a great place to start, no? return a ; separated string as paths
+
+        // TODO: think about how to load file
+
         if(river2D_insideRect(&engine->controls.pointer, &editor->button_tilepicker_close))
         {
             river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
@@ -283,6 +309,18 @@ internal void checkEditorButtons
 
             if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
             {
+                editor->editorflags &= ~MAPEDIT_FLAG_BIT_TILEPICKER;
+            }
+        }
+        else if(river2D_insideRect(&engine->controls.pointer, &tilesheet))
+        {
+            river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+
+            // TODO: show reticle with current sprite size that is going to be selected
+
+            if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+            {
+                // TODO: compute which tile was selected and keep it safe somewhere!
                 editor->editorflags &= ~MAPEDIT_FLAG_BIT_TILEPICKER;
             }
         }
