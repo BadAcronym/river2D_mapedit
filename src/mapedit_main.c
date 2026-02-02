@@ -195,8 +195,8 @@ internal void checkMainMenuButtons
         // need better error msgs.
 
         river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
-                               editor->button_new.upperLeft.x * engine->backbuffer.width,
-                               editor->button_new.upperLeft.y * engine->backbuffer.height + 20,
+                               (uint32_t)(editor->button_new.upperLeft.x * engine->backbuffer.width),
+                               (uint32_t)(editor->button_new.upperLeft.y * engine->backbuffer.height + 20),
                                0, 0, 190, 5);
 
         if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
@@ -212,8 +212,8 @@ internal void checkMainMenuButtons
         // TODO: (mapedit #2): handle load project button
 
         river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
-                               editor->button_load.upperLeft.x * engine->backbuffer.width,
-                               editor->button_load.upperLeft.y * engine->backbuffer.height + 20,
+                               (uint32_t)(editor->button_load.upperLeft.x * engine->backbuffer.width),
+                               (uint32_t)(editor->button_load.upperLeft.y * engine->backbuffer.height + 20),
                                0, 0, 210, 5);
 
         if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
@@ -226,8 +226,8 @@ internal void checkMainMenuButtons
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
         river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
-                               editor->button_quit.upperLeft.x * engine->backbuffer.width,
-                               editor->button_quit.upperLeft.y * engine->backbuffer.height + 20,
+                               (uint32_t)(editor->button_quit.upperLeft.x * engine->backbuffer.width),
+                               (uint32_t)(editor->button_quit.upperLeft.y * engine->backbuffer.height + 20),
                                0, 0, 70, 5);
 
         if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
@@ -295,8 +295,8 @@ internal void checkEditorButtons
                                engine->backbuffer.width  / 10,
                                engine->backbuffer.height / 10,
                                0, 0,
-                               engine->backbuffer.width  / 1.25f,
-                               engine->backbuffer.height / 1.25f);
+                               (uint32_t)(engine->backbuffer.width  / 1.25f),
+                               (uint32_t)(engine->backbuffer.height / 1.25f));
 
         river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE], RIVER2D_PICTOP_OVER,
                                engine->backbuffer.width  / 2 - engine->planes[MAPEDIT_PLANE_SELECTTILE].width  / 2,
@@ -341,8 +341,8 @@ internal void checkEditorButtons
             river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
             river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
-                                   editor->button_tilepicker_close.upperLeft.x * engine->backbuffer.width  + 6,
-                                   editor->button_tilepicker_close.upperLeft.y * engine->backbuffer.height + 20,
+                                   (uint32_t)(editor->button_tilepicker_close.upperLeft.x * engine->backbuffer.width  + 6),
+                                   (uint32_t)(editor->button_tilepicker_close.upperLeft.y * engine->backbuffer.height + 20),
                                    0, 0, 92, 5);
 
             if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
@@ -360,8 +360,8 @@ internal void checkEditorButtons
             uint8_t tileY = deltaY * engine->backbuffer.height / editor->tilesize;
 
             river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
-                                   (tilesheet.upperLeft.x + 0.0055f) * engine->backbuffer.width  + tileX * editor->tilesize,
-                                   (tilesheet.upperLeft.y + 0.006f)  * engine->backbuffer.height + tileY * editor->tilesize,
+                                   (uint32_t)(engine->backbuffer.width  * (tilesheet.upperLeft.x + 0.0055f) + tileX * editor->tilesize),
+                                   (uint32_t)(engine->backbuffer.height * (tilesheet.upperLeft.y + 0.006f)  + tileY * editor->tilesize),
                                    0, 0, editor->tilesize, editor->tilesize);
 
             if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
@@ -414,8 +414,8 @@ internal void checkEditorButtons
 
     // TODO: wheel or menu of recently used tiles and a hotbar with specific ones, somewhere.
 
-    uint8_t tileX = engine->controls.pointer.x * engine->backbuffer.width  / editor->tilesize;
-    uint8_t tileY = engine->controls.pointer.y * engine->backbuffer.height / editor->tilesize;
+    uint8_t tileX = (uint8_t)(engine->controls.pointer.x * engine->backbuffer.width  / editor->tilesize);
+    uint8_t tileY = (uint8_t)(engine->controls.pointer.y * engine->backbuffer.height / editor->tilesize);
 
     // TODO: display outline around the current selected tile?
 
@@ -605,7 +605,7 @@ void mapedit_processKeys
     }
     else
     {
-        fprintf(stderr, "key pressed: %lu\n", key);
+        fprintf(stderr, "key pressed: %llu\n", key);
     }
 }
 
