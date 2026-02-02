@@ -53,6 +53,8 @@ void mapedit_init
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load font image!\033[0m\n");
     }
 
+    // BACKLOG: move this garbo somewhere lol
+
     uint32_t charsize     = 16;
     uint32_t total_width  = 13 * charsize;
     uint32_t total_height = 6  * (charsize + 10);
@@ -64,6 +66,24 @@ void mapedit_init
     river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_MENU], " NEW PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, 0, 50);
     river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_MENU], "LOAD PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, 0, 74);
     river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_MENU], "    QUIT",     MAPEDIT_PLANE_FONT16, 16, 1, 0, 126);
+
+    charsize     = 16;
+    total_width  = 13 * charsize;
+    total_height = charsize + 10;
+
+    engine->planes[MAPEDIT_PLANE_SELECTSHEET].width  = total_width;
+    engine->planes[MAPEDIT_PLANE_SELECTSHEET].height = total_height;
+    engine->planes[MAPEDIT_PLANE_SELECTSHEET].data   = calloc(total_width * total_height * RIVER2D_BPP, 1);
+    river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_SELECTSHEET], "SELECT SHEET",  MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
+
+    charsize     = 16;
+    total_width  = 6 * charsize;
+    total_height = charsize + 10;
+
+    engine->planes[MAPEDIT_PLANE_CLOSE].width  = total_width;
+    engine->planes[MAPEDIT_PLANE_CLOSE].height = total_height;
+    engine->planes[MAPEDIT_PLANE_CLOSE].data   = calloc(total_width * total_height * RIVER2D_BPP, 1);
+    river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_CLOSE], "CLOSE",  MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
 
     //transfer to mapedit_loadConfig at some point, when keybinds should be remappable
     engine->controls.keycodes[MAPEDIT_KEY_LEFTM]      = Button1;
@@ -87,6 +107,11 @@ void mapedit_init
     editor->button_quit.upperLeft.y  = 0.56f;
     editor->button_quit.lowerRight.x = 0.52f;
     editor->button_quit.lowerRight.y = 0.59f;
+
+    editor->button_tilepicker_close.upperLeft.x  = 0.09f;
+    editor->button_tilepicker_close.upperLeft.y  = 0.86f;
+    editor->button_tilepicker_close.lowerRight.x = 0.17f;
+    editor->button_tilepicker_close.lowerRight.y = 0.89f;
 }
 
 internal void drawMainMenu
@@ -190,8 +215,6 @@ internal void drawEditor
                                    uint32_t offsetDstX, uint32_t offsetDstY,  uint32_t offsetSrcX,
                                    uint32_t offsetSrcY, uint32_t cropWidth,   uint32_t cropHeight)
 ){
-    river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE]);
-
     river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_VOID], RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
                            engine->planes[MAPEDIT_PLANE_VOID].width,
                            engine->planes[MAPEDIT_PLANE_VOID].height);
@@ -235,12 +258,73 @@ internal void checkEditorButtons
                                engine->backbuffer.width  / 1.25f,
                                engine->backbuffer.height / 1.25f);
 
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_SELECTSHEET], RIVER2D_PICTOP_OVER,
+                               engine->backbuffer.width  / 2 - engine->planes[MAPEDIT_PLANE_SELECTSHEET].width  / 2,
+                               engine->backbuffer.height / 9,
+                               0, 0,
+                               engine->planes[MAPEDIT_PLANE_SELECTSHEET].width,
+                               engine->planes[MAPEDIT_PLANE_SELECTSHEET].height);
+
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_CLOSE], RIVER2D_PICTOP_OVER,
+                               engine->backbuffer.width / 10 + 10,
+                               engine->backbuffer.height - engine->backbuffer.height / 9 - 16,
+                               0, 0,
+                               engine->planes[MAPEDIT_PLANE_CLOSE].width,
+                               engine->planes[MAPEDIT_PLANE_CLOSE].height);
+
+        if(river2D_insideRect(&engine->controls.pointer, &editor->button_tilepicker_close))
+        {
+            river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+
+            river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
+                                   editor->button_tilepicker_close.upperLeft.x * engine->backbuffer.width,
+                                   editor->button_tilepicker_close.upperLeft.y * engine->backbuffer.height + 25,
+                                   0, 0, 120, 5);
+
+            if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+            {
+                editor->editorflags &= ~MAPEDIT_FLAG_BIT_TILEPICKER;
+            }
+        }
+        else
+        {
+            river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
+
+            //TESTING: getting info on UI button locations
+            if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+            {
+                fprintf(stderr, "mouse clicked @:\n");
+                fprintf(stderr, "x: %f\n", engine->controls.pointer.x);
+                fprintf(stderr, "y: %f\n", engine->controls.pointer.y);
+            }
+        }
+
         // TODO: display loaded tiles by tilesheet or 'all'. toggle between both tabs/views.
 
         // TODO: allow adding new tilesheets to projects, load sheet, allow subdividing into different sizes of tiles.
         // metadata is saved in the proj file, filepath + tilesize.
 
         // TODO: display current picked tile as (or right next to) the cursor.
+
+        // TODO: wheel or menu of recently used tiles and a hotbar with specific ones, somewhere.
+        return;
+    }
+
+    //if(river2D_insideRect(&engine->controls.pointer, &editor->button_someothereditorbutton))
+    // {
+    //     river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+    // }
+    // else
+    {
+        river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE]);
+
+        //TESTING: getting info on UI button locations
+        if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+        {
+            fprintf(stderr, "mouse clicked @:\n");
+            fprintf(stderr, "x: %f\n", engine->controls.pointer.x);
+            fprintf(stderr, "y: %f\n", engine->controls.pointer.y);
+        }
     }
 }
 

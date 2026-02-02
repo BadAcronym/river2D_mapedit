@@ -7,8 +7,8 @@
 #define MAPEDIT_PLANE_HIGHLIGHT      2
 #define MAPEDIT_PLANE_FONT16         3
 #define MAPEDIT_PLANE_MENU           4
-#define MAPEDIT_PLANE_HUD1           5
-#define MAPEDIT_PLANE_HUD2           6
+#define MAPEDIT_PLANE_SELECTSHEET    5
+#define MAPEDIT_PLANE_CLOSE          6
 #define MAPEDIT_PLANE_HUD3           7
 #define MAPEDIT_PLANE_CURSOR_DEFAULT 8
 #define MAPEDIT_PLANE_CURSOR_HOVER   9
@@ -39,6 +39,7 @@ typedef struct EditorData
     Rect     button_new;
     Rect     button_load;
     Rect     button_quit;
+    Rect     button_tilepicker_close;
     uint8_t  state;
     uint64_t editorflags;
 }
