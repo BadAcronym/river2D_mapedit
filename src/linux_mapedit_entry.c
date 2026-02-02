@@ -167,9 +167,9 @@ int main
             }
         }
 
-        mapedit_update(&engine, &editor, river2D_compositeImage);
         if(mapped)
         {
+            mapedit_update(&engine, &editor, river2D_compositeImage);
             river2D_bltBuffer(&engine);
         }
     }
