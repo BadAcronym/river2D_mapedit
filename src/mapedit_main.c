@@ -57,8 +57,6 @@ void mapedit_init
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load font image!\033[0m\n");
     }
 
-    // CURRENT: allow for river2D_createImage to create a blank image.
-
     river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],   engine->backbuffer.width, engine->backbuffer.height);
     river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU],  engine->backbuffer.width, engine->backbuffer.height);
     river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE], engine->backbuffer.width, engine->backbuffer.height);
@@ -176,7 +174,8 @@ void mapedit_init
         editor->projectName = "unnamed_project";
     }
 
-    editor->current_state = MAPEDIT_STATE_MENU;
+    editor->current_state   = MAPEDIT_STATE_MENU;
+    editor->lastPresentTime = river2D_queryTime();
 }
 
 int32_t mapedit_shutdown

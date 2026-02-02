@@ -111,7 +111,27 @@ int main
         if(mapped)
         {
             mapedit_update(&engine, &editor);
+            River2D_Time now = river2D_queryTime();
+
+            River2D_Time delta = river2D_deltaTime(&editor.lastPresentTime);
+            if(delta.s == 0 && delta.ns < 4000000)
+            {
+                struct timespec next;
+                clock_gettime(CLOCK_MONOTONIC, &next);
+
+                next.tv_nsec += 4000000 - delta.ns;
+                while(next.tv_nsec >= 1000000000)
+                {
+                    next.tv_sec++;
+                    next.tv_nsec -= 1000000000;
+                }
+
+                // FIXME: nanosleep correctly
+                // nanosleep(&next, NULL);
+            }
+
             engine.bltBuffer(&engine);
+            editor.lastPresentTime = now;
         }
     }
 
