@@ -91,6 +91,7 @@ popd
 
 if(0 -eq $LASTEXITCODE -and -not $compile_only)
 {
+    $target = ".\bin\$build\river2D_mapedit.exe"
     Write-Host "`nrunning $target..."
     Invoke-Expression $target
 }
