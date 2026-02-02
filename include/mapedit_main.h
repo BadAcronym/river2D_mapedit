@@ -38,12 +38,13 @@
 #define MAPEDIT_BIT_RIGHTM     2
 #define MAPEDIT_BIT_MIDDLEM    4
 #define MAPEDIT_BIT_ESCAPE     8
-#define MAPEDIT_BIT_QUIT       16
-#define MAPEDIT_BIT_TILEPICKER 32
-#define MAPEDIT_BIT_LAYER0     64
-#define MAPEDIT_BIT_LAYER1     128
-#define MAPEDIT_BIT_LAYER2     256
-#define MAPEDIT_BIT_LAYER3     512
+#define MAPEDIT_BIT_SAVE       16
+#define MAPEDIT_BIT_QUIT       32
+#define MAPEDIT_BIT_TILEPICKER 64
+#define MAPEDIT_BIT_LAYER0     128
+#define MAPEDIT_BIT_LAYER1     256
+#define MAPEDIT_BIT_LAYER2     512
+#define MAPEDIT_BIT_LAYER3     1024
 
 #define MAPEDIT_STATE_MENU  0
 #define MAPEDIT_STATE_EDIT  1
@@ -60,21 +61,22 @@ Tile;
 
 typedef struct EditorData
 {
-    uint8_t  current_state;
-    uint8_t  previous_state;
-    uint8_t  tilesize;
-    uint8_t  currentLayer;
-    uint8_t  selectedX;
-    uint8_t  selectedY;
-    uint8_t  layers;
-    uint32_t map_width;
-    uint32_t map_height;
-    Tile     *tiles;
-    uint64_t editorflags;
-    Rect     button_new;
-    Rect     button_load;
-    Rect     button_quit;
-    Rect     button_tilepicker_close;
+    uint8_t    current_state;
+    uint8_t    previous_state;
+    uint8_t    tilesize;
+    uint8_t    currentLayer;
+    uint8_t    layers;
+    uint8_t    selectedX;
+    uint8_t    selectedY;
+    uint32_t   map_width;
+    uint32_t   map_height;
+    uint64_t   editorflags;
+    Rect       button_new;
+    Rect       button_load;
+    Rect       button_quit;
+    Rect       button_tilepicker_close;
+    Tile       *tiles;
+    const char *projectName;
 }
 EditorData;
 

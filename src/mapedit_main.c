@@ -125,6 +125,11 @@ void mapedit_init
         editor->tiles[i].x = UINT32_MAX;
         editor->tiles[i].y = UINT32_MAX;
     }
+
+    if(!editor->projectName)
+    {
+        editor->projectName = "unnamed";
+    }
 }
 
 internal void changeState
@@ -142,10 +147,31 @@ internal void changeState
     editor->current_state  = nextState;
 }
 
+// NOTE: need to validate string length of whatever user sets projectName to
+void saveCurrentProject
+(
+    EditorData *editor
+){
+    char *filename = malloc(256);
+    sprintf(filename, "%s.rte", editor->projectName);
+
+    FILE *file = fopen(filename, "wb");
+    if(!file)
+    {
+        fprintf(stderr, "\n\033[31;1;7mERROR: could not open file for saving: %s.\033[0m\n", editor->projectName);
+    }
+
+    // BACKLOG: more sophisticated binary format, with RLE, at least, so sizes aren't as bloated
+
+    uint64_t tilecount = editor->layers * editor->map_height * editor->map_width;
+    fwrite(editor->tiles, sizeof(editor->tiles), tilecount, file);
+    fclose(file);
+}
+
 internal void drawMainMenu
 (
     EngineData *engine,
-    void (*river2D_compositeImage)(EngineData *engine,  River2D_Image *image, uint8_t pictop,
+    void (*river2D_compositeImage)(EngineData *engine,  River2D_Image *image, uint8_t  pictop,
                                    uint32_t offsetDstX, uint32_t offsetDstY,  uint32_t offsetSrcX,
                                    uint32_t offsetSrcY, uint32_t cropWidth,   uint32_t cropHeight)
 ){
@@ -278,6 +304,14 @@ internal void checkEditorButtons
         changeState(editor, MAPEDIT_STATE_MENU);
         engine->controls.keymap &= ~MAPEDIT_BIT_ESCAPE;
         return;
+    }
+
+    if(engine->controls.keymap & MAPEDIT_BIT_SAVE)
+    {
+        saveCurrentProject(editor);
+        engine->controls.keymap &= ~MAPEDIT_BIT_SAVE;
+
+        fprintf(stdout, "Project saved successfully.\n");
     }
 
     // TODO: (mapedit #6): make backbuffer moveable,
@@ -449,8 +483,7 @@ internal void checkFilePickerButtons
         return;
     }
 
-    // TODO: (mapedit #2): write simple file picker or path loader,
-    // then after loading file, transition to editor state
+    // JANKY: load whatever file is "*.rte" in the current directory for now
 }
 
 // BACKLOG: let 'escape' from the main menu return to current state
@@ -498,6 +531,17 @@ void mapedit_processKeys
         else
         {
             controls->keymap &= ~MAPEDIT_BIT_ESCAPE;
+        }
+    }
+    else if(key == controls->keycodes[MAPEDIT_KEY_SAVE])
+    {
+        if(isDown)
+        {
+            controls->keymap |= MAPEDIT_BIT_SAVE;
+        }
+        else
+        {
+            controls->keymap &= ~MAPEDIT_BIT_SAVE;
         }
     }
     else if(key == controls->keycodes[MAPEDIT_KEY_QUIT])
