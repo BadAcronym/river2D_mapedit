@@ -87,6 +87,158 @@ void mapedit_init
     editor->button_quit.lowerRight.y = 0.59f;
 }
 
+internal void drawMainMenu
+(
+    EngineData *engine,
+    void (*river2D_compositeImage)(EngineData *engine,  River2D_Image *image, uint8_t pictop,
+                                   uint32_t offsetDstX, uint32_t offsetDstY,  uint32_t offsetSrcX,
+                                   uint32_t offsetSrcY, uint32_t cropWidth,   uint32_t cropHeight)
+){
+    river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_BACKGROUND], RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
+                           engine->planes[MAPEDIT_PLANE_BACKGROUND].width,
+                           engine->planes[MAPEDIT_PLANE_BACKGROUND].height);
+
+    river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_MENU], RIVER2D_PICTOP_OVER,
+                           engine->backbuffer.width  / 2 - engine->planes[MAPEDIT_PLANE_MENU].width  / 2,
+                           engine->backbuffer.height / 2 - engine->planes[MAPEDIT_PLANE_MENU].height / 2,
+                           0, 0,
+                           engine->planes[MAPEDIT_PLANE_MENU].width,
+                           engine->planes[MAPEDIT_PLANE_MENU].height);
+}
+
+internal void checkMainMenuButtons
+(
+    EngineData *engine,
+    EditorData *editor,
+    void (*river2D_compositeImage)(EngineData *engine,  River2D_Image *image, uint8_t pictop,
+                                   uint32_t offsetDstX, uint32_t offsetDstY,  uint32_t offsetSrcX,
+                                   uint32_t offsetSrcY, uint32_t cropWidth,   uint32_t cropHeight)
+){
+    if(river2D_insideRect(&engine->controls.pointer, &editor->button_new))
+    {
+        river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+
+        // TODO: (mapedit #2): handle new project button
+
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
+                               editor->button_new.upperLeft.x * engine->backbuffer.width,
+                               editor->button_new.upperLeft.y * engine->backbuffer.height + 25,
+                               0, 0, 196, 5);
+
+        if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+        {
+            editor->state = MAPEDIT_STATE_EDIT;
+        }
+    }
+    else if(river2D_insideRect(&engine->controls.pointer, &editor->button_load))
+    {
+        river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+
+        // TODO: (mapedit #2): handle load project button
+
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
+                               editor->button_load.upperLeft.x * engine->backbuffer.width,
+                               editor->button_load.upperLeft.y * engine->backbuffer.height + 25,
+                               0, 0, 210, 5);
+
+        if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+        {
+            editor->state = MAPEDIT_STATE_LOAD;
+        }
+    }
+    else if(river2D_insideRect(&engine->controls.pointer, &editor->button_quit))
+    {
+        river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
+                               editor->button_quit.upperLeft.x * engine->backbuffer.width,
+                               editor->button_quit.upperLeft.y * engine->backbuffer.height + 25,
+                               0, 0, 72, 5);
+
+        if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+        {
+            engine->running = false;
+        }
+    }
+    else
+    {
+        river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
+
+        //TESTING: getting info on UI button locations
+        if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
+        {
+            fprintf(stderr, "mouse clicked @:\n");
+            fprintf(stderr, "x: %f\n", engine->controls.pointer.x);
+            fprintf(stderr, "y: %f\n", engine->controls.pointer.y);
+        }
+    }
+}
+
+internal void drawEditor
+(
+    EngineData *engine,
+    void (*river2D_compositeImage)(EngineData *engine,  River2D_Image *image, uint8_t pictop,
+                                   uint32_t offsetDstX, uint32_t offsetDstY,  uint32_t offsetSrcX,
+                                   uint32_t offsetSrcY, uint32_t cropWidth,   uint32_t cropHeight)
+){
+    river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE]);
+
+    river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_VOID], RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
+                           engine->planes[MAPEDIT_PLANE_VOID].width,
+                           engine->planes[MAPEDIT_PLANE_VOID].height);
+}
+
+internal void checkEditorButtons
+(
+    EngineData *engine,
+    EditorData *editor,
+    void (*river2D_compositeImage)(EngineData *engine,  River2D_Image *image, uint8_t pictop,
+                                   uint32_t offsetDstX, uint32_t offsetDstY,  uint32_t offsetSrcX,
+                                   uint32_t offsetSrcY, uint32_t cropWidth,   uint32_t cropHeight)
+){
+    if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
+    {
+        editor->state = MAPEDIT_STATE_MENU;
+        return;
+    }
+
+    // TODO: (mapedit #6): highlight in gridsize where cursor is currently
+    // grid starts from top left of backbuffer
+
+    // TODO: (mapedit #6): make backbuffer moveable,
+    // move grid along with it (so it might be offset)
+}
+
+internal void drawFilePicker
+(
+    EngineData *engine,
+    void (*river2D_compositeImage)(EngineData *engine,  River2D_Image *image, uint8_t pictop,
+                                   uint32_t offsetDstX, uint32_t offsetDstY,  uint32_t offsetSrcX,
+                                   uint32_t offsetSrcY, uint32_t cropWidth,   uint32_t cropHeight)
+){
+    river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_VOID], RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
+                           engine->planes[MAPEDIT_PLANE_VOID].width,
+                           engine->planes[MAPEDIT_PLANE_VOID].height);
+}
+
+internal void checkFilePickerButtons
+(
+    EngineData *engine,
+    EditorData *editor,
+    void (*river2D_compositeImage)(EngineData *engine,  River2D_Image *image, uint8_t pictop,
+                                   uint32_t offsetDstX, uint32_t offsetDstY,  uint32_t offsetSrcX,
+                                   uint32_t offsetSrcY, uint32_t cropWidth,   uint32_t cropHeight)
+){
+    if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
+    {
+        editor->state = MAPEDIT_STATE_MENU;
+        return;
+    }
+
+    // TODO: (mapedit #2): write simple file picker or path loader,
+    // then after loading file, transition to editor state
+}
+
 void mapedit_update
 (
     EngineData *engine,
@@ -95,110 +247,20 @@ void mapedit_update
                                    uint32_t offsetDstX, uint32_t offsetDstY,  uint32_t offsetSrcX,
                                    uint32_t offsetSrcY, uint32_t cropWidth,   uint32_t cropHeight)
 ){
-
     if(editor->state == MAPEDIT_STATE_MENU)
     {
-        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_BACKGROUND], RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
-                               engine->planes[MAPEDIT_PLANE_BACKGROUND].width,
-                               engine->planes[MAPEDIT_PLANE_BACKGROUND].height);
-
-        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_MENU], RIVER2D_PICTOP_OVER,
-                               engine->backbuffer.width  / 2 - engine->planes[MAPEDIT_PLANE_MENU].width  / 2,
-                               engine->backbuffer.height / 2 - engine->planes[MAPEDIT_PLANE_MENU].height / 2,
-                               0, 0,
-                               engine->planes[MAPEDIT_PLANE_MENU].width,
-                               engine->planes[MAPEDIT_PLANE_MENU].height);
-
-        if(river2D_insideRect(&engine->controls.pointer, &editor->button_new))
-        {
-            river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
-
-            // TODO: (mapedit #2): handle new project button
-
-            river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
-                                   editor->button_new.upperLeft.x * engine->backbuffer.width,
-                                   editor->button_new.upperLeft.y * engine->backbuffer.height + 25,
-                                   0, 0, 196, 5);
-
-            if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
-            {
-                editor->state = MAPEDIT_STATE_EDIT;
-            }
-        }
-        else if(river2D_insideRect(&engine->controls.pointer, &editor->button_load))
-        {
-            river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
-
-            // TODO: (mapedit #2): handle load project button
-
-            river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
-                                   editor->button_load.upperLeft.x * engine->backbuffer.width,
-                                   editor->button_load.upperLeft.y * engine->backbuffer.height + 25,
-                                   0, 0, 210, 5);
-
-            if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
-            {
-                editor->state = MAPEDIT_STATE_LOAD;
-            }
-        }
-        else if(river2D_insideRect(&engine->controls.pointer, &editor->button_quit))
-        {
-            river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
-
-            river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
-                                   editor->button_quit.upperLeft.x * engine->backbuffer.width,
-                                   editor->button_quit.upperLeft.y * engine->backbuffer.height + 25,
-                                   0, 0, 72, 5);
-
-            if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
-            {
-                engine->running = false;
-            }
-        }
-        else
-        {
-            river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
-
-            //TESTING: getting info on UI button locations
-            if(engine->controls.keymap & MAPEDIT_BIT_LEFTM)
-            {
-                fprintf(stderr, "mouse clicked @:\n");
-                fprintf(stderr, "x: %f\n", engine->controls.pointer.x);
-                fprintf(stderr, "y: %f\n", engine->controls.pointer.y);
-            }
-        }
+        drawMainMenu(engine, river2D_compositeImage);
+        checkMainMenuButtons(engine, editor, river2D_compositeImage);
     }
     else if(editor->state == MAPEDIT_STATE_EDIT)
     {
-        river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE]);
-
-        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_VOID], RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
-                               engine->planes[MAPEDIT_PLANE_VOID].width,
-                               engine->planes[MAPEDIT_PLANE_VOID].height);
-
-        if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
-        {
-            editor->state = MAPEDIT_STATE_MENU;
-            return;
-        }
-
-        // TODO: (mapedit #6): highlight in gridsize where cursor is currently
-        // grid starts from top left of backbuffer
-
-        // TODO: (mapedit #6): make backbuffer moveable,
-        // move grid along with it (so it might be offset)
+        drawEditor(engine, river2D_compositeImage);
+        checkEditorButtons(engine, editor, river2D_compositeImage);
     }
     else if(editor->state == MAPEDIT_STATE_LOAD)
     {
-        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_VOID], RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
-                               engine->planes[MAPEDIT_PLANE_VOID].width,
-                               engine->planes[MAPEDIT_PLANE_VOID].height);
-
-        if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
-        {
-            editor->state = MAPEDIT_STATE_MENU;
-            return;
-        }
+        drawFilePicker(engine, river2D_compositeImage);
+        checkFilePickerButtons(engine, editor, river2D_compositeImage);
     }
     else
     {
