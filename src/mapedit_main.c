@@ -530,12 +530,22 @@ internal void checkEditorButtons
         {
             river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_NULL]);
 
-            // TODO: allow selecting same size at weird (min tilesize) offsets
+            double   deltaX = engine->controls.pointer.x - tilesheet.upperLeft.x;
+            double   deltaY = engine->controls.pointer.y - tilesheet.upperLeft.y;
+            uint8_t  tileX  = (uint8_t)(deltaX * engine->backbuffer.width  / editor->tilesize);
+            uint8_t  tileY  = (uint8_t)(deltaY * engine->backbuffer.height / editor->tilesize);
 
-            double  deltaX = engine->controls.pointer.x - tilesheet.upperLeft.x;
-            double  deltaY = engine->controls.pointer.y - tilesheet.upperLeft.y;
-            uint8_t tileX  = (uint8_t)(deltaX * engine->backbuffer.width  / (editor->tilesize * editor->selectMult));
-            uint8_t tileY  = (uint8_t)(deltaY * engine->backbuffer.height / (editor->tilesize * editor->selectMult));
+            uint16_t tilesheet_width  = engine->planes[MAPEDIT_PLANE_TILESHEET].width  / editor->tilesize;
+            uint16_t tilesheet_height = engine->planes[MAPEDIT_PLANE_TILESHEET].height / editor->tilesize;
+
+            if(tileX + editor->selectMult > tilesheet_width)
+            {
+                tileX = tilesheet_width - editor->selectMult;
+            }
+            if(tileY + editor->selectMult > tilesheet_height)
+            {
+                tileY = tilesheet_height - editor->selectMult;
+            }
 
             if(engine->controls.keymap & MAPEDIT_BIT_INC_SIZE)
             {
@@ -550,16 +560,16 @@ internal void checkEditorButtons
             }
 
             engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_PICTOP_OVER,
-                                   (uint32_t)(engine->backbuffer.width  * (tilesheet.upperLeft.x + 0.0055f) + tileX * editor->tilesize * editor->selectMult),
-                                   (uint32_t)(engine->backbuffer.height * (tilesheet.upperLeft.y + 0.006f)  + tileY * editor->tilesize * editor->selectMult),
+                                   (uint32_t)(engine->backbuffer.width  * (tilesheet.upperLeft.x + 0.0055f) + tileX * editor->tilesize),
+                                   (uint32_t)(engine->backbuffer.height * (tilesheet.upperLeft.y + 0.006f)  + tileY * editor->tilesize),
                                    0, 0,
                                    editor->tilesize * editor->selectMult,
                                    editor->tilesize * editor->selectMult);
 
             if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
             {
-                editor->selectedX          =  tileX * editor->selectMult;
-                editor->selectedY          =  tileY * editor->selectMult;
+                editor->selectedX           = tileX;
+                editor->selectedY           = tileY;
                 editor->editorflags        &= ~MAPEDIT_FLAG_BIT_TILEPICKER;
                 engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
             }
@@ -614,15 +624,27 @@ internal void checkEditorButtons
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE]);
 
+        // FIXME: currently writing past end of row back around to the beginning, with the mouse.
+        // constrain the mouse to the window, maybe? I'm not sure
+
+        bool keep_going = true;
+
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
             uint64_t topLeft = editor->currentLayer * editor->map_width * editor->map_height + tileY * editor->map_width + tileX;
-            for(uint8_t y = 0; y < editor->selectMult; ++y)
+            for(uint8_t y = 0; y < editor->selectMult && keep_going; ++y)
             {
                 for(uint8_t x = 0; x < editor->selectMult; ++x)
                 {
-                    editor->tiles[topLeft + y * editor->map_width + x].x = editor->selectedX + x;
-                    editor->tiles[topLeft + y * editor->map_width + x].y = editor->selectedY + y;
+                    uint64_t index = topLeft + y * editor->map_width + x;
+                    if(index > ((editor->currentLayer + 1) * editor->map_width * editor->map_height - 1))
+                    {
+                        keep_going = false;
+                        break;
+                    }
+
+                    editor->tiles[index].x = editor->selectedX + x;
+                    editor->tiles[index].y = editor->selectedY + y;
                 }
             }
         }
