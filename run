@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# BACKLOG: switch to CMake. it can natively export compile commands!
+
 if [[ ! -d "./obj/" ]]
 then
     mkdir ./obj/
