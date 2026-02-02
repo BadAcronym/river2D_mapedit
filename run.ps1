@@ -42,7 +42,6 @@ function Get-Compileprep()
     Write-Host ""
     Write-Host "\033[36mcompiling river2D...\033[0m"
     Write-Host ""
-    premake5 ecc
     premake5 vs2022
 }
 

@@ -1,8 +1,7 @@
 ---@diagnostic disable: undefined-global, undefined-field
-require"vendor/premake-ecc/ecc"
 require"vendor/river2D/premake5"
 
---TODO: turn on implicit cast warnings
+--TODO: turn on implicit cast warnings on linux
 
 workspace("mapedit")
     configurations({"debug", "asan", "release"})
