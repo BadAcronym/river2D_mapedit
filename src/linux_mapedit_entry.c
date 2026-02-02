@@ -1,14 +1,22 @@
 #include "mapedit_main.h"
 
 // BACKLOG: future renderers
-//river2D_vulkan.dll / libriver2D_vulkan.so
-//river2D_d3d.dll    / libriver2D_d3d.so
-//river2D_openGL.dll / libriver2D_opengl.so
-//
-//move the functions to their appropriate paths
+// libriver2Dopengl.so / river2DopenGL.dll
+// libriver2Dvulkan.so / river2Dvulkan.dll
+// libriver2Dd3d.so    / river2Dd3d.dll
 
 // TODO: load/save animated tiles, not just static ones!
 // TODO: for this, allow animating tiles in the first place. How to store that info?
+
+#ifdef ASAN
+        #define LIBPATH "./vendor/river2D/bin/asan/"
+#else
+    #ifdef DEBUG
+        #define LIBPATH "./vendor/river2D/bin/debug/"
+    #else
+        #define LIBPATH "./vendor/river2D/bin/release/"
+    #endif
+#endif
 
 int main
 (
@@ -18,10 +26,7 @@ int main
     EngineData    engine = {0};
     River2D_Image planes[RIVER2D_MAX_PLANES] = {0};
 
-    // TODO: get rid of this function pointer loading nonsense, just pass the libpath and wanted renderer :p
-    // think about where this would go, Engine or app side function pointer struct.
-
-    river2D_resolveRenderer(&engine, RIVER2D_RENDERER_SOFTWARE);
+    river2D_resolveRenderer(&engine, LIBPATH, RIVER2D_RENDERER_SOFTWARE);
 
     river2D_loadConfig(&engine.config);
     engine.config.choices |= RIVER2D_CHOICE_STATIC_CANVAS_BIT;
