@@ -160,6 +160,7 @@ void mapedit_init
     editor->tilesize = 16;
 
     // allow 10 layers by default, any other layer you'd have to add to the UI selector
+    // PERF: start with 1 layer, only poll and draw that layer, until there's any data written to the other layers 🤔
     editor->layers       = 10;
     editor->currentLayer = 1;
 
