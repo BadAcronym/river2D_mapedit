@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <memory.h>
 
-// TODO: write logging function (or library, lmfao) that writes to file, as well as stderr
+// BACKLOG: write logging function (or library, lmfao) that writes to file, as well as stderr
 // copy some river3D code for that?
 
 void mapedit_init
@@ -71,7 +71,6 @@ void mapedit_init
     // BACKLOG: transfer to mapedit_loadConfig at some point, when keybinds should be remappable
     // TODO: add "save project" UI button in the menu, but only if a project is actually loaded
 
-    // TODO: handle each letter as itself, for typing...
     engine->controls.keycodes[MAPEDIT_KEY_LEFTM]      = RIVER2D_MOUSE1;
     engine->controls.keycodes[MAPEDIT_KEY_MIDDLEM]    = RIVER2D_MOUSE2;
     engine->controls.keycodes[MAPEDIT_KEY_RIGHTM]     = RIVER2D_MOUSE3;
@@ -89,6 +88,32 @@ void mapedit_init
     engine->controls.keycodes[MAPEDIT_KEY_LAYER7]     = river2D_interpretCharAsKey('7');
     engine->controls.keycodes[MAPEDIT_KEY_LAYER8]     = river2D_interpretCharAsKey('8');
     engine->controls.keycodes[MAPEDIT_KEY_LAYER9]     = river2D_interpretCharAsKey('9');
+    engine->controls.keycodes[MAPEDIT_KEY_A]          = river2D_interpretCharAsKey('a');
+    engine->controls.keycodes[MAPEDIT_KEY_B]          = river2D_interpretCharAsKey('b');
+    engine->controls.keycodes[MAPEDIT_KEY_C]          = river2D_interpretCharAsKey('c');
+    engine->controls.keycodes[MAPEDIT_KEY_D]          = river2D_interpretCharAsKey('d');
+    engine->controls.keycodes[MAPEDIT_KEY_E]          = river2D_interpretCharAsKey('e');
+    engine->controls.keycodes[MAPEDIT_KEY_F]          = river2D_interpretCharAsKey('f');
+    engine->controls.keycodes[MAPEDIT_KEY_G]          = river2D_interpretCharAsKey('g');
+    engine->controls.keycodes[MAPEDIT_KEY_H]          = river2D_interpretCharAsKey('h');
+    engine->controls.keycodes[MAPEDIT_KEY_I]          = river2D_interpretCharAsKey('i');
+    engine->controls.keycodes[MAPEDIT_KEY_J]          = river2D_interpretCharAsKey('j');
+    engine->controls.keycodes[MAPEDIT_KEY_K]          = river2D_interpretCharAsKey('k');
+    engine->controls.keycodes[MAPEDIT_KEY_L]          = river2D_interpretCharAsKey('l');
+    engine->controls.keycodes[MAPEDIT_KEY_M]          = river2D_interpretCharAsKey('m');
+    engine->controls.keycodes[MAPEDIT_KEY_N]          = river2D_interpretCharAsKey('n');
+    engine->controls.keycodes[MAPEDIT_KEY_O]          = river2D_interpretCharAsKey('o');
+    engine->controls.keycodes[MAPEDIT_KEY_P]          = river2D_interpretCharAsKey('p');
+    engine->controls.keycodes[MAPEDIT_KEY_Q]          = river2D_interpretCharAsKey('q');
+    engine->controls.keycodes[MAPEDIT_KEY_R]          = river2D_interpretCharAsKey('r');
+    engine->controls.keycodes[MAPEDIT_KEY_S]          = river2D_interpretCharAsKey('s');
+    engine->controls.keycodes[MAPEDIT_KEY_T]          = river2D_interpretCharAsKey('t');
+    engine->controls.keycodes[MAPEDIT_KEY_U]          = river2D_interpretCharAsKey('u');
+    engine->controls.keycodes[MAPEDIT_KEY_V]          = river2D_interpretCharAsKey('v');
+    engine->controls.keycodes[MAPEDIT_KEY_W]          = river2D_interpretCharAsKey('w');
+    engine->controls.keycodes[MAPEDIT_KEY_X]          = river2D_interpretCharAsKey('x');
+    engine->controls.keycodes[MAPEDIT_KEY_Y]          = river2D_interpretCharAsKey('y');
+    engine->controls.keycodes[MAPEDIT_KEY_Z]          = river2D_interpretCharAsKey('z');
 
     // JANKY: I'm loading text by creating a button, then overwriting it. maybe allow for float-centric text loading in the future?
     Coordinates point = { .x = 0.5f, .y = 0.2f };
