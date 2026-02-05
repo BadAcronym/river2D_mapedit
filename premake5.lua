@@ -15,7 +15,7 @@ project("mapedit binary")
     warnings("Extra")
     targetname("mapedit")
     libdirs({"./vendor/river2D/bin/%{cfg.buildcfg}/", "./vendor/river2D/vendor/imgsurf/bin/%{cfg.buildcfg}/"})
-    includedirs({"./include/", "/usr/include/", "./vendor/river2D/include/"})
+    includedirs({"./include/", "/usr/include/", "./vendor/river2D/include/", "./vendor/river2D/vendor/imgsurf/include"})
     debugdir("./")
 
     filter("configurations:asan")
