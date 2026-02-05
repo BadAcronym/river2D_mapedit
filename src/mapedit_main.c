@@ -1,5 +1,7 @@
 #include "mapedit_main.h"
 
+#include "imgsurf_main.h"
+
 #include <stdio.h>
 #include <inttypes.h>
 #include <stdlib.h>
@@ -228,23 +230,11 @@ internal void saveCurrentProject
         return;
     }
 
-    uint64_t tilecount = editor->layers * editor->map_height * editor->map_width;
-
     const char header[9] = "r2Dtiles";
     fwrite(header, sizeof(header) - 1, 1, file);
 
     size_t elements = 0;
 
-    if((elements = fwrite(&engine->planes[MAPEDIT_PLANE_TILESHEET].width, 4, 1, file)) != 1)
-    {
-        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
-        return;
-    }
-    if((elements = fwrite(&engine->planes[MAPEDIT_PLANE_TILESHEET].height, 4, 1, file)) != 1)
-    {
-        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
-        return;
-    }
     if((elements = fwrite(&editor->map_width, 2, 1, file)) != 1)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
@@ -261,11 +251,14 @@ internal void saveCurrentProject
         return;
     }
 
-    // TODO: **tilesheet** (size tilesheet_width * tilesheet_height * RIVER2D_BPP)
-
+    uint64_t tilecount = editor->layers * editor->map_height * editor->map_width;
     fwrite(editor->tiles, sizeof(Tile), tilecount, file);
 
-    // NOTE: add extra sure EOF, like QOI?
+    imgsurf_write_ptr(file, engine->planes[MAPEDIT_PLANE_TILESHEET].data, IMGSURF_FILE_QOI,
+                      engine->planes[MAPEDIT_PLANE_TILESHEET].width,
+                      engine->planes[MAPEDIT_PLANE_TILESHEET].height,
+                      IMGSURF_CHANNELS_BGRA, 8);
+
     fclose(file);
 
     // TODO: some user indication (notification) that the project has been saved
@@ -666,11 +659,6 @@ internal void loadProject
     EngineData *engine,
     EditorData *editor
 ){
-    // if(engine->planes[MAPEDIT_PLANE_TILESHEET].data)
-    // {
-    //     river2D_destroyImage(&engine->planes[MAPEDIT_PLANE_TILESHEET]);
-    // }
-
     // TODO: later, this will be a filepicker screen with recent files, etc, (aseprite esc)
     // JANKY: load whatever file is "*.rte" in the current directory for now, instead of a filepicker
     const char *dirlist = river2D_listFiles(".");
@@ -742,16 +730,6 @@ internal void loadProject
 
     size_t elements = 0;
 
-    if((elements = fread(&engine->planes[MAPEDIT_PLANE_TILESHEET].width, 4, 1, file)) != 1)
-    {
-        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
-        return;
-    }
-    if((elements = fread(&engine->planes[MAPEDIT_PLANE_TILESHEET].height, 4, 1, file)) != 1)
-    {
-        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
-        return;
-    }
     if((elements = fread(&editor->map_width, 2, 1, file)) != 1)
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
@@ -762,20 +740,25 @@ internal void loadProject
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
         return;
     }
-
-    if((byte = fgetc(file)) == EOF)
+    if((elements = fread(&editor->layers, 1, 1, file)) != 1)
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
         return;
     }
-    editor->layers = (uint8_t)byte;
-
-    // TODO: read the tilesheet with imgsurf_read into engine->planes[MAPEDIT_PLANE_TILESHEET].
 
     for(uint32_t i = 0; i < tilecount * 4 && ((byte = fgetc(file)) != EOF); ++i)
     {
         ((uint8_t*)editor->tiles)[i] = byte;
     }
+
+    if(engine->planes[MAPEDIT_PLANE_TILESHEET].data)
+    {
+        river2D_destroyImage(&engine->planes[MAPEDIT_PLANE_TILESHEET]);
+    }
+
+    // NOTE: might not be BGRA
+    engine->planes[MAPEDIT_PLANE_TILESHEET].data = imgsurf_load_ptr(file, IMGSURF_FILE_QOI, &engine->planes[MAPEDIT_PLANE_TILESHEET].width, &engine->planes[MAPEDIT_PLANE_TILESHEET].height, IMGSURF_CHANNELS_BGRA, 8);
+    engine->planes[MAPEDIT_PLANE_TILESHEET].path = "imgsurf_load_ptr in loadProject";
 
     fclose(file);
     free((void*)dirlist);
