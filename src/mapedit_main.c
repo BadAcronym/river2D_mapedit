@@ -737,6 +737,11 @@ internal void loadProject
 
     size_t elements = 0;
 
+    if((elements = fread(&editor->tilesize, 2, 1, file)) != 1)
+    {
+        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
+        return;
+    }
     if((elements = fread(&editor->map_width, 2, 1, file)) != 1)
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
