@@ -1,10 +1,7 @@
 const char header[8] = "r2Dtiles";
-uint32_t  tilesheet_width;
-uint32_t  tilesheet_height;
 uint16_t  map_width;
 uint16_t  map_height;
 uint8_t   layers;
 
-**tilesheet**      (size tilesheet_width * tilesheet_height * RIVER2D_BPP)
 **array of tiles** (size map_width * map_height * sizeof(Tile))
-EOF
+**tilesheet**      (size tilesheet_width * tilesheet_height * RIVER2D_BPP)
