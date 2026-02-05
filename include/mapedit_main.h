@@ -136,7 +136,7 @@ typedef struct EditorData
     River2D_Time lastPresentTime;
     uint8_t      current_state;
     uint8_t      previous_state;
-    uint8_t      tilesize;
+    uint16_t     tilesize;
     uint8_t      currentLayer;
     uint8_t      layers;
     uint8_t      selectedX;

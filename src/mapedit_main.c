@@ -235,6 +235,11 @@ internal void saveCurrentProject
 
     size_t elements = 0;
 
+    if((elements = fwrite(&editor->tilesize, 2, 1, file)) != 1)
+    {
+        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
+        return;
+    }
     if((elements = fwrite(&editor->map_width, 2, 1, file)) != 1)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
@@ -588,8 +593,8 @@ internal void checkEditorButtons
 
     // TODO: wheel or menu of recently used tiles and a hotbar with specific ones, somewhere.
 
-    uint8_t tileX = (uint8_t)(engine->controls.pointer.x * engine->backbuffer.width  / editor->tilesize);
-    uint8_t tileY = (uint8_t)(engine->controls.pointer.y * engine->backbuffer.height / editor->tilesize);
+    uint16_t tileX = (uint16_t)(engine->controls.pointer.x * engine->backbuffer.width  / editor->tilesize);
+    uint16_t tileY = (uint16_t)(engine->controls.pointer.y * engine->backbuffer.height / editor->tilesize);
 
     // TODO: display outline around the current selected tile? pulsating, maybe
 
@@ -706,6 +711,10 @@ internal void loadProject
         return;
     }
 
+    #ifdef DEBUG
+    fprintf(stderr, "\nloading file: %s\n", filename);
+    #endif
+
     FILE *file = fopen(filename, "rb");
     if(!file)
     {
@@ -713,8 +722,6 @@ internal void loadProject
         changeState(editor, MAPEDIT_STATE_EDIT);
         return;
     }
-
-    uint64_t tilecount = editor->layers * editor->map_width * editor->map_height;
 
     const char header[9] = "r2Dtiles";
     int byte;
@@ -745,6 +752,8 @@ internal void loadProject
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
         return;
     }
+
+    uint64_t tilecount = editor->layers * editor->map_width * editor->map_height;
 
     for(uint32_t i = 0; i < tilecount * 4 && ((byte = fgetc(file)) != EOF); ++i)
     {
