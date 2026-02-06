@@ -15,35 +15,35 @@ void mapedit_init
     EngineData *engine,
     EditorData *editor
 ){
-    river2D_loadImage(engine, "assets/background.qoi", &engine->planes[MAPEDIT_PLANE_BACKGROUND], RIVER2D_CHANNELS_BGRA, 8);
+    river2D_loadImage_file(engine, "assets/background.qoi", &engine->planes[MAPEDIT_PLANE_BACKGROUND], RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_BACKGROUND].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load background image!\033[0m\n");
     }
 
-    river2D_loadImage(engine, "assets/black.qoi", &engine->planes[MAPEDIT_PLANE_VOID], RIVER2D_CHANNELS_BGRA, 8);
+    river2D_loadImage_file(engine, "assets/black.qoi", &engine->planes[MAPEDIT_PLANE_VOID], RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_VOID].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load black image!\033[0m\n");
     }
 
-    river2D_loadImage(engine, "assets/highlight.qoi", &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_CHANNELS_BGRA, 8);
+    river2D_loadImage_file(engine, "assets/highlight.qoi", &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_HIGHLIGHT].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load highlight image!\033[0m\n");
     }
 
-    river2D_loadImage(engine, "assets/cursor_default.qoi", &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT], RIVER2D_CHANNELS_BGRA, 8);
+    river2D_loadImage_file(engine, "assets/cursor_default.qoi", &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT], RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load default cursor!\033[0m\n");
     }
-    river2D_loadImage(engine, "assets/cursor_hover.qoi", &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER], RIVER2D_CHANNELS_BGRA, 8);
+    river2D_loadImage_file(engine, "assets/cursor_hover.qoi", &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER], RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_CURSOR_HOVER].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load hover cursor!\033[0m\n");
     }
-    river2D_loadImage(engine, "assets/cursor_place.qoi", &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE], RIVER2D_CHANNELS_BGRA, 8);
+    river2D_loadImage_file(engine, "assets/cursor_place.qoi", &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE], RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_CURSOR_PLACE].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load place cursor!\033[0m\n");
@@ -53,7 +53,7 @@ void mapedit_init
     engine->planes[MAPEDIT_PLANE_CURSOR_NULL].height = 32;
     engine->planes[MAPEDIT_PLANE_CURSOR_NULL].data   = calloc(32 * 32 * RIVER2D_BPP, 1);
 
-    river2D_loadImage(engine, "assets/font_default_16.qoi", &engine->planes[MAPEDIT_PLANE_FONT16], RIVER2D_CHANNELS_BGRA, 8);
+    river2D_loadImage_file(engine, "assets/font_default_16.qoi", &engine->planes[MAPEDIT_PLANE_FONT16], RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_FONT16].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load font image!\033[0m\n");
@@ -151,7 +151,7 @@ void mapedit_init
     // HACK: load upfront for now
     // TODO: load all .qoi files from folder, then append to one big tilesheet in memory
     // BACKLOG: allow replacing this tilesheet by selecting one or multiple files with a file browser...
-    river2D_loadImage(engine, "assets/tiles/tilesheet.qoi", &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_CHANNELS_BGRA, 8);
+    river2D_loadImage_file(engine, "assets/tiles/tilesheet.qoi", &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_CHANNELS_BGRA, 8);
 
     // BACKLOG: allow decreasing/increasing this minimum tilesize
     editor->tilesize   = 8;
