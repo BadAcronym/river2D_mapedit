@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# BACKLOG: switch to writing makefiles and hand-write compile commands
-
 if [[ ! -d "./obj/" ]]
 then
     mkdir ./obj/
