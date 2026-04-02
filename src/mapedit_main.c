@@ -33,6 +33,17 @@ void mapedit_init
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load highlight image!\033[0m\n");
     }
 
+    river2D_loadImage_file(engine, "assets/saving.qoi", &engine->planes[MAPEDIT_PLANE_ICON_SAVING], RIVER2D_CHANNELS_BGRA, 8);
+    if(!engine->planes[MAPEDIT_PLANE_ICON_SAVING].data)
+    {
+        fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load saving icon!\033[0m\n");
+    }
+    river2D_loadImage_file(engine, "assets/saved.qoi", &engine->planes[MAPEDIT_PLANE_ICON_SAVED], RIVER2D_CHANNELS_BGRA, 8);
+    if(!engine->planes[MAPEDIT_PLANE_ICON_SAVED].data)
+    {
+        fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load saved icon!\033[0m\n");
+    }
+
     river2D_loadImage_file(engine, "assets/cursor_default.qoi", &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT], RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT].data)
     {
@@ -159,6 +170,7 @@ void mapedit_init
 
     // allow 10 layers by default, any other layer you'd have to add to the UI selector
     // PERF: start with 1 layer, only poll and draw that layer, until there's any data written to the other layers 🤔
+    // means to keep track of what layer has had data written to it, and only go through those??
     editor->layers       = 10;
     editor->currentLayer = 1;
 
@@ -182,6 +194,8 @@ void mapedit_init
 
     River2D_Time now                = river2D_queryTime();
     editor->lastPresentTime         = now;
+    editor->lastSaveTime.s          = 1;
+    editor->lastSaveTime.ns         = 1;
     engine->controls.lastScrollTime = now;
 
     editor->current_state = MAPEDIT_STATE_MENU;
@@ -202,7 +216,7 @@ internal void changeState
 ){
     if(editor->current_state == nextState)
     {
-        fprintf(stderr, "\n\033[33;1;7mWARNING: trying to change state to the same state.\033[0m\n");
+        fprintf(stderr, "\n\033[33;1;7mWARNING: trying to change state to the same state: %u.\033[0m\n", editor->current_state);
         return;
     }
 
@@ -219,6 +233,13 @@ internal void saveCurrentProject
     EngineData *engine,
     EditorData *editor
 ){
+    engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_ICON_SAVING], &engine->backbuffer,
+                           RIVER2D_PICTOP_OVER, 16, 16, 0, 0,
+                           engine->planes[MAPEDIT_PLANE_ICON_SAVING].width,
+                           engine->planes[MAPEDIT_PLANE_ICON_SAVING].height);
+
+    engine->bltBuffer(engine);
+
     char *filename = malloc(256);
     sprintf(filename, "%s.rte", editor->projectName);
 
@@ -266,11 +287,10 @@ internal void saveCurrentProject
 
     fclose(file);
 
-    // TODO: some user indication (notification) that the project has been saved
-    // create mapedit_notify type deal, input amount of ms that it'd stay on screen and where (float center), etc
-
     free(filename);
     fprintf(stdout, "Project saved successfully.\n");
+
+    editor->lastSaveTime = river2D_queryTime();
 }
 
 internal void drawMainMenu
@@ -392,7 +412,6 @@ internal void checkMainMenuButtons
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
             saveCurrentProject(engine, editor);
-            changeState(editor, MAPEDIT_STATE_EDIT);
             engine->controls.keymap    &= ~MAPEDIT_BIT_SAVE;
             engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
         }
@@ -441,6 +460,17 @@ internal void drawEditor
             }
         }
     }
+
+    // BACKLOG: make these icons use some sort of opacity...
+    River2D_Time delta   = river2D_deltaTime(&editor->lastSaveTime);
+    double       deltaMS = (double)delta.s * 1e3f + (double)delta.ns / 1e6f;
+    if(deltaMS < 250)
+    {
+        engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_ICON_SAVED], &engine->backbuffer,
+                               RIVER2D_PICTOP_OVER, 16, 16, 0, 0,
+                               engine->planes[MAPEDIT_PLANE_ICON_SAVED].width,
+                               engine->planes[MAPEDIT_PLANE_ICON_SAVED].height);
+    }
 }
 
 internal void checkEditorButtons
@@ -458,7 +488,6 @@ internal void checkEditorButtons
     if(engine->controls.keymap & MAPEDIT_BIT_SAVE)
     {
         saveCurrentProject(engine, editor);
-        changeState(editor, MAPEDIT_STATE_EDIT);
         engine->controls.keymap &= ~MAPEDIT_BIT_SAVE;
         return;
     }
@@ -660,6 +689,7 @@ internal void drawFilePicker
 (
     EngineData *engine
 ){
+    // void for now, file picker UI goes here
     engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_VOID],
                            &engine->backbuffer, RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
                            engine->planes[MAPEDIT_PLANE_VOID].width,

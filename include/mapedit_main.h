@@ -11,11 +11,13 @@
 #define MAPEDIT_PLANE_SELECTTILE      6
 #define MAPEDIT_PLANE_HUD2            7
 #define MAPEDIT_PLANE_HUD3            8
-#define MAPEDIT_PLANE_CURSOR_DEFAULT  9
-#define MAPEDIT_PLANE_CURSOR_HOVER   10
-#define MAPEDIT_PLANE_CURSOR_PLACE   11
-#define MAPEDIT_PLANE_CURSOR_NULL    12
-#define MAPEDIT_PLANE_TILESHEET      13
+#define MAPEDIT_PLANE_ICON_SAVING     9
+#define MAPEDIT_PLANE_ICON_SAVED     10
+#define MAPEDIT_PLANE_CURSOR_DEFAULT 11
+#define MAPEDIT_PLANE_CURSOR_HOVER   12
+#define MAPEDIT_PLANE_CURSOR_PLACE   13
+#define MAPEDIT_PLANE_CURSOR_NULL    14
+#define MAPEDIT_PLANE_TILESHEET      15
 
 #define MAPEDIT_BUTTON_LEFTM       0
 #define MAPEDIT_BUTTON_RIGHTM      1
@@ -134,6 +136,7 @@ Tile;
 typedef struct EditorData
 {
     River2D_Time lastPresentTime;
+    River2D_Time lastSaveTime;
     uint8_t      current_state;
     uint8_t      previous_state;
     uint16_t     tilesize;
