@@ -430,6 +430,10 @@ internal void checkMainMenuButtons
     }
 }
 
+// CURRENT: add sidebar that displays:
+// current layer
+// couple most recent tiles
+
 internal void drawEditor
 (
     EngineData *engine,
@@ -461,7 +465,7 @@ internal void drawEditor
         }
     }
 
-    // BACKLOG: make these icons use some sort of opacity...
+    // BACKLOG: make these icons use some sort of opacity, fade-out animation (and / or animation in general)...
     River2D_Time delta   = river2D_deltaTime(&editor->lastSaveTime);
     double       deltaMS = (double)delta.s * 1e3f + (double)delta.ns / 1e6f;
     if(deltaMS < 250)
