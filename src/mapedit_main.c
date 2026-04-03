@@ -430,10 +430,6 @@ internal void checkMainMenuButtons
     }
 }
 
-// CURRENT: add sidebar that displays:
-// current layer
-// couple most recent tiles
-
 internal void drawEditor
 (
     EngineData *engine,
@@ -464,6 +460,17 @@ internal void drawEditor
             }
         }
     }
+
+    char layerStr[2];
+    snprintf(layerStr, 2, "%hhu", editor->currentLayer);
+
+    engine->loadText(engine, &engine->planes[MAPEDIT_PLANE_CURRENTLAYER],
+                     layerStr, MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
+
+    engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTLAYER], &engine->backbuffer,
+                           RIVER2D_PICTOP_OVER, 608, 16, 0, 0,
+                           engine->planes[MAPEDIT_PLANE_CURRENTLAYER].width,
+                           engine->planes[MAPEDIT_PLANE_CURRENTLAYER].height);
 
     // BACKLOG: make these icons use some sort of opacity, fade-out animation (and / or animation in general)...
     River2D_Time delta   = river2D_deltaTime(&editor->lastSaveTime);
