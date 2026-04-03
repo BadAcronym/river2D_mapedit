@@ -317,6 +317,17 @@ internal void drawMainMenu
                                engine->planes[MAPEDIT_PLANE_PAUSEMENU].width,
                                engine->planes[MAPEDIT_PLANE_PAUSEMENU].height);
     }
+
+    // BACKLOG: make these icons use some sort of opacity, fade-out animation (and / or animation in general)...
+    River2D_Time delta   = river2D_deltaTime(&editor->lastSaveTime);
+    double       deltaMS = (double)delta.s * 1e3f + (double)delta.ns / 1e6f;
+    if(deltaMS < 250)
+    {
+        engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_ICON_SAVED], &engine->backbuffer,
+                               RIVER2D_PICTOP_OVER, 16, 16, 0, 0,
+                               engine->planes[MAPEDIT_PLANE_ICON_SAVED].width,
+                               engine->planes[MAPEDIT_PLANE_ICON_SAVED].height);
+    }
 }
 
 internal void checkMainMenuButtons
