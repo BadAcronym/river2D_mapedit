@@ -188,12 +188,12 @@ void mapedit_init
         editor->tiles[i].y = UINT16_MAX;
     }
 
-    // TESTING: static undo/redo size
+    // TESTING: static undo/redo size. Increase to like 4096 or something huge when I'm done testing
+    // (because an action is essentially a singular tile change... hmmm... maybe even that wouldn't be enough)
     #define actions 4
 
     editor->history_start = malloc(actions * sizeof(Action));
     editor->history_end   = editor->history_start + actions * sizeof(Action);
-    editor->history_ptr   = editor->history_start;
 
     // TODO: allow changing project name with a menu item or hotkey, pop-up textbox and user keyboard input
     if(!editor->projectName)
@@ -542,8 +542,18 @@ internal void placeSelectedTiles
 
     for(uint8_t y = 0; y < editor->selectMult && !break_outer; ++y)
     {
+        if(tileY + y > editor->map_height - 1)
+        {
+            break;
+        }
+
         for(uint8_t x = 0; x < editor->selectMult; ++x)
         {
+            if(tileX + x > editor->map_width - 1)
+            {
+                break;
+            }
+
             uint64_t index = topLeft + y * editor->map_width + x;
             if(index > maxCurIndex)
             {
@@ -551,40 +561,35 @@ internal void placeSelectedTiles
                 break;
             }
 
+            if(editor->tiles[index].x == editor->selectedX + x &&
+               editor->tiles[index].y == editor->selectedY + y
+            ){
+                continue;
+            }
+
+            editor->history_start[editor->current_action].timestamp   = river2D_queryTime();
+            editor->history_start[editor->current_action].index       = index;
+            editor->history_start[editor->current_action].prev_tile.x = editor->tiles[index].x;
+            editor->history_start[editor->current_action].prev_tile.y = editor->tiles[index].y;
+            editor->history_start[editor->current_action].new_tile.x  = editor->selectedX + x;
+            editor->history_start[editor->current_action].new_tile.y  = editor->selectedY + y;
+
+            if(++editor->current_action >= actions)
+            {
+                editor->current_action = 0;
+            }
+
             editor->tiles[index].x = editor->selectedX + x;
             editor->tiles[index].y = editor->selectedY + y;
+
+            // TESTING: debugging what is what here
+
+            fprintf(stderr, "action [%u] taken: placed %ux%u tile stencil from tilesheet at (%u, %u) at map coords (%u, %u, %u), ", editor->current_action,
+                    editor->selectMult, editor->selectMult, editor->tiles[topLeft].x, editor->tiles[topLeft].y, tileX, tileY, editor->currentLayer);
+            fprintf(stderr, "topLeft: %lu\n", topLeft);
         }
     }
 
-    // CURRENT: okay, now I need to save the previous stencil size tiles in the action history, in order for it to be restored...
-    // how to do this dynamically? I don't want every click to memcpy.
-    // Do I just ask for max stencil size on every item in the action history? that seems like a lot.
-
-    editor->history_ptr->x           = tileX;
-    editor->history_ptr->y           = tileY;
-    editor->history_ptr->z           = editor->currentLayer;
-    // HEAP-BUFFER-OVERFLOW: triggered on 288 bytes after 144000-byte region from reading past editor->tiles
-    // happens only on layer 0. hmmm
-    editor->history_ptr->prev_tile.x = editor->tiles[topLeft].x;
-    editor->history_ptr->prev_tile.y = editor->tiles[topLeft].y;
-    editor->history_ptr->new_tile.x  = editor->selectedX;
-    editor->history_ptr->new_tile.y  = editor->selectedY;
-    editor->history_ptr->selectMult  = editor->selectMult;
-
-    // if(editor->history_ptr <= editor->history_end - sizeof(Action))
-    // {
-    //     editor->history_ptr += sizeof(Action);
-    // }
-    // else
-    // {
-    //     editor->history_ptr = editor->history_start;
-    // }
-
-    // TESTING: debugging what is what here
-
-    fprintf(stderr, "action taken: placed %ux%u tile stencil from tilesheet at (%u, %u) at map coords (%u, %u, %u), ",
-            editor->selectMult, editor->selectMult, editor->tiles[topLeft].x, editor->tiles[topLeft].y, tileX, tileY, editor->currentLayer);
-    fprintf(stderr, "topLeft: %lu, should be max %u\n", topLeft, 3600 + editor->currentLayer * editor->map_width * editor->map_height);
 }
 
 internal void checkEditorButtons

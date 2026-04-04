@@ -138,12 +138,11 @@ Tile;
 
 typedef struct Action
 {
-    uint16_t x;
-    uint16_t y;
-    uint8_t  z;
-    uint8_t  selectMult;
-    Tile     prev_tile;
-    Tile     new_tile;
+    River2D_Time timestamp;
+    uint64_t     index;
+    uint8_t      selectMult;
+    Tile         prev_tile;
+    Tile         new_tile;
 }
 Action;
 
@@ -170,7 +169,7 @@ typedef struct EditorData
     Tile         *tiles;
     Action       *history_start;
     Action       *history_end;
-    Action       *history_ptr;
+    uint8_t      current_action;
     const char   *projectName;
 }
 EditorData;
