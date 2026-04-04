@@ -181,7 +181,6 @@ void mapedit_init
 
     uint64_t tilecount = editor->layers * editor->map_width * editor->map_height;
     // TODO: resize this when user decides to expand canvas, set map_width & _height
-    // HEAP-BUFFER-OVERFLOW: ALLOC
     editor->tiles = malloc(tilecount * sizeof(Tile));
     for(uint32_t i = 0; i < tilecount; ++i)
     {
@@ -560,7 +559,6 @@ internal void placeSelectedTiles
     editor->history_ptr->x           = tileX;
     editor->history_ptr->y           = tileY;
     editor->history_ptr->z           = editor->currentLayer;
-    // HEAP-BUFFER-OVERFLOW: TRIGGER
     editor->history_ptr->prev_tile.x = editor->tiles[topLeft].x;
     editor->history_ptr->prev_tile.y = editor->tiles[topLeft].y;
     editor->history_ptr->new_tile.x  = editor->selectedX;
@@ -577,9 +575,6 @@ internal void placeSelectedTiles
     }
 
     // TESTING: debugging what is what here
-
-    // ASAN: confine the cursor to the godforsaken window and don't let tiles overflow into the next/previous row or layer!!
-    // clamping x seems to work fine. but why does clamping y not work???
 
     fprintf(stderr, "action taken: placed %ux%u tile stencil from tilesheet at (%u, %u) at map coords (%u, %u, %u), ",
             editor->selectMult, editor->selectMult, editor->tiles[topLeft].x, editor->tiles[topLeft].y, tileX, tileY, editor->currentLayer);
@@ -756,8 +751,6 @@ internal void checkEditorButtons
     // sizing down, then back up.
 
     // TODO: wheel or menu of recently used tiles and a hotbar with specific ones, somewhere.
-
-    // FIXME: need to clamp tileX and tileY values to possible coordinates!
 
     uint16_t tileX = (uint16_t)(engine->controls.pointer.x * engine->backbuffer.width  / editor->tilesize);
     uint16_t tileY = (uint16_t)(engine->controls.pointer.y * engine->backbuffer.height / editor->tilesize);
@@ -1121,27 +1114,16 @@ void mapedit_processPointer
     uint32_t   y
 ){
     Dimensions dim = river2D_getWindowSize(engine);
+
+    if(x > dim.width)
+    {
+        x = dim.width;
+    }
+    if(y > dim.height)
+    {
+        y = dim.height;
+    }
+
     engine->controls.pointer.x = (double)x / dim.width;
     engine->controls.pointer.y = (double)y / dim.height;
-
-    // FIXME: clamp pointer between 0,1!
-    // clamping x works fine, y not so much... why???
-
-    if(engine->controls.pointer.x > 1)
-    {
-        engine->controls.pointer.x = 1;
-    }
-    else if(engine->controls.pointer.x < 0)
-    {
-        engine->controls.pointer.x = 0;
-    }
-
-    if(engine->controls.pointer.y > 1)
-    {
-        engine->controls.pointer.y = 1;
-    }
-    else if(engine->controls.pointer.y < 0)
-    {
-        engine->controls.pointer.y = 0;
-    }
 }
