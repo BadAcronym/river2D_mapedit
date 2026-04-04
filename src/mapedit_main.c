@@ -531,24 +531,28 @@ internal void placeSelectedTiles
     uint16_t   tileY
 ){
     bool     break_outer = false;
-    uint64_t topLeft     = editor->currentLayer * editor->map_width * editor->map_height + tileY * editor->map_width + tileX;
+    uint64_t sliceSize   = editor->map_width * editor->map_height;
+    uint64_t topLeft     = editor->currentLayer * sliceSize + tileY * editor->map_width + tileX;
+    uint64_t maxCurIndex = sliceSize + editor->currentLayer * sliceSize - 1;
+
+    if(topLeft > maxCurIndex)
+    {
+        topLeft = maxCurIndex;
+    }
 
     for(uint8_t y = 0; y < editor->selectMult && !break_outer; ++y)
     {
         for(uint8_t x = 0; x < editor->selectMult; ++x)
         {
             uint64_t index = topLeft + y * editor->map_width + x;
-            if(index > ((editor->currentLayer + 1) * editor->map_width * editor->map_height - 1))
+            if(index > maxCurIndex)
             {
                 break_outer = true;
                 break;
             }
 
-            uint16_t newTileX = editor->selectedX + x;
-            uint16_t newTileY = editor->selectedX + y;
-
-            editor->tiles[index].x = newTileX;
-            editor->tiles[index].y = newTileY;
+            editor->tiles[index].x = editor->selectedX + x;
+            editor->tiles[index].y = editor->selectedY + y;
         }
     }
 
@@ -559,26 +563,28 @@ internal void placeSelectedTiles
     editor->history_ptr->x           = tileX;
     editor->history_ptr->y           = tileY;
     editor->history_ptr->z           = editor->currentLayer;
+    // HEAP-BUFFER-OVERFLOW: triggered on 288 bytes after 144000-byte region from reading past editor->tiles
+    // happens only on layer 0. hmmm
     editor->history_ptr->prev_tile.x = editor->tiles[topLeft].x;
     editor->history_ptr->prev_tile.y = editor->tiles[topLeft].y;
     editor->history_ptr->new_tile.x  = editor->selectedX;
     editor->history_ptr->new_tile.y  = editor->selectedY;
     editor->history_ptr->selectMult  = editor->selectMult;
 
-    if(editor->history_ptr <= editor->history_end - sizeof(Action))
-    {
-        editor->history_ptr += sizeof(Action);
-    }
-    else
-    {
-        editor->history_ptr = editor->history_start;
-    }
+    // if(editor->history_ptr <= editor->history_end - sizeof(Action))
+    // {
+    //     editor->history_ptr += sizeof(Action);
+    // }
+    // else
+    // {
+    //     editor->history_ptr = editor->history_start;
+    // }
 
     // TESTING: debugging what is what here
 
     fprintf(stderr, "action taken: placed %ux%u tile stencil from tilesheet at (%u, %u) at map coords (%u, %u, %u), ",
             editor->selectMult, editor->selectMult, editor->tiles[topLeft].x, editor->tiles[topLeft].y, tileX, tileY, editor->currentLayer);
-    fprintf(stderr, "cursor: (%f, %f)\n", engine->controls.pointer.x, engine->controls.pointer.y);
+    fprintf(stderr, "topLeft: %lu, should be max %u\n", topLeft, 3600 + editor->currentLayer * editor->map_width * editor->map_height);
 }
 
 internal void checkEditorButtons
