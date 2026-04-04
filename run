@@ -40,7 +40,7 @@ then
     fi
 
     echo ""
-    echo -e "\033[36mcompiling river2D...\033[0m"
+    echo -e "\033[36mcompiling river2D_mapedit...\033[0m"
     echo ""
     premake5 gmake
 
