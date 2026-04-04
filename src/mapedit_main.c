@@ -880,7 +880,7 @@ void mapedit_update
     }
     else
     {
-        fprintf(stderr, "\033[31;1;7mERROR: invalid state.\033[0m\n");
+        fprintf(stderr, "\033[31;1;7mERROR: invalid state: %u, previous: %u\033[0m\n", editor->current_state, editor->previous_state);
     }
 }
 
