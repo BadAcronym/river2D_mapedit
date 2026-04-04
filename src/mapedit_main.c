@@ -79,7 +79,9 @@ void mapedit_init
     engine->controls.buttoncodes[MAPEDIT_BUTTON_MIDDLEM]    = RIVER2D_MOUSE2;
     engine->controls.buttoncodes[MAPEDIT_BUTTON_RIGHTM]     = RIVER2D_MOUSE3;
 
-    engine->controls.keycodes[MAPEDIT_KEY_ESCAPE]     = river2D_interpretCharAsKey(0x1B);
+    engine->controls.keycodes[MAPEDIT_KEY_ESCAPE]     = river2D_interpretCharAsKey(RIVER2D_ASCII_ESCAPE);
+    engine->controls.keycodes[MAPEDIT_KEY_LSHIFT]     = river2D_interpretCharAsKey(RIVER2D_ASCII_LSHIFT);
+    engine->controls.keycodes[MAPEDIT_KEY_LCTRL]      = river2D_interpretCharAsKey(RIVER2D_ASCII_LCTRL);
     engine->controls.keycodes[MAPEDIT_KEY_QUIT]       = river2D_interpretCharAsKey('q');
     engine->controls.keycodes[MAPEDIT_KEY_SAVE]       = river2D_interpretCharAsKey('s');
     engine->controls.keycodes[MAPEDIT_KEY_TILEPICKER] = river2D_interpretCharAsKey('t');
@@ -342,7 +344,7 @@ internal void checkMainMenuButtons
         return;
     }
 
-    if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
+    if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE && editor->previous_state != MAPEDIT_STATE_NULL)
     {
         changeState(editor, editor->previous_state);
         engine->controls.keymap &= ~MAPEDIT_BIT_ESCAPE;
@@ -500,20 +502,6 @@ internal void checkEditorButtons
     EngineData *engine,
     EditorData *editor
 ){
-    if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
-    {
-        changeState(editor, MAPEDIT_STATE_MENU);
-        engine->controls.keymap &= ~MAPEDIT_BIT_ESCAPE;
-        return;
-    }
-
-    if(engine->controls.keymap & MAPEDIT_BIT_SAVE)
-    {
-        saveCurrentProject(engine, editor);
-        engine->controls.keymap &= ~MAPEDIT_BIT_SAVE;
-        return;
-    }
-
     // TODO: (mapedit #6): make backbuffer moveable,
     // move grid along with it (so it might be offset)
 
@@ -527,6 +515,12 @@ internal void checkEditorButtons
 
     if(editor->editorflags & MAPEDIT_FLAG_BIT_TILEPICKER)
     {
+        if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
+        {
+            engine->controls.keymap &= ~MAPEDIT_BIT_ESCAPE;
+            editor->editorflags     &= ~MAPEDIT_FLAG_BIT_TILEPICKER;
+            return;
+        }
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_BACKGROUND],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
                                engine->backbuffer.width  / 10,
@@ -636,8 +630,32 @@ internal void checkEditorButtons
 
         return;
     }
-
-    // TODO: display the current layer (maybe lil UI to the left).
+    else if(engine->controls.keymap & MAPEDIT_BIT_Z &&
+            engine->controls.keymap & MAPEDIT_BIT_LCTRL
+    ){
+        fprintf(stderr, "TODO: UNDO!\n");
+        engine->controls.keymap &= ~MAPEDIT_BIT_Z;
+        return;
+    }
+    else if(engine->controls.keymap & MAPEDIT_BIT_Y &&
+            engine->controls.keymap & MAPEDIT_BIT_LCTRL
+    ){
+        fprintf(stderr, "TODO: REDO!\n");
+        engine->controls.keymap &= ~MAPEDIT_BIT_Y;
+        return;
+    }
+    else if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
+    {
+        changeState(editor, MAPEDIT_STATE_MENU);
+        engine->controls.keymap &= ~MAPEDIT_BIT_ESCAPE;
+        return;
+    }
+    else if(engine->controls.keymap & MAPEDIT_BIT_SAVE)
+    {
+        saveCurrentProject(engine, editor);
+        engine->controls.keymap &= ~MAPEDIT_BIT_SAVE;
+        return;
+    }
 
     // BACKLOG: allow isolating view to a selected layer
 
@@ -653,7 +671,7 @@ internal void checkEditorButtons
     uint16_t tileX = (uint16_t)(engine->controls.pointer.x * engine->backbuffer.width  / editor->tilesize);
     uint16_t tileY = (uint16_t)(engine->controls.pointer.y * engine->backbuffer.height / editor->tilesize);
 
-    // TODO: display outline around the current selected tile? pulsating, maybe
+    // TODO: display outline around the current selected tile
 
     engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET],
                            &engine->backbuffer, RIVER2D_PICTOP_OVER,
@@ -680,22 +698,19 @@ internal void checkEditorButtons
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE]);
 
-        // FIXME: currently writing past end of row back around to the beginning, with the mouse.
-        // constrain the mouse to the window, maybe? I'm not sure
-
-        bool keep_going = true;
+        bool break_outer = false;
 
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
             uint64_t topLeft = editor->currentLayer * editor->map_width * editor->map_height + tileY * editor->map_width + tileX;
-            for(uint8_t y = 0; y < editor->selectMult && keep_going; ++y)
+            for(uint8_t y = 0; y < editor->selectMult && !break_outer; ++y)
             {
                 for(uint8_t x = 0; x < editor->selectMult; ++x)
                 {
                     uint64_t index = topLeft + y * editor->map_width + x;
                     if(index > ((editor->currentLayer + 1) * editor->map_width * editor->map_height - 1))
                     {
-                        keep_going = false;
+                        break_outer = true;
                         break;
                     }
 
@@ -899,7 +914,10 @@ void mapedit_updateSelectSize
     }
 }
 
-internal void processButton
+#define CONTROL_NOTFOUND 0
+#define CONTROL_FOUND    1
+
+internal uint8_t processButton
 (
     River2D_ControlMap *controls,
     uint64_t           desired,
@@ -917,10 +935,14 @@ internal void processButton
         {
             controls->buttonmap &= ~bit;
         }
+
+        return CONTROL_FOUND;
     }
+
+    return CONTROL_NOTFOUND;
 }
 
-internal void processKey
+internal uint8_t processKey
 (
     River2D_ControlMap *controls,
     uint64_t           desired,
@@ -938,7 +960,10 @@ internal void processKey
         {
             controls->keymap &= ~bit;
         }
+        return CONTROL_FOUND;
     }
+
+    return CONTROL_NOTFOUND;
 }
 
 void mapedit_processButtons
@@ -947,9 +972,13 @@ void mapedit_processButtons
     uint64_t           button,
     bool               isDown
 ){
-    processButton(controls, MAPEDIT_BUTTON_LEFTM,      button, MAPEDIT_BIT_LEFTM,      isDown);
-    processButton(controls, MAPEDIT_BUTTON_MIDDLEM,    button, MAPEDIT_BIT_MIDDLEM,    isDown);
-    processButton(controls, MAPEDIT_BUTTON_RIGHTM,     button, MAPEDIT_BIT_RIGHTM,     isDown);
+    if(processButton(controls, MAPEDIT_BUTTON_LEFTM,      button, MAPEDIT_BIT_LEFTM,      isDown)){ return; }
+    if(processButton(controls, MAPEDIT_BUTTON_MIDDLEM,    button, MAPEDIT_BIT_MIDDLEM,    isDown)){ return; }
+    if(processButton(controls, MAPEDIT_BUTTON_RIGHTM,     button, MAPEDIT_BIT_RIGHTM,     isDown)){ return; }
+
+#ifdef DEBUG
+    fprintf(stderr, "button pressed: %" PRIx64 "\n", button);
+#endif
 }
 
 void mapedit_processKeys
@@ -958,52 +987,53 @@ void mapedit_processKeys
     uint64_t           key,
     bool               isDown
 ){
-    processKey(controls, MAPEDIT_KEY_ESCAPE,     key, MAPEDIT_BIT_ESCAPE,     isDown);
-    processKey(controls, MAPEDIT_KEY_SHIFT,      key, MAPEDIT_BIT_SHIFT,      isDown);
-    processKey(controls, MAPEDIT_KEY_SAVE,       key, MAPEDIT_BIT_SAVE,       isDown);
-    processKey(controls, MAPEDIT_KEY_QUIT,       key, MAPEDIT_BIT_QUIT,       isDown);
-    processKey(controls, MAPEDIT_KEY_SAVE,       key, MAPEDIT_BIT_SAVE,       isDown);
-    processKey(controls, MAPEDIT_KEY_TILEPICKER, key, MAPEDIT_BIT_TILEPICKER, isDown);
-    processKey(controls, MAPEDIT_KEY_INC_SIZE,   key, MAPEDIT_BIT_INC_SIZE,   isDown);
-    processKey(controls, MAPEDIT_KEY_RED_SIZE,   key, MAPEDIT_BIT_RED_SIZE,   isDown);
-    processKey(controls, MAPEDIT_KEY_LAYER0,     key, MAPEDIT_BIT_LAYER0,     isDown);
-    processKey(controls, MAPEDIT_KEY_LAYER1,     key, MAPEDIT_BIT_LAYER1,     isDown);
-    processKey(controls, MAPEDIT_KEY_LAYER2,     key, MAPEDIT_BIT_LAYER2,     isDown);
-    processKey(controls, MAPEDIT_KEY_LAYER3,     key, MAPEDIT_BIT_LAYER3,     isDown);
-    processKey(controls, MAPEDIT_KEY_LAYER4,     key, MAPEDIT_BIT_LAYER4,     isDown);
-    processKey(controls, MAPEDIT_KEY_LAYER5,     key, MAPEDIT_BIT_LAYER5,     isDown);
-    processKey(controls, MAPEDIT_KEY_LAYER6,     key, MAPEDIT_BIT_LAYER6,     isDown);
-    processKey(controls, MAPEDIT_KEY_LAYER7,     key, MAPEDIT_BIT_LAYER7,     isDown);
-    processKey(controls, MAPEDIT_KEY_LAYER8,     key, MAPEDIT_BIT_LAYER8,     isDown);
-    processKey(controls, MAPEDIT_KEY_LAYER9,     key, MAPEDIT_BIT_LAYER9,     isDown);
-    processKey(controls, MAPEDIT_KEY_ZOOMIN,     key, MAPEDIT_BIT_ZOOMIN,     isDown);
-    processKey(controls, MAPEDIT_KEY_ZOOMOUT,    key, MAPEDIT_BIT_ZOOMOUT,    isDown);
-    processKey(controls, MAPEDIT_KEY_A,          key, MAPEDIT_BIT_A,          isDown);
-    processKey(controls, MAPEDIT_KEY_B,          key, MAPEDIT_BIT_B,          isDown);
-    processKey(controls, MAPEDIT_KEY_C,          key, MAPEDIT_BIT_C,          isDown);
-    processKey(controls, MAPEDIT_KEY_D,          key, MAPEDIT_BIT_D,          isDown);
-    processKey(controls, MAPEDIT_KEY_E,          key, MAPEDIT_BIT_E,          isDown);
-    processKey(controls, MAPEDIT_KEY_F,          key, MAPEDIT_BIT_F,          isDown);
-    processKey(controls, MAPEDIT_KEY_G,          key, MAPEDIT_BIT_G,          isDown);
-    processKey(controls, MAPEDIT_KEY_H,          key, MAPEDIT_BIT_H,          isDown);
-    processKey(controls, MAPEDIT_KEY_I,          key, MAPEDIT_BIT_I,          isDown);
-    processKey(controls, MAPEDIT_KEY_J,          key, MAPEDIT_BIT_J,          isDown);
-    processKey(controls, MAPEDIT_KEY_K,          key, MAPEDIT_BIT_K,          isDown);
-    processKey(controls, MAPEDIT_KEY_L,          key, MAPEDIT_BIT_L,          isDown);
-    processKey(controls, MAPEDIT_KEY_M,          key, MAPEDIT_BIT_M,          isDown);
-    processKey(controls, MAPEDIT_KEY_N,          key, MAPEDIT_BIT_N,          isDown);
-    processKey(controls, MAPEDIT_KEY_O,          key, MAPEDIT_BIT_O,          isDown);
-    processKey(controls, MAPEDIT_KEY_P,          key, MAPEDIT_BIT_P,          isDown);
-    processKey(controls, MAPEDIT_KEY_Q,          key, MAPEDIT_BIT_Q,          isDown);
-    processKey(controls, MAPEDIT_KEY_R,          key, MAPEDIT_BIT_R,          isDown);
-    processKey(controls, MAPEDIT_KEY_S,          key, MAPEDIT_BIT_S,          isDown);
-    processKey(controls, MAPEDIT_KEY_T,          key, MAPEDIT_BIT_T,          isDown);
-    processKey(controls, MAPEDIT_KEY_U,          key, MAPEDIT_BIT_U,          isDown);
-    processKey(controls, MAPEDIT_KEY_V,          key, MAPEDIT_BIT_V,          isDown);
-    processKey(controls, MAPEDIT_KEY_W,          key, MAPEDIT_BIT_W,          isDown);
-    processKey(controls, MAPEDIT_KEY_X,          key, MAPEDIT_BIT_X,          isDown);
-    processKey(controls, MAPEDIT_KEY_Y,          key, MAPEDIT_BIT_Y,          isDown);
-    processKey(controls, MAPEDIT_KEY_Z,          key, MAPEDIT_BIT_Z,          isDown);
+    if(processKey(controls, MAPEDIT_KEY_ESCAPE,     key, MAPEDIT_BIT_ESCAPE,     isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_LSHIFT,     key, MAPEDIT_BIT_LSHIFT,     isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_LCTRL,      key, MAPEDIT_BIT_LCTRL,      isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_SAVE,       key, MAPEDIT_BIT_SAVE,       isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_QUIT,       key, MAPEDIT_BIT_QUIT,       isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_SAVE,       key, MAPEDIT_BIT_SAVE,       isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_TILEPICKER, key, MAPEDIT_BIT_TILEPICKER, isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_INC_SIZE,   key, MAPEDIT_BIT_INC_SIZE,   isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_RED_SIZE,   key, MAPEDIT_BIT_RED_SIZE,   isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_LAYER0,     key, MAPEDIT_BIT_LAYER0,     isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_LAYER1,     key, MAPEDIT_BIT_LAYER1,     isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_LAYER2,     key, MAPEDIT_BIT_LAYER2,     isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_LAYER3,     key, MAPEDIT_BIT_LAYER3,     isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_LAYER4,     key, MAPEDIT_BIT_LAYER4,     isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_LAYER5,     key, MAPEDIT_BIT_LAYER5,     isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_LAYER6,     key, MAPEDIT_BIT_LAYER6,     isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_LAYER7,     key, MAPEDIT_BIT_LAYER7,     isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_LAYER8,     key, MAPEDIT_BIT_LAYER8,     isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_LAYER9,     key, MAPEDIT_BIT_LAYER9,     isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_ZOOMIN,     key, MAPEDIT_BIT_ZOOMIN,     isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_ZOOMOUT,    key, MAPEDIT_BIT_ZOOMOUT,    isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_A,          key, MAPEDIT_BIT_A,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_B,          key, MAPEDIT_BIT_B,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_C,          key, MAPEDIT_BIT_C,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_D,          key, MAPEDIT_BIT_D,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_E,          key, MAPEDIT_BIT_E,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_F,          key, MAPEDIT_BIT_F,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_G,          key, MAPEDIT_BIT_G,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_H,          key, MAPEDIT_BIT_H,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_I,          key, MAPEDIT_BIT_I,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_J,          key, MAPEDIT_BIT_J,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_K,          key, MAPEDIT_BIT_K,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_L,          key, MAPEDIT_BIT_L,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_M,          key, MAPEDIT_BIT_M,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_N,          key, MAPEDIT_BIT_N,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_O,          key, MAPEDIT_BIT_O,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_P,          key, MAPEDIT_BIT_P,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_Q,          key, MAPEDIT_BIT_Q,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_R,          key, MAPEDIT_BIT_R,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_S,          key, MAPEDIT_BIT_S,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_T,          key, MAPEDIT_BIT_T,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_U,          key, MAPEDIT_BIT_U,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_V,          key, MAPEDIT_BIT_V,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_W,          key, MAPEDIT_BIT_W,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_X,          key, MAPEDIT_BIT_X,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_Y,          key, MAPEDIT_BIT_Y,          isDown)){ return; }
+    if(processKey(controls, MAPEDIT_KEY_Z,          key, MAPEDIT_BIT_Z,          isDown)){ return; }
 
 #ifdef DEBUG
     fprintf(stderr, "key pressed: %" PRIx64 "\n", key);
