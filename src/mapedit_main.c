@@ -181,12 +181,20 @@ void mapedit_init
 
     uint64_t tilecount = editor->layers * editor->map_width * editor->map_height;
     // TODO: resize this when user decides to expand canvas, set map_width & _height
+    // HEAP-BUFFER-OVERFLOW: ALLOC
     editor->tiles = malloc(tilecount * sizeof(Tile));
     for(uint32_t i = 0; i < tilecount; ++i)
     {
         editor->tiles[i].x = UINT16_MAX;
         editor->tiles[i].y = UINT16_MAX;
     }
+
+    // TESTING: static undo/redo size
+    #define actions 4
+
+    editor->history_start = malloc(actions * sizeof(Action));
+    editor->history_end   = editor->history_start + actions * sizeof(Action);
+    editor->history_ptr   = editor->history_start;
 
     // TODO: allow changing project name with a menu item or hotkey, pop-up textbox and user keyboard input
     if(!editor->projectName)
@@ -208,6 +216,7 @@ int32_t mapedit_shutdown
     EditorData *editor
 ){
     free(editor->tiles);
+    free(editor->history_start);
     return 0;
 }
 
@@ -497,6 +506,86 @@ internal void drawEditor
     }
 }
 
+internal void undo
+(
+    EngineData *engine,
+    EditorData *editor
+){
+    // CURRENT: use undo function to reverse last action: undo up to 16 actions to test
+    fprintf(stderr, "TODO: UNDO!\n");
+}
+
+internal void redo
+(
+    EngineData *engine,
+    EditorData *editor
+){
+    // CURRENT: use redo function to reverse last undo: undo up to 16 undos to test
+    fprintf(stderr, "TODO: REDO!\n");
+}
+
+internal void placeSelectedTiles
+(
+    EngineData *engine,
+    EditorData *editor,
+    uint16_t   tileX,
+    uint16_t   tileY
+){
+    bool     break_outer = false;
+    uint64_t topLeft     = editor->currentLayer * editor->map_width * editor->map_height + tileY * editor->map_width + tileX;
+
+    for(uint8_t y = 0; y < editor->selectMult && !break_outer; ++y)
+    {
+        for(uint8_t x = 0; x < editor->selectMult; ++x)
+        {
+            uint64_t index = topLeft + y * editor->map_width + x;
+            if(index > ((editor->currentLayer + 1) * editor->map_width * editor->map_height - 1))
+            {
+                break_outer = true;
+                break;
+            }
+
+            uint16_t newTileX = editor->selectedX + x;
+            uint16_t newTileY = editor->selectedX + y;
+
+            editor->tiles[index].x = newTileX;
+            editor->tiles[index].y = newTileY;
+        }
+    }
+
+    // CURRENT: okay, now I need to save the previous stencil size tiles in the action history, in order for it to be restored...
+    // how to do this dynamically? I don't want every click to memcpy.
+    // Do I just ask for max stencil size on every item in the action history? that seems like a lot.
+
+    editor->history_ptr->x           = tileX;
+    editor->history_ptr->y           = tileY;
+    editor->history_ptr->z           = editor->currentLayer;
+    // HEAP-BUFFER-OVERFLOW: TRIGGER
+    editor->history_ptr->prev_tile.x = editor->tiles[topLeft].x;
+    editor->history_ptr->prev_tile.y = editor->tiles[topLeft].y;
+    editor->history_ptr->new_tile.x  = editor->selectedX;
+    editor->history_ptr->new_tile.y  = editor->selectedY;
+    editor->history_ptr->selectMult  = editor->selectMult;
+
+    if(editor->history_ptr <= editor->history_end - sizeof(Action))
+    {
+        editor->history_ptr += sizeof(Action);
+    }
+    else
+    {
+        editor->history_ptr = editor->history_start;
+    }
+
+    // TESTING: debugging what is what here
+
+    // ASAN: confine the cursor to the godforsaken window and don't let tiles overflow into the next/previous row or layer!!
+    // clamping x seems to work fine. but why does clamping y not work???
+
+    fprintf(stderr, "action taken: placed %ux%u tile stencil from tilesheet at (%u, %u) at map coords (%u, %u, %u), ",
+            editor->selectMult, editor->selectMult, editor->tiles[topLeft].x, editor->tiles[topLeft].y, tileX, tileY, editor->currentLayer);
+    fprintf(stderr, "cursor: (%f, %f)\n", engine->controls.pointer.x, engine->controls.pointer.y);
+}
+
 internal void checkEditorButtons
 (
     EngineData *engine,
@@ -633,14 +722,14 @@ internal void checkEditorButtons
     else if(engine->controls.keymap & MAPEDIT_BIT_Z &&
             engine->controls.keymap & MAPEDIT_BIT_LCTRL
     ){
-        fprintf(stderr, "TODO: UNDO!\n");
+        undo(engine, editor);
         engine->controls.keymap &= ~MAPEDIT_BIT_Z;
         return;
     }
     else if(engine->controls.keymap & MAPEDIT_BIT_Y &&
             engine->controls.keymap & MAPEDIT_BIT_LCTRL
     ){
-        fprintf(stderr, "TODO: REDO!\n");
+        redo(engine, editor);
         engine->controls.keymap &= ~MAPEDIT_BIT_Y;
         return;
     }
@@ -667,6 +756,8 @@ internal void checkEditorButtons
     // sizing down, then back up.
 
     // TODO: wheel or menu of recently used tiles and a hotbar with specific ones, somewhere.
+
+    // FIXME: need to clamp tileX and tileY values to possible coordinates!
 
     uint16_t tileX = (uint16_t)(engine->controls.pointer.x * engine->backbuffer.width  / editor->tilesize);
     uint16_t tileY = (uint16_t)(engine->controls.pointer.y * engine->backbuffer.height / editor->tilesize);
@@ -698,26 +789,9 @@ internal void checkEditorButtons
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE]);
 
-        bool break_outer = false;
-
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
-            uint64_t topLeft = editor->currentLayer * editor->map_width * editor->map_height + tileY * editor->map_width + tileX;
-            for(uint8_t y = 0; y < editor->selectMult && !break_outer; ++y)
-            {
-                for(uint8_t x = 0; x < editor->selectMult; ++x)
-                {
-                    uint64_t index = topLeft + y * editor->map_width + x;
-                    if(index > ((editor->currentLayer + 1) * editor->map_width * editor->map_height - 1))
-                    {
-                        break_outer = true;
-                        break;
-                    }
-
-                    editor->tiles[index].x = editor->selectedX + x;
-                    editor->tiles[index].y = editor->selectedY + y;
-                }
-            }
+            placeSelectedTiles(engine, editor, tileX, tileY);
         }
     }
 }
@@ -1049,4 +1123,25 @@ void mapedit_processPointer
     Dimensions dim = river2D_getWindowSize(engine);
     engine->controls.pointer.x = (double)x / dim.width;
     engine->controls.pointer.y = (double)y / dim.height;
+
+    // FIXME: clamp pointer between 0,1!
+    // clamping x works fine, y not so much... why???
+
+    if(engine->controls.pointer.x > 1)
+    {
+        engine->controls.pointer.x = 1;
+    }
+    else if(engine->controls.pointer.x < 0)
+    {
+        engine->controls.pointer.x = 0;
+    }
+
+    if(engine->controls.pointer.y > 1)
+    {
+        engine->controls.pointer.y = 1;
+    }
+    else if(engine->controls.pointer.y < 0)
+    {
+        engine->controls.pointer.y = 0;
+    }
 }

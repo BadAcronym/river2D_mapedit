@@ -122,12 +122,12 @@
 #define MAPEDIT_BIT_Y                 0x100000000000
 #define MAPEDIT_BIT_Z                 0x200000000000
 
-#define MAPEDIT_STATE_NULL 0
-#define MAPEDIT_STATE_MENU 1
-#define MAPEDIT_STATE_EDIT 2
-#define MAPEDIT_STATE_LOAD 3
+#define MAPEDIT_STATE_NULL            0
+#define MAPEDIT_STATE_MENU            1
+#define MAPEDIT_STATE_EDIT            2
+#define MAPEDIT_STATE_LOAD            3
 
-#define MAPEDIT_FLAG_BIT_TILEPICKER 0x01
+#define MAPEDIT_FLAG_BIT_TILEPICKER   0x01
 
 typedef struct Tile
 {
@@ -135,6 +135,17 @@ typedef struct Tile
     uint16_t y;
 }
 Tile;
+
+typedef struct Action
+{
+    uint16_t x;
+    uint16_t y;
+    uint8_t  z;
+    uint8_t  selectMult;
+    Tile     prev_tile;
+    Tile     new_tile;
+}
+Action;
 
 typedef struct EditorData
 {
@@ -157,6 +168,9 @@ typedef struct EditorData
     Rect         button_quit;
     Rect         button_tilepicker_close;
     Tile         *tiles;
+    Action       *history_start;
+    Action       *history_end;
+    Action       *history_ptr;
     const char   *projectName;
 }
 EditorData;
