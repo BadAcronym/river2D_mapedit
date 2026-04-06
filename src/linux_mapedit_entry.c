@@ -124,7 +124,7 @@ int main
         {
             mapedit_update(&engine, &editor);
             River2D_Time now   = river2D_queryTime();
-            River2D_Time delta = river2D_deltaTime(&editor.lastPresentTime);
+            River2D_Time delta = river2D_deltaTime(&editor.lastPresentTime, &now);
 
             uint64_t nscount = 5000000;
 
