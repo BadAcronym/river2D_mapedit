@@ -188,13 +188,6 @@ void mapedit_init
         editor->tiles[i].y = UINT16_MAX;
     }
 
-    // TESTING: static undo/redo size. Increase to like 4096 or something huge when I'm done testing
-    // (because an action is essentially a singular tile change... hmmm... maybe even that wouldn't be enough)
-    #define actions 4
-
-    editor->history_start = malloc(actions * sizeof(Action));
-    editor->history_end   = editor->history_start + actions * sizeof(Action);
-
     // TODO: allow changing project name with a menu item or hotkey, pop-up textbox and user keyboard input
     if(!editor->projectName)
     {
@@ -215,7 +208,6 @@ int32_t mapedit_shutdown
     EditorData *editor
 ){
     free(editor->tiles);
-    free(editor->history_start);
     return 0;
 }
 
@@ -329,8 +321,7 @@ internal void drawMainMenu
     }
 
     // BACKLOG: make these icons use some sort of opacity, fade-out animation (and / or animation in general)...
-    River2D_Time delta   = river2D_deltaTime(&editor->lastSaveTime);
-    double       deltaMS = (double)delta.s * 1e3f + (double)delta.ns / 1e6f;
+    uint64_t deltaMS = river2D_deltaTime_now_ms(&editor->lastSaveTime);
     if(deltaMS < 250)
     {
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_ICON_SAVED], &engine->backbuffer,
@@ -494,8 +485,7 @@ internal void drawEditor
                            engine->planes[MAPEDIT_PLANE_CURRENTLAYER].height);
 
     // BACKLOG: make these icons use some sort of opacity, fade-out animation (and / or animation in general)...
-    River2D_Time delta   = river2D_deltaTime(&editor->lastSaveTime);
-    double       deltaMS = (double)delta.s * 1e3f + (double)delta.ns / 1e6f;
+    uint64_t deltaMS = river2D_deltaTime_now_ms(&editor->lastSaveTime);
     if(deltaMS < 250)
     {
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_ICON_SAVED], &engine->backbuffer,
@@ -567,28 +557,23 @@ internal void placeSelectedTiles
                 continue;
             }
 
-            editor->history_start[editor->current_action].timestamp   = river2D_queryTime();
-            editor->history_start[editor->current_action].index       = index;
-            editor->history_start[editor->current_action].prev_tile.x = editor->tiles[index].x;
-            editor->history_start[editor->current_action].prev_tile.y = editor->tiles[index].y;
-            editor->history_start[editor->current_action].new_tile.x  = editor->selectedX + x;
-            editor->history_start[editor->current_action].new_tile.y  = editor->selectedY + y;
+            River2D_Time timestamp = river2D_queryTime();
+            Tile         prev_tile = editor->tiles[index];
+            Tile         new_tile  = {editor->selectedX + x, editor->selectedY + y};
 
-            if(++editor->current_action >= actions)
-            {
-                editor->current_action = 0;
-            }
+            // CURRENT: turn this fprintf call into something that streams this data to a file.
+            // then, we just need to keep track of when the last action started (mouse down) and when it ended (mouse up).
 
-            editor->tiles[index].x = editor->selectedX + x;
-            editor->tiles[index].y = editor->selectedY + y;
+            fprintf(stderr, "%lu.%lu: changed tile @ map coords (%u, %u, %u) from (%u, %u) to (%u, %u)\n", timestamp.s, timestamp.ns,
+                    tileX + x, tileY + y, editor->currentLayer, prev_tile.x, prev_tile.y, new_tile.x, new_tile.y);
 
-            // TESTING: debugging what is what here
-
-            fprintf(stderr, "action [%u] taken: placed %ux%u tile stencil from tilesheet at (%u, %u) at map coords (%u, %u, %u), ", editor->current_action,
-                    editor->selectMult, editor->selectMult, editor->tiles[topLeft].x, editor->tiles[topLeft].y, tileX, tileY, editor->currentLayer);
-            fprintf(stderr, "topLeft: %lu\n", topLeft);
+            editor->tiles[index] = new_tile;
         }
     }
+
+    // fprintf(stderr, "action [%u] taken: placed %ux%u tile stencil from tilesheet at (%u, %u) at map coords (%u, %u, %u), ", editor->current_action,
+    //         editor->selectMult, editor->selectMult, editor->tiles[topLeft].x, editor->tiles[topLeft].y, tileX, tileY, editor->currentLayer);
+    // fprintf(stderr, "topLeft: %lu\n", topLeft);
 
 }
 

@@ -167,9 +167,6 @@ typedef struct EditorData
     Rect         button_quit;
     Rect         button_tilepicker_close;
     Tile         *tiles;
-    Action       *history_start;
-    Action       *history_end;
-    uint8_t      current_action;
     const char   *projectName;
 }
 EditorData;
