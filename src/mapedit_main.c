@@ -563,18 +563,12 @@ internal void placeSelectedTiles
 
             // CURRENT: turn this fprintf call into something that streams this data to a file.
             // then, we just need to keep track of when the last action started (mouse down) and when it ended (mouse up).
-
-            fprintf(stderr, "%lu.%lu: changed tile @ map coords (%u, %u, %u) from (%u, %u) to (%u, %u)\n", timestamp.s, timestamp.ns,
-                    tileX + x, tileY + y, editor->currentLayer, prev_tile.x, prev_tile.y, new_tile.x, new_tile.y);
+            // fprintf(stderr, "%lu.%lu: changed tile @ map index %lu from (%u, %u) to (%u, %u)\n",
+            //         timestamp.s, timestamp.ns, index, prev_tile.x, prev_tile.y, new_tile.x, new_tile.y);
 
             editor->tiles[index] = new_tile;
         }
     }
-
-    // fprintf(stderr, "action [%u] taken: placed %ux%u tile stencil from tilesheet at (%u, %u) at map coords (%u, %u, %u), ", editor->current_action,
-    //         editor->selectMult, editor->selectMult, editor->tiles[topLeft].x, editor->tiles[topLeft].y, tileX, tileY, editor->currentLayer);
-    // fprintf(stderr, "topLeft: %lu\n", topLeft);
-
 }
 
 internal void checkEditorButtons
