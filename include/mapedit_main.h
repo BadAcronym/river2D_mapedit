@@ -139,8 +139,7 @@ Tile;
 typedef struct Action
 {
     River2D_Time timestamp;
-    uint64_t     index;
-    uint8_t      selectMult;
+    uint64_t     map_index;
     Tile         prev_tile;
     Tile         new_tile;
 }

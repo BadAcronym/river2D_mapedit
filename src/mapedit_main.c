@@ -354,7 +354,7 @@ internal void checkMainMenuButtons
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
-        double length = editor->button_new.lowerRight.x - editor->button_new.upperLeft.x;
+        float length = editor->button_new.lowerRight.x - editor->button_new.upperLeft.x;
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
                                (uint32_t)(editor->button_new.upperLeft.x * engine->backbuffer.width),
@@ -381,7 +381,7 @@ internal void checkMainMenuButtons
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
-        double length = editor->button_load.lowerRight.x - editor->button_load.upperLeft.x;
+        float length = editor->button_load.lowerRight.x - editor->button_load.upperLeft.x;
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
                                (uint32_t)(editor->button_load.upperLeft.x * engine->backbuffer.width),
@@ -398,7 +398,7 @@ internal void checkMainMenuButtons
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
-        double length = editor->button_quit.lowerRight.x - editor->button_quit.upperLeft.x;
+        float length = editor->button_quit.lowerRight.x - editor->button_quit.upperLeft.x;
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
                                (uint32_t)(editor->button_quit.upperLeft.x * engine->backbuffer.width),
@@ -414,7 +414,7 @@ internal void checkMainMenuButtons
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
-        double length = editor->button_save.lowerRight.x - editor->button_save.upperLeft.x;
+        float length = editor->button_save.lowerRight.x - editor->button_save.upperLeft.x;
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
                                (uint32_t)(editor->button_save.upperLeft.x * engine->backbuffer.width),
@@ -620,10 +620,10 @@ internal void checkEditorButtons
                                engine->planes[MAPEDIT_PLANE_TILESHEET].height);
 
         Rect tilesheet = {0};
-        tilesheet.upperLeft.x  = 0.095f + (double)((double)editor->tilesize / (double)engine->backbuffer.width);
-        tilesheet.upperLeft.y  = 0.095f + (double)((double)editor->tilesize / (double)engine->backbuffer.height);
-        tilesheet.lowerRight.x = tilesheet.upperLeft.x + (double)engine->planes[MAPEDIT_PLANE_TILESHEET].width  / (double)engine->backbuffer.width;
-        tilesheet.lowerRight.y = tilesheet.upperLeft.y + (double)engine->planes[MAPEDIT_PLANE_TILESHEET].height / (double)engine->backbuffer.height;
+        tilesheet.upperLeft.x  = 0.095f + (float)((float)editor->tilesize / (float)engine->backbuffer.width);
+        tilesheet.upperLeft.y  = 0.095f + (float)((float)editor->tilesize / (float)engine->backbuffer.height);
+        tilesheet.lowerRight.x = tilesheet.upperLeft.x + (float)engine->planes[MAPEDIT_PLANE_TILESHEET].width  / (float)engine->backbuffer.width;
+        tilesheet.lowerRight.y = tilesheet.upperLeft.y + (float)engine->planes[MAPEDIT_PLANE_TILESHEET].height / (float)engine->backbuffer.height;
 
         // TODO: load all files inside the specified folder, separate the spreadsheets visually but have them be one image
 
@@ -635,7 +635,7 @@ internal void checkEditorButtons
         {
             river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
-            double length = editor->button_tilepicker_close.lowerRight.x - editor->button_tilepicker_close.upperLeft.x;
+            float length = editor->button_tilepicker_close.lowerRight.x - editor->button_tilepicker_close.upperLeft.x;
             engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                    &engine->backbuffer, RIVER2D_PICTOP_OVER,
                                    (uint32_t)(editor->button_tilepicker_close.upperLeft.x * engine->backbuffer.width),
@@ -652,8 +652,8 @@ internal void checkEditorButtons
         {
             river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_NULL]);
 
-            double   deltaX = engine->controls.pointer.x - tilesheet.upperLeft.x;
-            double   deltaY = engine->controls.pointer.y - tilesheet.upperLeft.y;
+            float   deltaX = engine->controls.pointer.x - tilesheet.upperLeft.x;
+            float   deltaY = engine->controls.pointer.y - tilesheet.upperLeft.y;
             uint8_t  tileX  = (uint8_t)(deltaX * engine->backbuffer.width  / editor->tilesize);
             uint8_t  tileY  = (uint8_t)(deltaY * engine->backbuffer.height / editor->tilesize);
 
@@ -1114,6 +1114,6 @@ void mapedit_processPointer
         y = dim.height;
     }
 
-    engine->controls.pointer.x = (double)x / dim.width;
-    engine->controls.pointer.y = (double)y / dim.height;
+    engine->controls.pointer.x = (float)x / dim.width;
+    engine->controls.pointer.y = (float)y / dim.height;
 }
