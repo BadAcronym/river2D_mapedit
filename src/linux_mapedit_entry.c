@@ -122,15 +122,17 @@ int main
 
         if(mapped)
         {
+            uint16_t desiredFPS = 144;
+
             mapedit_update(&engine, &editor);
-            River2D_Time now   = river2D_queryTime();
-            River2D_Time delta = river2D_deltaTime(&editor.lastPresentTime, &now);
 
-            uint64_t nscount = 5000000;
+            River2D_Time now     = river2D_queryTime();
+            int64_t      deltaNS = river2D_deltaTime_ns(&editor.lastPresentTime, &now);
+            double  ns_threshold = 1e9f / (double)(desiredFPS);
 
-            if(delta.s == 0 && delta.ns < nscount)
+            if(deltaNS < ns_threshold)
             {
-                struct timespec duration = {0, nscount - delta.ns};
+                struct timespec duration = {0, ns_threshold - deltaNS};
                 nanosleep(&duration, NULL);
             }
 
