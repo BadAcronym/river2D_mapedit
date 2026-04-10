@@ -149,6 +149,7 @@ typedef struct EditorData
 {
     River2D_Time lastPresentTime;
     River2D_Time lastSaveTime;
+    River2D_Time lastActionStart;
     uint8_t      current_state;
     uint8_t      previous_state;
     uint16_t     tilesize;
@@ -157,8 +158,8 @@ typedef struct EditorData
     uint8_t      selectedX;
     uint8_t      selectedY;
     uint8_t      selectMult;
-    uint32_t     map_width;
-    uint32_t     map_height;
+    uint32_t     mapWidth;
+    uint32_t     mapHeight;
     uint64_t     editorflags;
     Rect         button_new;
     Rect         button_load;
@@ -166,6 +167,9 @@ typedef struct EditorData
     Rect         button_quit;
     Rect         button_tilepicker_close;
     Tile         *tiles;
+    Action       *actions;
+    uint32_t     currentAction;
+    uint32_t     max_actions;
     const char   *projectName;
 }
 EditorData;
@@ -195,6 +199,7 @@ extern void mapedit_updateSelectSize
 
 extern void mapedit_processButtons
 (
+    EditorData         *editor,
     River2D_ControlMap *controls,
     uint64_t           button,
     bool               isDown
