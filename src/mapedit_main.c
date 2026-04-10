@@ -545,9 +545,9 @@ internal void undo
 
     for(uint32_t undoCount = 0; undoCount < editor->max_actions; ++undoCount)
     {
-        // TESTING:
-        // if(river2D_deltaTime_ms() < 0)
+        if(river2D_deltaTime_ns(&editor->lastActionStart, &currentActionTime) < 0)
         {
+            break;
         }
         readAction(editor);
     }
@@ -1074,11 +1074,14 @@ void mapedit_processButtons
 ){
     if(processButton(controls, MAPEDIT_BUTTON_LEFTM, button, MAPEDIT_BIT_LEFTM, isDown))
     {
-        editor->lastActionStart = river2D_queryTime();
+        if(isDown)
+        {
+            editor->lastActionStart = river2D_queryTime();
+        }
         return;
     }
-    if(processButton(controls, MAPEDIT_BUTTON_MIDDLEM,    button, MAPEDIT_BIT_MIDDLEM,    isDown)){ return; }
-    if(processButton(controls, MAPEDIT_BUTTON_RIGHTM,     button, MAPEDIT_BIT_RIGHTM,     isDown)){ return; }
+    if(processButton(controls, MAPEDIT_BUTTON_MIDDLEM,    button, MAPEDIT_BIT_MIDDLEM, isDown)){ return; }
+    if(processButton(controls, MAPEDIT_BUTTON_RIGHTM,     button, MAPEDIT_BIT_RIGHTM,  isDown)){ return; }
 
 #ifdef DEBUG
     fprintf(stderr, "button pressed: %" PRIx64 "\n", button);
