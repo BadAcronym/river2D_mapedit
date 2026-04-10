@@ -188,9 +188,12 @@ void mapedit_init
         editor->tiles[i].y = UINT16_MAX;
     }
 
-    // TESTING: small buffer to test, afterward expand to 1 gazillion
-    editor->max_actions = 8;
-    editor->actions     = malloc(editor->max_actions * sizeof(Action));
+    editor->actions = malloc(MAPEDIT_MAX_ACTIONS * sizeof(Action));
+    for(uint32_t i = 0; i < MAPEDIT_MAX_ACTIONS; ++i)
+    {
+        editor->actions[i].action_start.s  = 0;
+        editor->actions[i].action_start.ns = 0;
+    }
 
     // TODO: allow changing project name with a menu item or hotkey, pop-up textbox and user keyboard input
     if(!editor->projectName)
@@ -204,7 +207,7 @@ void mapedit_init
     editor->lastSaveTime.ns         = 1;
     engine->controls.lastScrollTime = now;
 
-    editor->current_state = MAPEDIT_STATE_MENU;
+    editor->currentState = MAPEDIT_STATE_MENU;
 }
 
 int32_t mapedit_shutdown
@@ -221,14 +224,14 @@ internal void changeState
     EditorData *editor,
     uint8_t    nextState
 ){
-    if(editor->current_state == nextState)
+    if(editor->currentState == nextState)
     {
-        fprintf(stderr, "\n\033[33;1;7mWARNING: trying to change state to the same state: %u.\033[0m\n", editor->current_state);
+        fprintf(stderr, "\n\033[33;1;7mWARNING: trying to change state to the same state: %u.\033[0m\n", editor->currentState);
         return;
     }
 
-    editor->previous_state = editor->current_state;
-    editor->current_state  = nextState;
+    editor->previousState = editor->currentState;
+    editor->currentState  = nextState;
 }
 
 // TODO: add RLE? lose 1 bit of the 32 for every tile, just to make some uint32_t's a repeat of the last placed tile
@@ -310,7 +313,7 @@ internal void drawMainMenu
                            engine->planes[MAPEDIT_PLANE_BACKGROUND].width,
                            engine->planes[MAPEDIT_PLANE_BACKGROUND].height);
 
-    if(!editor->previous_state)
+    if(!editor->previousState)
     {
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
@@ -326,7 +329,7 @@ internal void drawMainMenu
     }
 
     // BACKLOG: make these icons use some sort of opacity, fade-out animation (and / or animation in general)...
-    uint64_t deltaMS = river2D_deltaTime_now_ms(&editor->lastSaveTime);
+    float deltaMS = river2D_deltaTime_now_ms(&editor->lastSaveTime);
     if(deltaMS < 250)
     {
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_ICON_SAVED], &engine->backbuffer,
@@ -348,9 +351,9 @@ internal void checkMainMenuButtons
         return;
     }
 
-    if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE && editor->previous_state != MAPEDIT_STATE_NULL)
+    if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE && editor->previousState != MAPEDIT_STATE_NULL)
     {
-        changeState(editor, editor->previous_state);
+        changeState(editor, editor->previousState);
         engine->controls.keymap &= ~MAPEDIT_BIT_ESCAPE;
         return;
     }
@@ -368,7 +371,7 @@ internal void checkMainMenuButtons
 
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
-            if(editor->previous_state != MAPEDIT_STATE_NULL && editor->tiles)
+            if(editor->previousState != MAPEDIT_STATE_NULL && editor->tiles)
             {
                 uint64_t tilecount = editor->layers * editor->mapHeight * editor->mapWidth;
                 for(uint32_t i = 0; i < tilecount; ++i)
@@ -415,7 +418,7 @@ internal void checkMainMenuButtons
             engine->running = false;
         }
     }
-    else if(editor->previous_state && river2D_insideRect(&engine->controls.pointer, &editor->button_save))
+    else if(editor->previousState && river2D_insideRect(&engine->controls.pointer, &editor->button_save))
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
@@ -490,7 +493,7 @@ internal void drawEditor
                            engine->planes[MAPEDIT_PLANE_CURRENTLAYER].height);
 
     // BACKLOG: make these icons use some sort of opacity, fade-out animation (and / or animation in general)...
-    uint64_t deltaMS = river2D_deltaTime_now_ms(&editor->lastSaveTime);
+    float deltaMS = river2D_deltaTime_now_ms(&editor->lastSaveTime);
     if(deltaMS < 250)
     {
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_ICON_SAVED], &engine->backbuffer,
@@ -500,21 +503,36 @@ internal void drawEditor
     }
 }
 
+internal void incrementAction
+(
+    EditorData *editor
+){
+    if(++editor->currentAction > MAPEDIT_MAX_ACTIONS - 1)
+    {
+        editor->currentAction = 0;
+    }
+}
+
+internal void decrementAction
+(
+    EditorData *editor
+){
+    if(editor->currentAction == 0)
+    {
+        editor->currentAction = MAPEDIT_MAX_ACTIONS - 1;
+    }
+    else
+    {
+        --editor->currentAction;
+    }
+}
+
 internal void readAction
 (
     EditorData *editor
 ){
     Action lastAction = editor->actions[editor->currentAction];
     editor->tiles[lastAction.map_index] = lastAction.prev_tile;
-
-    if(editor->currentAction == 0)
-    {
-        editor->currentAction = editor->max_actions - 1;
-    }
-    else
-    {
-        --editor->currentAction;
-    }
 }
 
 internal void writeAction
@@ -526,39 +544,49 @@ internal void writeAction
     Tile prev_tile = editor->tiles[map_index];
     editor->tiles[map_index] = new_tile;
 
-    editor->actions[editor->currentAction].timestamp = river2D_queryTime();
-    editor->actions[editor->currentAction].map_index = map_index;
-    editor->actions[editor->currentAction].prev_tile = prev_tile;
-    editor->actions[editor->currentAction].new_tile  = new_tile;
-
-    if(++editor->currentAction > editor->max_actions - 1)
-    {
-        editor->currentAction = 0;
-    }
+    editor->actions[editor->currentAction].action_start = editor->lastActionStart;
+    editor->actions[editor->currentAction].map_index    = map_index;
+    editor->actions[editor->currentAction].prev_tile    = prev_tile;
+    editor->actions[editor->currentAction].new_tile     = new_tile;
 }
+
+// 150
+// 150
+// 150
+// 150
+// 150 <
+// 200 <
+// 0
+
+// CURRENT: check the boundaries and make sure the pointer ends up in the same place. inc/decr is weird here
 
 internal void undo
 (
     EditorData *editor
 ){
-    River2D_Time currentActionTime = editor->actions[editor->currentAction].timestamp;
-
-    for(uint32_t undoCount = 0; undoCount < editor->max_actions; ++undoCount)
+    for(uint32_t undoCount = 0; undoCount < MAPEDIT_MAX_ACTIONS; ++undoCount)
     {
-        if(river2D_deltaTime_ns(&editor->lastActionStart, &currentActionTime) < 0)
+        decrementAction(editor);
+        Action  currentAction = editor->actions[editor->currentAction];
+        decrementAction(editor);
+
+        Action  prevAction    = editor->actions[editor->currentAction];
+        int64_t deltaNS       = river2D_deltaTime_ns(&prevAction.action_start, &currentAction.action_start);
+
+        if(deltaNS < 0)
         {
             break;
         }
+
         readAction(editor);
     }
 }
 
+// TODO: do NOT re-do when the next action in sequence has a lower lastActionStart time than the current one.
 internal void redo
 (
     EditorData *editor
 ){
-    // TODO: use redo function to reverse last undo (essentially move the currentAction pointer.
-    // TODO: Think about how to invalidate actions...
     fprintf(stderr, "TODO: REDO!\n");
 }
 
@@ -608,7 +636,10 @@ internal void placeSelectedTiles
 
             Tile new_tile = {editor->selectedX + x, editor->selectedY + y};
 
+            // TODO: if new tile is old tile, skip writing completely
+
             writeAction(editor, index, new_tile);
+            incrementAction(editor);
         }
     }
 }
@@ -977,24 +1008,24 @@ void mapedit_update
     EngineData *engine,
     EditorData *editor
 ){
-    if(editor->current_state == MAPEDIT_STATE_MENU)
+    if(editor->currentState == MAPEDIT_STATE_MENU)
     {
         drawMainMenu(engine, editor);
         checkMainMenuButtons(engine, editor);
     }
-    else if(editor->current_state == MAPEDIT_STATE_EDIT)
+    else if(editor->currentState == MAPEDIT_STATE_EDIT)
     {
         drawEditor(engine, editor);
         checkEditorButtons(engine, editor);
     }
-    else if(editor->current_state == MAPEDIT_STATE_LOAD)
+    else if(editor->currentState == MAPEDIT_STATE_LOAD)
     {
         drawFilePicker(engine);
         checkFilePickerButtons(engine, editor);
     }
     else
     {
-        fprintf(stderr, "\033[31;1;7mERROR: invalid state: %u, previous: %u\033[0m\n", editor->current_state, editor->previous_state);
+        fprintf(stderr, "\033[31;1;7mERROR: invalid state: %u, previous: %u\033[0m\n", editor->currentState, editor->previousState);
     }
 }
 
@@ -1078,6 +1109,7 @@ void mapedit_processButtons
         {
             editor->lastActionStart = river2D_queryTime();
         }
+
         return;
     }
     if(processButton(controls, MAPEDIT_BUTTON_MIDDLEM,    button, MAPEDIT_BIT_MIDDLEM, isDown)){ return; }

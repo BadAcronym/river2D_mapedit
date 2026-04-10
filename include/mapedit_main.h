@@ -2,6 +2,8 @@
 
 #include "river2D_main.h"
 
+#define MAPEDIT_MAX_ACTIONS           0xFFFF
+
 #define MAPEDIT_PLANE_BACKGROUND      0
 #define MAPEDIT_PLANE_VOID            1
 #define MAPEDIT_PLANE_HIGHLIGHT       2
@@ -138,7 +140,7 @@ Tile;
 
 typedef struct Action
 {
-    River2D_Time timestamp;
+    River2D_Time action_start;
     uint64_t     map_index;
     Tile         prev_tile;
     Tile         new_tile;
@@ -150,8 +152,8 @@ typedef struct EditorData
     River2D_Time lastPresentTime;
     River2D_Time lastSaveTime;
     River2D_Time lastActionStart;
-    uint8_t      current_state;
-    uint8_t      previous_state;
+    uint8_t      currentState;
+    uint8_t      previousState;
     uint16_t     tilesize;
     uint8_t      currentLayer;
     uint8_t      layers;
@@ -169,7 +171,6 @@ typedef struct EditorData
     Tile         *tiles;
     Action       *actions;
     uint32_t     currentAction;
-    uint32_t     max_actions;
     const char   *projectName;
 }
 EditorData;
