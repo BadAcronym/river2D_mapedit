@@ -550,39 +550,52 @@ internal void writeAction
     editor->actions[editor->currentAction].new_tile     = new_tile;
 }
 
-// 150
-// 150
-// 150
-// 150
-// 150 <
-// 200 <
-// 0
-
-// CURRENT: check the boundaries and make sure the pointer ends up in the same place. inc/decr is weird here
-
 internal void undo
 (
     EditorData *editor
 ){
+    Action currentAction;
+    Action prevAction;
+
+    if(editor->currentAction == 0)
+    {
+        prevAction = editor->actions[MAPEDIT_MAX_ACTIONS - 1];
+    }
+    else
+    {
+        prevAction = editor->actions[editor->currentAction - 1];
+    }
+
+    if(prevAction.action_start.s == 0 && prevAction.action_start.ns == 0)
+    {
+        return;
+    }
+
     for(uint32_t undoCount = 0; undoCount < MAPEDIT_MAX_ACTIONS; ++undoCount)
     {
-        decrementAction(editor);
-        Action  currentAction = editor->actions[editor->currentAction];
+        currentAction = editor->actions[editor->currentAction];
+        if(editor->currentAction == 0)
+        {
+            prevAction = editor->actions[MAPEDIT_MAX_ACTIONS - 1];
+        }
+        else
+        {
+            prevAction = editor->actions[editor->currentAction - 1];
+        }
+
+        int64_t deltaNS = river2D_deltaTime_ns(&prevAction.action_start, &currentAction.action_start);
+
+        readAction(editor);
         decrementAction(editor);
 
-        Action  prevAction    = editor->actions[editor->currentAction];
-        int64_t deltaNS       = river2D_deltaTime_ns(&prevAction.action_start, &currentAction.action_start);
-
-        if(deltaNS < 0)
+        if(deltaNS != 0)
         {
             break;
         }
-
-        readAction(editor);
     }
 }
 
-// TODO: do NOT re-do when the next action in sequence has a lower lastActionStart time than the current one.
+// TODO: analogue undo, but forwards moving :3
 internal void redo
 (
     EditorData *editor
@@ -638,8 +651,8 @@ internal void placeSelectedTiles
 
             // TODO: if new tile is old tile, skip writing completely
 
-            writeAction(editor, index, new_tile);
             incrementAction(editor);
+            writeAction(editor, index, new_tile);
         }
     }
 }
