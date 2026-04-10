@@ -176,10 +176,10 @@ void mapedit_init
     editor->layers       = 10;
     editor->currentLayer = 1;
 
-    editor->map_width  = engine->config.canvas_width  / editor->tilesize;
-    editor->map_height = engine->config.canvas_height / editor->tilesize;
+    editor->mapWidth  = engine->config.canvas_width  / editor->tilesize;
+    editor->mapHeight = engine->config.canvas_height / editor->tilesize;
 
-    uint64_t tilecount = editor->layers * editor->map_width * editor->map_height;
+    uint64_t tilecount = editor->layers * editor->mapWidth * editor->mapHeight;
     // TODO: resize this when user decides to expand canvas, set map_width & _height
     editor->tiles = malloc(tilecount * sizeof(Tile));
     for(uint32_t i = 0; i < tilecount; ++i)
@@ -187,6 +187,10 @@ void mapedit_init
         editor->tiles[i].x = UINT16_MAX;
         editor->tiles[i].y = UINT16_MAX;
     }
+
+    // TESTING: small buffer to test, afterward expand to 1 gazillion
+    editor->max_actions = 8;
+    editor->actions     = malloc(editor->max_actions * sizeof(Action));
 
     // TODO: allow changing project name with a menu item or hotkey, pop-up textbox and user keyboard input
     if(!editor->projectName)
@@ -208,6 +212,7 @@ int32_t mapedit_shutdown
     EditorData *editor
 ){
     free(editor->tiles);
+    free(editor->actions);
     return 0;
 }
 
@@ -263,12 +268,12 @@ internal void saveCurrentProject
         fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
         return;
     }
-    if((elements = fwrite(&editor->map_width, 2, 1, file)) != 1)
+    if((elements = fwrite(&editor->mapWidth, 2, 1, file)) != 1)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
         return;
     }
-    if((elements = fwrite(&editor->map_height, 2, 1, file)) != 1)
+    if((elements = fwrite(&editor->mapHeight, 2, 1, file)) != 1)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
         return;
@@ -279,7 +284,7 @@ internal void saveCurrentProject
         return;
     }
 
-    uint64_t tilecount = editor->layers * editor->map_height * editor->map_width;
+    uint64_t tilecount = editor->layers * editor->mapHeight * editor->mapWidth;
     fwrite(editor->tiles, sizeof(Tile), tilecount, file);
 
     imgsurf_write_ptr(file, engine->planes[MAPEDIT_PLANE_TILESHEET].data, IMGSURF_FILE_QOI,
@@ -365,7 +370,7 @@ internal void checkMainMenuButtons
         {
             if(editor->previous_state != MAPEDIT_STATE_NULL && editor->tiles)
             {
-                uint64_t tilecount = editor->layers * editor->map_height * editor->map_width;
+                uint64_t tilecount = editor->layers * editor->mapHeight * editor->mapWidth;
                 for(uint32_t i = 0; i < tilecount; ++i)
                 {
                     editor->tiles[i].x = UINT16_MAX;
@@ -454,11 +459,11 @@ internal void drawEditor
 
     for(uint32_t z = 0; z < editor->layers; ++z)
     {
-        for(uint32_t x = 0; x < editor->map_width; ++x)
+        for(uint32_t x = 0; x < editor->mapWidth; ++x)
         {
-            for(uint32_t y = 0; y < editor->map_height; ++y)
+            for(uint32_t y = 0; y < editor->mapHeight; ++y)
             {
-                uint64_t index = z * editor->map_width * editor->map_height + y * editor->map_width + x;
+                uint64_t index = z * editor->mapWidth * editor->mapHeight + y * editor->mapWidth + x;
                 if(editor->tiles[index].x != UINT16_MAX && editor->tiles[index].y != UINT16_MAX)
                 {
                     engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET],
@@ -495,21 +500,65 @@ internal void drawEditor
     }
 }
 
-internal void undo
+internal void readAction
 (
-    EngineData *engine,
     EditorData *editor
 ){
-    // CURRENT: use undo function to reverse last action: undo up to 16 actions to test
-    fprintf(stderr, "TODO: UNDO!\n");
+    Action lastAction = editor->actions[editor->currentAction];
+    editor->tiles[lastAction.map_index] = lastAction.prev_tile;
+
+    if(editor->currentAction == 0)
+    {
+        editor->currentAction = editor->max_actions - 1;
+    }
+    else
+    {
+        --editor->currentAction;
+    }
+}
+
+internal void writeAction
+(
+    EditorData   *editor,
+    uint64_t     map_index,
+    Tile         new_tile
+){
+    Tile prev_tile = editor->tiles[map_index];
+    editor->tiles[map_index] = new_tile;
+
+    editor->actions[editor->currentAction].timestamp = river2D_queryTime();
+    editor->actions[editor->currentAction].map_index = map_index;
+    editor->actions[editor->currentAction].prev_tile = prev_tile;
+    editor->actions[editor->currentAction].new_tile  = new_tile;
+
+    if(++editor->currentAction > editor->max_actions - 1)
+    {
+        editor->currentAction = 0;
+    }
+}
+
+internal void undo
+(
+    EditorData *editor
+){
+    River2D_Time currentActionTime = editor->actions[editor->currentAction].timestamp;
+
+    for(uint32_t undoCount = 0; undoCount < editor->max_actions; ++undoCount)
+    {
+        // TESTING:
+        // if(river2D_deltaTime_ms() < 0)
+        {
+        }
+        readAction(editor);
+    }
 }
 
 internal void redo
 (
-    EngineData *engine,
     EditorData *editor
 ){
-    // CURRENT: use redo function to reverse last undo: undo up to 16 undos to test
+    // TODO: use redo function to reverse last undo (essentially move the currentAction pointer.
+    // TODO: Think about how to invalidate actions...
     fprintf(stderr, "TODO: REDO!\n");
 }
 
@@ -521,8 +570,8 @@ internal void placeSelectedTiles
     uint16_t   tileY
 ){
     bool     break_outer = false;
-    uint64_t sliceSize   = editor->map_width * editor->map_height;
-    uint64_t topLeft     = editor->currentLayer * sliceSize + tileY * editor->map_width + tileX;
+    uint64_t sliceSize   = editor->mapWidth * editor->mapHeight;
+    uint64_t topLeft     = editor->currentLayer * sliceSize + tileY * editor->mapWidth + tileX;
     uint64_t maxCurIndex = sliceSize + editor->currentLayer * sliceSize - 1;
 
     if(topLeft > maxCurIndex)
@@ -532,19 +581,19 @@ internal void placeSelectedTiles
 
     for(uint8_t y = 0; y < editor->selectMult && !break_outer; ++y)
     {
-        if(tileY + y > editor->map_height - 1)
+        if(tileY + y > editor->mapHeight - 1)
         {
             break;
         }
 
         for(uint8_t x = 0; x < editor->selectMult; ++x)
         {
-            if(tileX + x > editor->map_width - 1)
+            if(tileX + x > editor->mapWidth - 1)
             {
                 break;
             }
 
-            uint64_t index = topLeft + y * editor->map_width + x;
+            uint64_t index = topLeft + y * editor->mapWidth + x;
             if(index > maxCurIndex)
             {
                 break_outer = true;
@@ -557,16 +606,9 @@ internal void placeSelectedTiles
                 continue;
             }
 
-            River2D_Time timestamp = river2D_queryTime();
-            Tile         prev_tile = editor->tiles[index];
-            Tile         new_tile  = {editor->selectedX + x, editor->selectedY + y};
+            Tile new_tile = {editor->selectedX + x, editor->selectedY + y};
 
-            // CURRENT: turn this fprintf call into something that streams this data to a file.
-            // then, we just need to keep track of when the last action started (mouse down) and when it ended (mouse up).
-            // fprintf(stderr, "%lu.%lu: changed tile @ map index %lu from (%u, %u) to (%u, %u)\n",
-            //         timestamp.s, timestamp.ns, index, prev_tile.x, prev_tile.y, new_tile.x, new_tile.y);
-
-            editor->tiles[index] = new_tile;
+            writeAction(editor, index, new_tile);
         }
     }
 }
@@ -707,14 +749,14 @@ internal void checkEditorButtons
     else if(engine->controls.keymap & MAPEDIT_BIT_Z &&
             engine->controls.keymap & MAPEDIT_BIT_LCTRL
     ){
-        undo(engine, editor);
+        undo(editor);
         engine->controls.keymap &= ~MAPEDIT_BIT_Z;
         return;
     }
     else if(engine->controls.keymap & MAPEDIT_BIT_Y &&
             engine->controls.keymap & MAPEDIT_BIT_LCTRL
     ){
-        redo(engine, editor);
+        redo(editor);
         engine->controls.keymap &= ~MAPEDIT_BIT_Y;
         return;
     }
@@ -873,12 +915,12 @@ internal void loadProject
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
         return;
     }
-    if((elements = fread(&editor->map_width, 2, 1, file)) != 1)
+    if((elements = fread(&editor->mapWidth, 2, 1, file)) != 1)
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
         return;
     }
-    if((elements = fread(&editor->map_height, 2, 1, file)) != 1)
+    if((elements = fread(&editor->mapHeight, 2, 1, file)) != 1)
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
         return;
@@ -889,7 +931,7 @@ internal void loadProject
         return;
     }
 
-    uint64_t tilecount = editor->layers * editor->map_width * editor->map_height;
+    uint64_t tilecount = editor->layers * editor->mapWidth * editor->mapHeight;
 
     for(uint32_t i = 0; i < tilecount * 4 && ((byte = fgetc(file)) != EOF); ++i)
     {
@@ -1025,11 +1067,16 @@ internal uint8_t processKey
 
 void mapedit_processButtons
 (
+    EditorData         *editor,
     River2D_ControlMap *controls,
     uint64_t           button,
     bool               isDown
 ){
-    if(processButton(controls, MAPEDIT_BUTTON_LEFTM,      button, MAPEDIT_BIT_LEFTM,      isDown)){ return; }
+    if(processButton(controls, MAPEDIT_BUTTON_LEFTM, button, MAPEDIT_BIT_LEFTM, isDown))
+    {
+        editor->lastActionStart = river2D_queryTime();
+        return;
+    }
     if(processButton(controls, MAPEDIT_BUTTON_MIDDLEM,    button, MAPEDIT_BIT_MIDDLEM,    isDown)){ return; }
     if(processButton(controls, MAPEDIT_BUTTON_RIGHTM,     button, MAPEDIT_BIT_RIGHTM,     isDown)){ return; }
 
