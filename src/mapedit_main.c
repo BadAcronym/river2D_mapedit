@@ -527,12 +527,20 @@ internal void decrementAction
     }
 }
 
-internal void readAction
+internal void readAction_undo
 (
     EditorData *editor
 ){
-    Action lastAction = editor->actions[editor->currentAction];
-    editor->tiles[lastAction.map_index] = lastAction.prev_tile;
+    Action action = editor->actions[editor->currentAction];
+    editor->tiles[action.map_index] = action.prev_tile;
+}
+
+internal void readAction_redo
+(
+    EditorData *editor
+){
+    Action action = editor->actions[editor->currentAction];
+    editor->tiles[action.map_index] = action.new_tile;
 }
 
 internal void writeAction
@@ -584,10 +592,9 @@ internal void undo
             prevAction = editor->actions[editor->currentAction - 1];
         }
 
+        readAction_undo(editor);
+
         int64_t deltaNS = river2D_deltaTime_ns(&prevAction.action_start, &currentAction.action_start);
-
-        readAction(editor);
-
         if(deltaNS != 0)
         {
             break;
@@ -595,12 +602,56 @@ internal void undo
     }
 }
 
-// CURRENT: analogue undo, but forwards moving :3
 internal void redo
 (
     EditorData *editor
 ){
+    Action currentAction = editor->actions[editor->currentAction];
+    Action prevAction;
+    Action nextAction;
 
+    if(currentAction.action_start.s == 0 && currentAction.action_start.ns == 0)
+    {
+        return;
+    }
+
+    if(editor->currentAction == 0)
+    {
+        prevAction = editor->actions[MAPEDIT_MAX_ACTIONS - 1];
+    }
+    else
+    {
+        prevAction = editor->actions[editor->currentAction - 1];
+    }
+
+    int64_t deltaNS = river2D_deltaTime_ns(&prevAction.action_start, &currentAction.action_start);
+
+    if(deltaNS < 0)
+    {
+        return;
+    }
+
+    for(uint32_t undoCount = 0; undoCount < MAPEDIT_MAX_ACTIONS; ++undoCount)
+    {
+        currentAction = editor->actions[editor->currentAction];
+        if(editor->currentAction >= MAPEDIT_MAX_ACTIONS - 1)
+        {
+            nextAction = editor->actions[0];
+        }
+        else
+        {
+            nextAction = editor->actions[editor->currentAction + 1];
+        }
+
+        readAction_redo(editor);
+        incrementAction(editor);
+
+        int64_t deltaNS = river2D_deltaTime_ns(&nextAction.action_start, &currentAction.action_start);
+        if(deltaNS != 0)
+        {
+            break;
+        }
+    }
 }
 
 internal void placeSelectedTiles
