@@ -573,6 +573,7 @@ internal void undo
 
     for(uint32_t undoCount = 0; undoCount < MAPEDIT_MAX_ACTIONS; ++undoCount)
     {
+        decrementAction(editor);
         currentAction = editor->actions[editor->currentAction];
         if(editor->currentAction == 0)
         {
@@ -586,7 +587,6 @@ internal void undo
         int64_t deltaNS = river2D_deltaTime_ns(&prevAction.action_start, &currentAction.action_start);
 
         readAction(editor);
-        decrementAction(editor);
 
         if(deltaNS != 0)
         {
@@ -595,12 +595,12 @@ internal void undo
     }
 }
 
-// TODO: analogue undo, but forwards moving :3
+// CURRENT: analogue undo, but forwards moving :3
 internal void redo
 (
     EditorData *editor
 ){
-    fprintf(stderr, "TODO: REDO!\n");
+
 }
 
 internal void placeSelectedTiles
@@ -651,11 +651,17 @@ internal void placeSelectedTiles
 
             // TODO: if new tile is old tile, skip writing completely
 
-            incrementAction(editor);
             writeAction(editor, index, new_tile);
+            incrementAction(editor);
         }
     }
 }
+
+// data
+// null <
+// null
+// null
+// null
 
 internal void checkEditorButtons
 (
