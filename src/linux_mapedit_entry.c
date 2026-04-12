@@ -124,8 +124,6 @@ int main
         {
             uint16_t desiredFPS = 144;
 
-            mapedit_update(&engine, &editor);
-
             River2D_Time now     = river2D_queryTime();
             int64_t      deltaNS = river2D_deltaTime_ns(&editor.lastPresentTime, &now);
             double  ns_threshold = 1e9f / (double)(desiredFPS);
@@ -136,6 +134,7 @@ int main
                 nanosleep(&duration, NULL);
             }
 
+            mapedit_update(&engine, &editor);
             engine.bltBuffer(&engine);
             editor.lastPresentTime = now;
         }
