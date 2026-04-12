@@ -124,9 +124,9 @@ int main
         {
             uint16_t desiredFPS = 144;
 
-            River2D_Time now     = river2D_queryTime();
-            int64_t      deltaNS = river2D_deltaTime_ns(&editor.lastPresentTime, &now);
-            double  ns_threshold = 1e9f / (double)(desiredFPS);
+            River2D_Time now          = river2D_queryTime();
+            int64_t      deltaNS      = river2D_deltaTime_ns(&editor.lastPresentTime, &now);
+            double       ns_threshold = 1e9f / (double)(desiredFPS);
 
             if(deltaNS < ns_threshold)
             {
