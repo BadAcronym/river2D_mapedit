@@ -656,7 +656,6 @@ internal void redo
 
 internal void placeSelectedTiles
 (
-    EngineData *engine,
     EditorData *editor,
     uint16_t   tileX,
     uint16_t   tileY
@@ -917,7 +916,7 @@ internal void checkEditorButtons
 
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
-            placeSelectedTiles(engine, editor, tileX, tileY);
+            placeSelectedTiles(editor, tileX, tileY);
         }
     }
 }
