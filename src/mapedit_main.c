@@ -462,9 +462,9 @@ internal void drawEditor
 
     for(uint32_t z = 0; z < editor->layers; ++z)
     {
-        for(uint32_t x = 0; x < editor->mapWidth; ++x)
+        for(uint32_t y = 0; y < editor->mapHeight; ++y)
         {
-            for(uint32_t y = 0; y < editor->mapHeight; ++y)
+            for(uint32_t x = 0; x < editor->mapWidth; ++x)
             {
                 uint64_t index = z * editor->mapWidth * editor->mapHeight + y * editor->mapWidth + x;
                 if(editor->tiles[index].x != UINT16_MAX && editor->tiles[index].y != UINT16_MAX)
