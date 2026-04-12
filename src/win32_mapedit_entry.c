@@ -152,7 +152,7 @@ int CALLBACK WinMain
 
     river2D_loadConfig(&engine.config);
     engine.config.choices |= RIVER2D_CHOICE_STATIC_CANVAS_BIT;
-    engine.river2D_init(&engine, planes);
+    engine.init(&engine, planes);
     mapedit_init(&engine, &editor);
 
     global_engine = &engine;
@@ -199,15 +199,25 @@ int CALLBACK WinMain
             DispatchMessageA(&message);
         }
 
-        mapedit_update(&engine, &editor);
+        uint16_t desiredFPS = 144;
 
+        River2D_Time now          = river2D_queryTime();
+        int64_t      deltaMS      = river2D_deltaTime_ms(&editor.lastPresentTime, &now);
+        double       ms_threshold = 1000 / (double)(desiredFPS);
+
+        if(deltaMS < ms_threshold)
+        {
+            // struct timespec duration = {0, ns_threshold - deltaNS};
+            // nanosleep(&duration, NULL);
+            // TODO: nanosleep on windows, or 1ms precision
+        }
+
+        mapedit_update(&engine, &editor);
         engine.context = GetDC(engine.window);
-        // if(mapped)
-        // {
-            engine.bltBuffer(&engine);
-        // }
+        engine.bltBuffer(&engine);
+        editor.lastPresentTime = now;
         ReleaseDC(engine.window, engine.context);
     }
 
-    return engine.river2D_shutdown(&engine);
+    return engine.shutdown(&engine);
 }
