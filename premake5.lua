@@ -45,7 +45,7 @@ project("mapedit binary")
                "./src/mapedit_*",
                "./include/mapedit_*"})
         links({"river2Dcommon:static", "imgsurf:static"})
-        linkoptions({"-lX11", "-lXrender", "-lXcursor", "-fuse-ld=mold"})
+        linkoptions({"-lX11", "-lXrender", "-lXcursor", "-lm", "-fuse-ld=mold"})
         buildoptions({"-Wextra", "-Wall", "-Wpedantic", "-Wconversion", "-Wshadow", "-Wsign-compare"})
         toolset("clang")
 
