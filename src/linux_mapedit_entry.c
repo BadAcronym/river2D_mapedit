@@ -1,13 +1,5 @@
 #include "mapedit_main.h"
 
-// BACKLOG: future renderers
-// libriver2Dopengl.so / river2DopenGL.dll
-// libriver2Dvulkan.so / river2Dvulkan.dll
-// libriver2Dd3d.so    / river2Dd3d.dll
-
-// TODO: load/save animated tiles, not just static ones!
-// TODO: for this, allow animating tiles in the first place. How to store that info?
-
 #ifdef ASAN
         #define LIBPATH "./vendor/river2D/bin/asan/"
 #else
@@ -97,8 +89,8 @@ int main
                 }
                 case ConfigureNotify:
                 {
-                    resizeWidth  = event.xconfigure.width;
-                    resizeHeight = event.xconfigure.height;
+                    resizeWidth  = (uint32_t)event.xconfigure.width;
+                    resizeHeight = (uint32_t)event.xconfigure.height;
 
                     if(resizeWidth != engine.config.window_width || resizeHeight != engine.config.window_height)
                     {
