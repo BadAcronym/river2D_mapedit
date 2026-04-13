@@ -84,7 +84,7 @@ int main
                 }
                 case MotionNotify:
                 {
-                    mapedit_processPointer(&engine, event.xmotion.x, event.xmotion.y);
+                    mapedit_processPointer(&engine, (uint32_t)event.xmotion.x, (uint32_t)event.xmotion.y);
                     break;
                 }
                 case ClientMessage:
@@ -128,9 +128,9 @@ int main
             int64_t      deltaNS      = river2D_deltaTime_ns(&editor.lastPresentTime, &now);
             double       ns_threshold = 1e9f / (double)(desiredFPS);
 
-            if(deltaNS < ns_threshold)
+            if(deltaNS < (int64_t)ns_threshold)
             {
-                struct timespec duration = {0, ns_threshold - deltaNS};
+                struct timespec duration = {0, (int64_t)ns_threshold - deltaNS};
                 nanosleep(&duration, NULL);
             }
 

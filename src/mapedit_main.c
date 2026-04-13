@@ -365,9 +365,9 @@ internal void checkMainMenuButtons
         float length = editor->button_new.lowerRight.x - editor->button_new.upperLeft.x;
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
-                               (uint32_t)(editor->button_new.upperLeft.x * engine->backbuffer.width),
-                               (uint32_t)(editor->button_new.upperLeft.y * engine->backbuffer.height + 20),
-                               0, 0, length * engine->backbuffer.width, 5);
+                               (uint32_t)(editor->button_new.upperLeft.x * (float)engine->backbuffer.width),
+                               (uint32_t)(editor->button_new.upperLeft.y * (float)engine->backbuffer.height + 20),
+                               0, 0, (uint32_t)(length * (float)engine->backbuffer.width), 5);
 
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
@@ -392,9 +392,9 @@ internal void checkMainMenuButtons
         float length = editor->button_load.lowerRight.x - editor->button_load.upperLeft.x;
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
-                               (uint32_t)(editor->button_load.upperLeft.x * engine->backbuffer.width),
-                               (uint32_t)(editor->button_load.upperLeft.y * engine->backbuffer.height + 20),
-                               0, 0, length * engine->backbuffer.width, 5);
+                               (uint32_t)(editor->button_load.upperLeft.x * (float)engine->backbuffer.width),
+                               (uint32_t)(editor->button_load.upperLeft.y * (float)engine->backbuffer.height + 20),
+                               0, 0, (uint32_t)(length * (float)engine->backbuffer.width), 5);
 
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
@@ -409,9 +409,9 @@ internal void checkMainMenuButtons
         float length = editor->button_quit.lowerRight.x - editor->button_quit.upperLeft.x;
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
-                               (uint32_t)(editor->button_quit.upperLeft.x * engine->backbuffer.width),
-                               (uint32_t)(editor->button_quit.upperLeft.y * engine->backbuffer.height + 20),
-                               0, 0, length * engine->backbuffer.width, 5);
+                               (uint32_t)(editor->button_quit.upperLeft.x * (float)engine->backbuffer.width),
+                               (uint32_t)(editor->button_quit.upperLeft.y * (float)engine->backbuffer.height + 20),
+                               0, 0, (uint32_t)(length * (float)engine->backbuffer.width), 5);
 
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
@@ -425,9 +425,9 @@ internal void checkMainMenuButtons
         float length = editor->button_save.lowerRight.x - editor->button_save.upperLeft.x;
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
-                               (uint32_t)(editor->button_save.upperLeft.x * engine->backbuffer.width),
-                               (uint32_t)(editor->button_save.upperLeft.y * engine->backbuffer.height + 20),
-                               0, 0, length * engine->backbuffer.width, 5);
+                               (uint32_t)(editor->button_save.upperLeft.x * (float)engine->backbuffer.width),
+                               (uint32_t)(editor->button_save.upperLeft.y * (float)engine->backbuffer.height + 20),
+                               0, 0, (uint32_t)(length * (float)engine->backbuffer.width), 5);
 
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
@@ -488,7 +488,10 @@ internal void drawEditor
                      layerStr, MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
 
     engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTLAYER], &engine->backbuffer,
-                           RIVER2D_PICTOP_OVER, 608, 16, 0, 0,
+                           RIVER2D_PICTOP_OVER,
+                           (uint32_t)(0.95f * (float)engine->backbuffer.width),
+                           (uint32_t)(0.025f * (float)engine->backbuffer.width),
+                           0, 0,
                            engine->planes[MAPEDIT_PLANE_CURRENTLAYER].width,
                            engine->planes[MAPEDIT_PLANE_CURRENTLAYER].height);
 
@@ -742,8 +745,8 @@ internal void checkEditorButtons
                                engine->backbuffer.width  / 10,
                                engine->backbuffer.height / 10,
                                0, 0,
-                               (uint32_t)(engine->backbuffer.width  / 1.25f),
-                               (uint32_t)(engine->backbuffer.height / 1.25f));
+                               (uint32_t)((float)engine->backbuffer.width  / 1.25f),
+                               (uint32_t)((float)engine->backbuffer.height / 1.25f));
 
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
@@ -780,9 +783,9 @@ internal void checkEditorButtons
             float length = editor->button_tilepicker_close.lowerRight.x - editor->button_tilepicker_close.upperLeft.x;
             engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                    &engine->backbuffer, RIVER2D_PICTOP_OVER,
-                                   (uint32_t)(editor->button_tilepicker_close.upperLeft.x * engine->backbuffer.width),
-                                   (uint32_t)(editor->button_tilepicker_close.upperLeft.y * engine->backbuffer.height + 20),
-                                   0, 0, length * engine->backbuffer.width, 5);
+                                   (uint32_t)(editor->button_tilepicker_close.upperLeft.x * (float)engine->backbuffer.width),
+                                   (uint32_t)(editor->button_tilepicker_close.upperLeft.y * (float)engine->backbuffer.height + 20),
+                                   0, 0, (uint32_t)(length * (float)engine->backbuffer.width), 5);
 
             if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
             {
@@ -796,19 +799,19 @@ internal void checkEditorButtons
 
             float   deltaX = engine->controls.pointer.x - tilesheet.upperLeft.x;
             float   deltaY = engine->controls.pointer.y - tilesheet.upperLeft.y;
-            uint8_t  tileX  = (uint8_t)(deltaX * engine->backbuffer.width  / editor->tilesize);
-            uint8_t  tileY  = (uint8_t)(deltaY * engine->backbuffer.height / editor->tilesize);
+            uint8_t  tileX  = (uint8_t)(deltaX * (float)engine->backbuffer.width  / editor->tilesize);
+            uint8_t  tileY  = (uint8_t)(deltaY * (float)engine->backbuffer.height / editor->tilesize);
 
-            uint16_t tilesheet_width  = engine->planes[MAPEDIT_PLANE_TILESHEET].width  / editor->tilesize;
-            uint16_t tilesheet_height = engine->planes[MAPEDIT_PLANE_TILESHEET].height / editor->tilesize;
+            uint16_t tilesheet_width  = (uint16_t)(engine->planes[MAPEDIT_PLANE_TILESHEET].width  / editor->tilesize);
+            uint16_t tilesheet_height = (uint16_t)(engine->planes[MAPEDIT_PLANE_TILESHEET].height / editor->tilesize);
 
             if(tileX + editor->selectMult > tilesheet_width)
             {
-                tileX = tilesheet_width - editor->selectMult;
+                tileX = (uint8_t)(tilesheet_width - editor->selectMult);
             }
             if(tileY + editor->selectMult > tilesheet_height)
             {
-                tileY = tilesheet_height - editor->selectMult;
+                tileY = (uint8_t)(tilesheet_height - editor->selectMult);
             }
 
             if(engine->controls.keymap & MAPEDIT_BIT_INC_SIZE)
@@ -825,8 +828,8 @@ internal void checkEditorButtons
 
             engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                    &engine->backbuffer, RIVER2D_PICTOP_OVER,
-                                   (uint32_t)(engine->backbuffer.width  * (tilesheet.upperLeft.x + 0.0055f) + tileX * editor->tilesize),
-                                   (uint32_t)(engine->backbuffer.height * (tilesheet.upperLeft.y + 0.006f)  + tileY * editor->tilesize),
+                                   (uint32_t)((float)engine->backbuffer.width  * (tilesheet.upperLeft.x + 0.0055f) + tileX * editor->tilesize),
+                                   (uint32_t)((float)engine->backbuffer.height * (tilesheet.upperLeft.y + 0.006f)  + tileY * editor->tilesize),
                                    0, 0,
                                    editor->tilesize * editor->selectMult,
                                    editor->tilesize * editor->selectMult);
@@ -884,8 +887,8 @@ internal void checkEditorButtons
 
     // TODO: wheel or menu of recently used tiles and a hotbar with specific ones, somewhere.
 
-    uint16_t tileX = (uint16_t)(engine->controls.pointer.x * engine->backbuffer.width  / editor->tilesize);
-    uint16_t tileY = (uint16_t)(engine->controls.pointer.y * engine->backbuffer.height / editor->tilesize);
+    uint16_t tileX = (uint16_t)(engine->controls.pointer.x * (float)engine->backbuffer.width  / editor->tilesize);
+    uint16_t tileY = (uint16_t)(engine->controls.pointer.y * (float)engine->backbuffer.height / editor->tilesize);
 
     // TODO: display outline around the current selected tile
 
@@ -1035,7 +1038,7 @@ internal void loadProject
 
     for(uint32_t i = 0; i < tilecount * 4 && ((byte = fgetc(file)) != EOF); ++i)
     {
-        ((uint8_t*)editor->tiles)[i] = byte;
+        ((uint8_t*)editor->tiles)[i] = (uint8_t)byte;
     }
 
     if(engine->planes[MAPEDIT_PLANE_TILESHEET].data)
@@ -1265,6 +1268,6 @@ void mapedit_processPointer
         y = dim.height;
     }
 
-    engine->controls.pointer.x = (float)x / dim.width;
-    engine->controls.pointer.y = (float)y / dim.height;
+    engine->controls.pointer.x = (float)x / (float)dim.width;
+    engine->controls.pointer.y = (float)y / (float)dim.height;
 }
