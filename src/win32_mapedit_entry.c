@@ -6,6 +6,7 @@
 #include "mapedit_main.h"
 
 global EngineData *global_engine;
+global EditorData *global_editor;
 
 #ifdef ASAN
         #define LIBPATH "./vendor/river2D/bin/asan/"
@@ -26,6 +27,7 @@ int main
 }
 #endif
 
+// TODO: handle scrollwheel via WM_MOUSEWHEEL messages.
 LRESULT CALLBACK win32WindowCallback
 (
     HWND   window,
@@ -85,32 +87,32 @@ LRESULT CALLBACK win32WindowCallback
         }
         case WM_LBUTTONDOWN:
         {
-            mapedit_processKeys(&global_engine->controls, RIVER2D_MOUSE1, true);
+            mapedit_processButtons(global_editor, &global_engine->controls, RIVER2D_MOUSE1, true);
             break;
         }
         case WM_LBUTTONUP:
         {
-            mapedit_processKeys(&global_engine->controls, RIVER2D_MOUSE1, false);
+            mapedit_processButtons(global_editor, &global_engine->controls, RIVER2D_MOUSE1, false);
             break;
         }
         case WM_RBUTTONDOWN:
         {
-            mapedit_processKeys(&global_engine->controls, RIVER2D_MOUSE2, true);
+            mapedit_processButtons(global_editor, &global_engine->controls, RIVER2D_MOUSE2, true);
             break;
         }
         case WM_RBUTTONUP:
         {
-            mapedit_processKeys(&global_engine->controls, RIVER2D_MOUSE2, false);
+            mapedit_processButtons(global_editor, &global_engine->controls, RIVER2D_MOUSE2, false);
             break;
         }
         case WM_MBUTTONDOWN:
         {
-            mapedit_processKeys(&global_engine->controls, RIVER2D_MOUSE3, true);
+            mapedit_processButtons(global_editor, &global_engine->controls, RIVER2D_MOUSE3, true);
             break;
         }
         case WM_MBUTTONUP:
         {
-            mapedit_processKeys(&global_engine->controls, RIVER2D_MOUSE3, false);
+            mapedit_processButtons(global_editor, &global_engine->controls, RIVER2D_MOUSE3, false);
             break;
         }
         case WM_SETCURSOR:
@@ -147,15 +149,16 @@ int CALLBACK WinMain
 
     river2D_resolveRenderer(&engine, LIBPATH, RIVER2D_RENDERER_SOFTWARE);
 
-    engine.instance   = instance;
-    engine.windowName = "river2D map editor";
-
     river2D_loadConfig(&engine.config);
     engine.config.choices |= RIVER2D_CHOICE_STATIC_CANVAS_BIT;
+    engine.windowName     =  "River2D Map Editor";
+    engine.instance       =  instance;
+
     engine.init(&engine, planes);
     mapedit_init(&engine, &editor);
 
     global_engine = &engine;
+    global_editor = &editor;
 
     // TODO: figure out the mapping window msgs
 
