@@ -1244,7 +1244,7 @@ void mapedit_processKeys
     if(processKey(controls, MAPEDIT_KEY_Z,          key, MAPEDIT_BIT_Z,          isDown)){ return; }
 
 #ifdef DEBUG
-    fprintf(stderr, "key pressed: %" PRIx64 "\n", key);
+    fprintf(stderr, "key pressed: 0x%" PRIx64 "\n", key);
 #endif
 }
 
