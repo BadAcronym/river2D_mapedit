@@ -2,6 +2,7 @@
 
 #include "imgsurf_main.h"
 
+#include <math.h>
 #include <stdio.h>
 #include <inttypes.h>
 #include <stdlib.h>
@@ -597,6 +598,8 @@ internal void undo
 
         readAction_undo(editor);
 
+        editor->currentLayer = (uint8_t)floor((double)currentAction.map_index / (editor->mapWidth * editor->mapHeight));
+
         int64_t deltaNS = river2D_deltaTime_ns(&prevAction.action_start, &currentAction.action_start);
         if(deltaNS != 0)
         {
@@ -647,6 +650,7 @@ internal void redo
         }
 
         readAction_redo(editor);
+        editor->currentLayer = (uint8_t)floor((double)currentAction.map_index / (editor->mapWidth * editor->mapHeight));
         incrementAction(editor);
 
         int64_t deltaNS = river2D_deltaTime_ns(&nextAction.action_start, &currentAction.action_start);
