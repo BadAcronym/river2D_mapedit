@@ -115,6 +115,21 @@ LRESULT CALLBACK win32WindowCallback
             mapedit_processButtons(global_editor, &global_engine->controls, RIVER2D_MOUSE3, false);
             break;
         }
+        case WM_MOUSEWHEEL:
+        {
+            int32_t scrollAmount = GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
+            if(scrollAmount > 0)
+            {
+                mapedit_updateSelectSize(global_editor, true);
+                break;
+            }
+            else if(scrollAmount < 0)
+            {
+                mapedit_updateSelectSize(global_editor, false);
+                break;
+            }
+            break;
+        }
         case WM_SETCURSOR:
         {
             if(LOWORD(lParam) == HTCLIENT)
