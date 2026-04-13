@@ -1,8 +1,6 @@
 ---@diagnostic disable: undefined-global, undefined-field
 require"vendor/river2D/premake5"
 
---TODO: turn on implicit cast warnings on linux
-
 workspace("mapedit")
     configurations({"debug", "asan", "release"})
     platforms({"linux", "windows"})
@@ -48,7 +46,7 @@ project("mapedit binary")
                "./include/mapedit_*"})
         links({"river2Dcommon:static", "imgsurf:static"})
         linkoptions({"-lX11", "-lXrender", "-lXcursor", "-fuse-ld=mold"})
-        buildoptions({"-Wextra", "-Wall", "-Wpedantic"})
+        buildoptions({"-Wextra", "-Wall", "-Wpedantic", "-Wconversion"})
         toolset("clang")
 
     filter("platforms:Windows")
