@@ -21,6 +21,7 @@
 #define MAPEDIT_PLANE_CURSOR_NULL     14
 #define MAPEDIT_PLANE_TILESHEET       15
 #define MAPEDIT_PLANE_CURRENTLAYER    16
+#define MAPEDIT_PLANE_CURRENTFILE     17
 
 #define MAPEDIT_BUTTON_LEFTM          0
 #define MAPEDIT_BUTTON_RIGHTM         1
@@ -156,6 +157,7 @@ typedef struct EditorData
     uint8_t      previousState;
     uint16_t     tilesize;
     uint8_t      currentLayer;
+    bool         isolate;
     uint8_t      layers;
     uint8_t      selectedX;
     uint8_t      selectedY;
@@ -172,6 +174,8 @@ typedef struct EditorData
     Action       *actions;
     uint32_t     currentAction;
     const char   *projectName;
+    bool         confirmed;
+    const char   *currentFile;
 }
 EditorData;
 

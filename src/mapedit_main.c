@@ -61,16 +61,14 @@ void mapedit_init
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load place cursor!\033[0m\n");
     }
 
-    engine->planes[MAPEDIT_PLANE_CURSOR_NULL].width  = 32;
-    engine->planes[MAPEDIT_PLANE_CURSOR_NULL].height = 32;
-    engine->planes[MAPEDIT_PLANE_CURSOR_NULL].data   = calloc(32 * 32 * RIVER2D_BPP, 1);
-
     river2D_loadImage_file(engine, "assets/font_default_16.qoi", &engine->planes[MAPEDIT_PLANE_FONT16], RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_FONT16].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load font image!\033[0m\n");
     }
 
+    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_NULL], 32, 32);
+    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE], 32, 32);
     river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],   engine->backbuffer.width, engine->backbuffer.height);
     river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU],  engine->backbuffer.width, engine->backbuffer.height);
     river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE], engine->backbuffer.width, engine->backbuffer.height);
@@ -201,6 +199,8 @@ void mapedit_init
     {
         editor->projectName = "unnamed_project";
     }
+
+    editor->currentFile = calloc(255, 1);
 
     River2D_Time now                = river2D_queryTime();
     editor->lastPresentTime         = now;
@@ -461,7 +461,27 @@ internal void drawEditor
                            engine->planes[MAPEDIT_PLANE_VOID].width,
                            engine->planes[MAPEDIT_PLANE_VOID].height);
 
-    for(uint32_t z = 0; z < editor->layers; ++z)
+    for(uint8_t i = 0; i < editor->layers; ++i)
+    {
+        if(engine->controls.keymap & (MAPEDIT_BIT_LAYER0 << i))
+        {
+            editor->currentLayer = i;
+
+            if(engine->controls.keymap & MAPEDIT_BIT_LSHIFT)
+            {
+                editor->isolate = true;
+            }
+            else
+            {
+                editor->isolate = false;
+            }
+        }
+    }
+
+    uint8_t startLayer = editor->isolate ? editor->currentLayer : 0;
+    uint8_t endLayer   = editor->isolate ? editor->currentLayer + 1 : editor->layers;
+
+    for(uint8_t z = startLayer; z < endLayer; ++z)
     {
         for(uint32_t y = 0; y < editor->mapHeight; ++y)
         {
@@ -630,9 +650,8 @@ internal void redo
         prevAction = editor->actions[editor->currentAction - 1];
     }
 
-    int64_t deltaNS = river2D_deltaTime_ns(&prevAction.action_start, &currentAction.action_start);
-
-    if(deltaNS < 0)
+    // FIXME: return here?
+    if(prevAction.action_start.s == 0 && prevAction.action_start.ns == 0)
     {
         return;
     }
@@ -706,19 +725,11 @@ internal void placeSelectedTiles
 
             Tile new_tile = {editor->selectedX + x, editor->selectedY + y};
 
-            // TODO: if new tile is old tile, skip writing completely
-
             writeAction(editor, index, new_tile);
             incrementAction(editor);
         }
     }
 }
-
-// data
-// null <
-// null
-// null
-// null
 
 internal void checkEditorButtons
 (
@@ -880,21 +891,34 @@ internal void checkEditorButtons
         return;
     }
 
-    // BACKLOG: allow isolating view to a selected layer
+    // TODAY: allow isolating view to a selected layer
 
     // TODO: allow resizing the view to zoom in or out freely into the backbuffer.
     // TODO: allow scrolling and panning the view, as well as expanding the tilemap
 
-    // TODO: allow resizing the backbuffer itself to be smaller or bigger.
+    // BACKLOG: allow resizing the backbuffer itself to be smaller or bigger.
     // always keep a copy of the largest backbuffer in memory, so data is not lost when
-    // sizing down, then back up.
+    // sizing down, then back up?
 
     // TODO: wheel or menu of recently used tiles and a hotbar with specific ones, somewhere.
 
     uint16_t tileX = (uint16_t)(engine->controls.pointer.x * (float)engine->backbuffer.width  / editor->tilesize);
     uint16_t tileY = (uint16_t)(engine->controls.pointer.y * (float)engine->backbuffer.height / editor->tilesize);
 
-    // TODO: display outline around the current selected tile
+    uint8_t modX = tileX % editor->selectMult;
+    uint8_t modY = tileY % editor->selectMult;
+
+    if(engine->controls.keymap & MAPEDIT_BIT_LSHIFT)
+    {
+        if(modX)
+        {
+            tileX -= modX;
+        }
+        if(modY)
+        {
+            tileY -= modY;
+        }
+    }
 
     engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET],
                            &engine->backbuffer, RIVER2D_PICTOP_OVER,
@@ -904,14 +928,6 @@ internal void checkEditorButtons
                            editor->selectedY * editor->tilesize,
                            editor->tilesize  * editor->selectMult,
                            editor->tilesize  * editor->selectMult);
-
-    for(uint8_t i = 0; i < editor->layers; ++i)
-    {
-        if(engine->controls.keymap & (MAPEDIT_BIT_LAYER0 << i))
-        {
-            editor->currentLayer = i;
-        }
-    }
 
     //if(river2D_insideRect(&engine->controls.pointer, &editor->100button_someothereditorbutton))
     // {
@@ -942,52 +958,51 @@ internal void drawFilePicker
 internal void loadProject
 (
     EngineData *engine,
-    EditorData *editor
+    EditorData *editor,
+    const char *filename
 ){
-    // TODO: later, this will be a filepicker screen with recent files, etc, (aseprite esc)
-    // JANKY: load whatever file is "*.rte" in the current directory for now, instead of a filepicker
-    const char *dirlist = river2D_listFiles(".");
-    if(!dirlist)
-    {
-        fprintf(stderr, "\n\033[31;1;7mERROR: failed to list directory!\033[0m\n");
-        changeState(editor, MAPEDIT_STATE_EDIT);
-        return;
-    }
-
-    char     *filename  = 0;
-    uint32_t fileOffset = 0;
-    for(uint32_t i = 0; dirlist[i] != '\0'; ++i)
-    {
-        if(dirlist[i] == ';')
-        {
-            fileOffset = i + 1;
-            continue;
-        }
-
-        if(dirlist[i] == '\0' || dirlist[i + 1] == '\0' || dirlist[i + 2] == '\0' || dirlist[i + 3] == '\0')
-        {
-            break;
-        }
-
-        if(dirlist[i] == 'r' && dirlist[i + 1] == 't' && dirlist[i + 2] == 'e')
-        {
-            filename = (char*)malloc(255);
-
-            uint8_t j = 0;
-            for(; j < 255 && dirlist[fileOffset + j] != ';'; ++j)
-            {
-                filename[j] = dirlist[fileOffset + j];
-            }
-            filename[j] = '\0';
-
-            break;
-        }
-    }
+    // const char *dirlist = river2D_listFiles(".");
+    // if(!dirlist)
+    // {
+    //     fprintf(stderr, "\n\033[31;1;7mERROR: failed to list directory!\033[0m\n");
+    //     changeState(editor, MAPEDIT_STATE_EDIT);
+    //     return;
+    // }
+    //
+    // char     *filename  = 0;
+    // uint32_t fileOffset = 0;
+    // for(uint32_t i = 0; dirlist[i] != '\0'; ++i)
+    // {
+    //     if(dirlist[i] == ';')
+    //     {
+    //         fileOffset = i + 1;
+    //         continue;
+    //     }
+    //
+    //     if(dirlist[i] == '\0' || dirlist[i + 1] == '\0' || dirlist[i + 2] == '\0' || dirlist[i + 3] == '\0')
+    //     {
+    //         break;
+    //     }
+    //
+    //     if(dirlist[i] == 'r' && dirlist[i + 1] == 't' && dirlist[i + 2] == 'e')
+    //     {
+    //         filename = (char*)malloc(255);
+    //
+    //         uint8_t j = 0;
+    //         for(; j < 255 && dirlist[fileOffset + j] != ';'; ++j)
+    //         {
+    //             filename[j] = dirlist[fileOffset + j];
+    //         }
+    //         filename[j] = '\0';
+    //
+    //         break;
+    //     }
+    // }
 
     if(!filename)
     {
-        fprintf(stderr, "\n\033[31;1;7mERROR: failed to find .rte file to load!\nlist: %s\n\n\033[0m\n", dirlist);
-        changeState(editor, MAPEDIT_STATE_EDIT);
+        fprintf(stderr, "\n\033[31;1;7mERROR: failed to find .rte file to load!\033[0m\n");
+        changeState(editor, MAPEDIT_STATE_MENU);
         return;
     }
 
@@ -999,7 +1014,7 @@ internal void loadProject
     if(!file)
     {
         fprintf(stderr, "\033[31;1;7mERROR: could not open file: %s.\033[0m\n", filename);
-        changeState(editor, MAPEDIT_STATE_EDIT);
+        changeState(editor, MAPEDIT_STATE_MENU);
         return;
     }
 
@@ -1055,12 +1070,12 @@ internal void loadProject
     engine->planes[MAPEDIT_PLANE_TILESHEET].path = "imgsurf_load_ptr in loadProject";
 
     fclose(file);
-    free((void*)dirlist);
+    // free((void*)dirlist);
 
-    if(filename)
-    {
-        free((void*)filename);
-    }
+    // if(filename)
+    // {
+    //     free((void*)filename);
+    // }
 }
 
 internal void checkFilePickerButtons
@@ -1075,8 +1090,26 @@ internal void checkFilePickerButtons
         return;
     }
 
-    loadProject(engine, editor);
-    changeState(editor, MAPEDIT_STATE_EDIT);
+    if(editor->confirmed)
+    {
+        loadProject(engine, editor, editor->currentFile);
+        changeState(editor, MAPEDIT_STATE_EDIT);
+        return;
+    }
+
+    editor->currentFile = "HELLO, WORLD.";
+
+    // CURRENT: text input when I have string views done!
+    // dynamically change string view content
+
+    engine->loadText(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE], editor->currentFile, MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
+    engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE], &engine->backbuffer,
+                           RIVER2D_PICTOP_OVER,
+                           (uint32_t)(0.2f * (float)engine->backbuffer.width),
+                           (uint32_t)(0.4f * (float)engine->backbuffer.height),
+                           0, 0,
+                           engine->planes[MAPEDIT_PLANE_CURRENTFILE].width,
+                           engine->planes[MAPEDIT_PLANE_CURRENTFILE].height);
 }
 
 void mapedit_update
