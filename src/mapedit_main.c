@@ -190,8 +190,8 @@ void mapedit_init
     editor->actions = malloc(MAPEDIT_MAX_ACTIONS * sizeof(Action));
     for(uint32_t i = 0; i < MAPEDIT_MAX_ACTIONS; ++i)
     {
-        editor->actions[i].action_start.s  = 0;
-        editor->actions[i].action_start.ns = 0;
+        editor->actions[i].action_start.s  = INT64_MIN;
+        editor->actions[i].action_start.ns = INT64_MIN;
     }
 
     // TODO: allow changing project name with a menu item or hotkey, pop-up textbox and user keyboard input
@@ -598,7 +598,7 @@ internal void undo
         prevAction = editor->actions[editor->currentAction - 1];
     }
 
-    if(prevAction.action_start.s == 0 && prevAction.action_start.ns == 0)
+    if(prevAction.action_start.s == INT64_MIN && prevAction.action_start.ns == INT64_MIN)
     {
         return;
     }
@@ -633,14 +633,12 @@ internal void redo
     EditorData *editor
 ){
     Action currentAction = editor->actions[editor->currentAction];
-    Action prevAction;
-    Action nextAction;
-
-    if(currentAction.action_start.s == 0 && currentAction.action_start.ns == 0)
+    if(currentAction.action_start.s == INT64_MIN && currentAction.action_start.ns == INT64_MIN)
     {
         return;
     }
 
+    Action prevAction;
     if(editor->currentAction == 0)
     {
         prevAction = editor->actions[MAPEDIT_MAX_ACTIONS - 1];
@@ -650,12 +648,12 @@ internal void redo
         prevAction = editor->actions[editor->currentAction - 1];
     }
 
-    // FIXME: return here?
-    if(prevAction.action_start.s == 0 && prevAction.action_start.ns == 0)
+    if(river2D_deltaTime_ns(&currentAction.action_start, &prevAction.action_start) > 0)
     {
         return;
     }
 
+    Action nextAction;
     for(uint32_t undoCount = 0; undoCount < MAPEDIT_MAX_ACTIONS; ++undoCount)
     {
         currentAction = editor->actions[editor->currentAction];

@@ -27,7 +27,6 @@ int main
 }
 #endif
 
-// TODO: handle scrollwheel via WM_MOUSEWHEEL messages.
 LRESULT CALLBACK win32WindowCallback
 (
     HWND   window,
