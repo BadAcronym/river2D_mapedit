@@ -229,8 +229,8 @@ void mapedit_init
     editor->actions = malloc(MAPEDIT_MAX_ACTIONS * sizeof(Action));
     for(uint32_t i = 0; i < MAPEDIT_MAX_ACTIONS; ++i)
     {
-        editor->actions[i].action_start.s  = INT64_MIN;
-        editor->actions[i].action_start.ns = INT64_MIN;
+        editor->actions[i].stroke_start.s  = INT64_MIN;
+        editor->actions[i].stroke_start.ns = INT64_MIN;
     }
 
     // TODO: allow changing project name with a menu item or hotkey, pop-up
@@ -646,7 +646,7 @@ internal void writeAction
     Tile prev_tile = editor->tiles[map_index];
     editor->tiles[map_index] = new_tile;
 
-    editor->actions[editor->currentAction].action_start = editor->lastActionStart;
+    editor->actions[editor->currentAction].stroke_start = editor->lastActionStart;
     editor->actions[editor->currentAction].map_index    = map_index;
     editor->actions[editor->currentAction].prev_tile    = prev_tile;
     editor->actions[editor->currentAction].new_tile     = new_tile;
@@ -668,8 +668,8 @@ internal void undo
         prevAction = editor->actions[editor->currentAction - 1];
     }
 
-    if(prevAction.action_start.s == INT64_MIN &&
-       prevAction.action_start.ns == INT64_MIN
+    if(prevAction.stroke_start.s == INT64_MIN &&
+       prevAction.stroke_start.ns == INT64_MIN
     ){
         return;
     }
@@ -692,8 +692,8 @@ internal void undo
         editor->currentLayer = (uint8_t)floor((double)currentAction.map_index /
                                               (editor->mapWidth * editor->mapHeight));
 
-        int64_t deltaNS = river2D_deltaTime_ns(&prevAction.action_start,
-                                               &currentAction.action_start);
+        int64_t deltaNS = river2D_deltaTime_ns(&prevAction.stroke_start,
+                                               &currentAction.stroke_start);
         if(deltaNS != 0)
         {
             break;
@@ -701,14 +701,13 @@ internal void undo
     }
 }
 
-// FIXME: redo broken AGAIN! for god's sake, man...
 internal void redo
 (
     EditorData *editor
 ){
     Action currentAction = editor->actions[editor->currentAction];
-    if(currentAction.action_start.s == INT64_MIN &&
-       currentAction.action_start.ns == INT64_MIN
+    if(currentAction.stroke_start.s  == INT64_MIN &&
+       currentAction.stroke_start.ns == INT64_MIN
     ){
         return;
     }
@@ -723,8 +722,10 @@ internal void redo
         prevAction = editor->actions[editor->currentAction - 1];
     }
 
-    if(river2D_deltaTime_ns(&currentAction.action_start, &prevAction.action_start) > 0)
-    {
+    if(prevAction.stroke_start.s  >= 0 &&
+       prevAction.stroke_start.ns >= 0 &&
+       river2D_deltaTime_ns(&currentAction.stroke_start, &prevAction.stroke_start) > 0
+    ){
         return;
     }
 
@@ -746,8 +747,8 @@ internal void redo
                                               (editor->mapWidth * editor->mapHeight));
         incrementAction(editor);
 
-        int64_t deltaNS = river2D_deltaTime_ns(&nextAction.action_start,
-                                               &currentAction.action_start);
+        int64_t deltaNS = river2D_deltaTime_ns(&nextAction.stroke_start,
+                                               &currentAction.stroke_start);
         if(deltaNS != 0)
         {
             break;
