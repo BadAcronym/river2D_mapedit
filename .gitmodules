@@ -4,3 +4,6 @@
 [submodule "vendor/premake-ecc"]
 	path = vendor/premake-ecc
 	url = git@github.com:mattbystrin/premake-ecc
+[submodule "vendor/puddle"]
+	path = vendor/puddle
+	url = git@github.com:BadAcronym/puddle

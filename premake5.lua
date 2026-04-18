@@ -12,8 +12,13 @@ project("mapedit binary")
     cdialect("C99")
     warnings("Extra")
     targetname("mapedit")
-    libdirs({"./vendor/river2D/bin/%{cfg.buildcfg}/", "./vendor/river2D/vendor/imgsurf/bin/%{cfg.buildcfg}/"})
-    includedirs({"./include/", "/usr/include/", "./vendor/river2D/include/", "./vendor/river2D/vendor/imgsurf/include"})
+    libdirs({"./vendor/river2D/bin/%{cfg.buildcfg}/",
+             "./vendor/river2D/vendor/imgsurf/bin/%{cfg.buildcfg}/"})
+    includedirs({"./include/",
+                 "/usr/include/",
+                 "./vendor/puddle/include/",
+                 "./vendor/river2D/include/",
+                 "./vendor/river2D/vendor/imgsurf/include"})
     debugdir("./")
 
     filter("configurations:asan")
