@@ -195,13 +195,15 @@ void mapedit_init
 
     // HACK: load upfront for now
     // TODO: load all .qoi files from folder, then append to one big tilesheet
-    // in memory BACKLOG: allow replacing this tilesheet by selecting one or
+    // in memory
+    // BACKLOG: allow replacing this tilesheet by selecting one or
     // multiple files with a file browser...
     river2D_loadImage_file(engine, "assets/tiles/tilesheet.qoi",
                            &engine->planes[MAPEDIT_PLANE_TILESHEET],
                            RIVER2D_CHANNELS_BGRA, 8);
 
-    // BACKLOG: allow decreasing/increasing this minimum tilesize
+    // BACKLOG: allow decreasing/increasing this minimum tilesize, as well as limiting
+    // selectmult?
     editor->tilesize   = 8;
     editor->selectMult = 1;
 
