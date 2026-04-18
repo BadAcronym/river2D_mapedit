@@ -151,12 +151,12 @@ void mapedit_init
     keycodes[MAPEDIT_KEY_Y]          = river2D_charToKey('y');
     keycodes[MAPEDIT_KEY_Z]          = river2D_charToKey('z');
 
-    StringView title_sv  = cstr_sv("RIVER2D MAP EDITOR");
-    StringView new_sv  = cstr_sv("NEW PROJECT");
-    StringView load_sv = cstr_sv("LOAD PROJECT");
-    StringView save_sv = cstr_sv("SAVE PROJECT");
-    StringView quit_sv = cstr_sv("QUIT");
-    StringView close  = cstr_sv("CLOSE");
+    StringView title_sv = cstr_sv("RIVER2D MAP EDITOR");
+    StringView new_sv   = cstr_sv("NEW PROJECT");
+    StringView load_sv  = cstr_sv("LOAD PROJECT");
+    StringView save_sv  = cstr_sv("SAVE PROJECT");
+    StringView quit_sv  = cstr_sv("QUIT");
+    StringView close    = cstr_sv("CLOSE");
 
     // JANKY: I'm loading text by creating a button, then overwriting it. pause/main
     Coordinates point = { .x = 0.5f, .y = 0.2f };
@@ -240,9 +240,6 @@ void mapedit_init
     {
         editor->projectName = cstr_sv("unnamed_project");
     }
-
-    editor->currentFile.data = calloc(255, 1);
-    editor->currentFile.size = 255;
 
     River2D_Time now                = river2D_queryTime();
     editor->lastPresentTime         = now;
@@ -1036,7 +1033,6 @@ internal void drawFilePicker
 (
     EngineData *engine
 ){
-    // background for now, file picker UI goes here
     engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_BACKGROUND],
                            &engine->backbuffer, RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
                            engine->planes[MAPEDIT_PLANE_VOID].width,
@@ -1066,7 +1062,7 @@ internal void loadProject
     }
 
     #ifdef DEBUG
-    fprintf(stderr, "\nloading file: %s\n", filename);
+    fprintf(stderr, "\nloading file: "PRI_SV"\n", ARG_SV(*filename));
     #endif
 
     FILE *file = fopen(filename->data, "rb");
@@ -1151,18 +1147,20 @@ internal void checkFilePickerButtons
         return;
     }
 
+    // FIXME: not updating here... why??
+    if(engine->controls.keymap & MAPEDIT_BIT_BACKSPACE)
+    {
+        sv_trim(&editor->currentFile, 1, SV_RIGHT);
+        engine->controls.keymap &= ~MAPEDIT_BIT_BACKSPACE;
+    }
+
+    // TODO: confirm with enter
+
     if(editor->confirmed)
     {
         loadProject(engine, editor, &editor->currentFile);
         changeState(editor, MAPEDIT_STATE_EDIT);
         return;
-    }
-
-    // FIXME: not appearing here
-    if(engine->controls.keymap & MAPEDIT_BIT_BACKSPACE)
-    {
-        sv_trim(&editor->currentFile, 1, SV_RIGHT);
-        engine->controls.keymap &= ~MAPEDIT_BIT_BACKSPACE;
     }
 
     // TODO: the keyboard adds a character (check in loop)
@@ -1172,7 +1170,6 @@ internal void checkFilePickerButtons
 
     engine->loadText(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE],
                      &editor->currentFile, MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
-
 }
 
 void mapedit_update
