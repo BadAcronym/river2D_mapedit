@@ -701,6 +701,7 @@ internal void undo
     }
 }
 
+// FIXME: redo broken AGAIN! for god's sake, man...
 internal void redo
 (
     EditorData *editor
@@ -824,7 +825,7 @@ internal void checkEditorButtons
     }
 
     float fX = (float)engine->backbuffer.width;
-    float fY = (float)engine->backbuffer.width;
+    float fY = (float)engine->backbuffer.height;
 
     if(editor->editorflags & MAPEDIT_FLAG_BIT_TILEPICKER)
     {
@@ -878,12 +879,12 @@ internal void checkEditorButtons
         {
             river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
-            Rect  close  = editor->close_b.area;
-            float length = close.lowRight.x - close.upLeft.x;
+            float length = editor->close_b.area.lowRight.x -
+                           editor->close_b.area.upLeft.x;
             engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                    &engine->backbuffer, RIVER2D_PICTOP_OVER,
-                                   (uint32_t)(close.upLeft.x * fX),
-                                   (uint32_t)(close.upLeft.y * fY + 20),
+                                   (uint32_t)(editor->close_b.area.upLeft.x * fX),
+                                   (uint32_t)(editor->close_b.area.upLeft.y * fY + 20),
                                    0, 0, (uint32_t)(length * fX), 5);
 
             if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
@@ -926,7 +927,7 @@ internal void checkEditorButtons
 
             engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                    &engine->backbuffer, RIVER2D_PICTOP_OVER,
-                                   (uint32_t)(fX  * (tiles.upLeft.x + 0.0055f) +
+                                   (uint32_t)(fX * (tiles.upLeft.x + 0.0055f) +
                                               tileX * editor->tilesize),
                                    (uint32_t)(fY * (tiles.upLeft.y + 0.006f) +
                                               tileY * editor->tilesize),
