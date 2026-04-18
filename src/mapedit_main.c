@@ -1147,14 +1147,16 @@ internal void checkFilePickerButtons
         return;
     }
 
-    // FIXME: not updating here... why??
     if(engine->controls.keymap & MAPEDIT_BIT_BACKSPACE)
     {
         sv_trim(&editor->currentFile, 1, SV_RIGHT);
         engine->controls.keymap &= ~MAPEDIT_BIT_BACKSPACE;
     }
 
-    // TODO: confirm with enter
+    // CURRENT: each keyboard key adds a new character!
+    // (maybe allocate a super empty string and set the cursor to 0 at first)
+
+    // CURRENT: confirm with enter!
 
     if(editor->confirmed)
     {
@@ -1162,11 +1164,6 @@ internal void checkFilePickerButtons
         changeState(editor, MAPEDIT_STATE_EDIT);
         return;
     }
-
-    // TODO: the keyboard adds a character (check in loop)
-
-    // CURRENT: text input!
-    // dynamically change string view content with keyboard input
 
     engine->loadText(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE],
                      &editor->currentFile, MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
