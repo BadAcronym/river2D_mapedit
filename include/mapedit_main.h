@@ -166,11 +166,11 @@ typedef struct EditorData
     uint32_t     mapWidth;
     uint32_t     mapHeight;
     uint64_t     editorflags;
-    Rect         button_new;
-    Rect         button_load;
-    Rect         button_save;
-    Rect         button_quit;
-    Rect         button_tilepicker_close;
+    Button       new_b;
+    Button       load_b;
+    Button       save_b;
+    Button       quit_b;
+    Button       close_b;
     Tile         *tiles;
     Action       *actions;
     uint32_t     currentAction;
