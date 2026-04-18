@@ -1,6 +1,7 @@
 #pragma once
 
 #include "river2D_main.h"
+#include "string_view.h"
 
 #define MAPEDIT_MAX_ACTIONS           0xFFFF
 
@@ -173,9 +174,9 @@ typedef struct EditorData
     Tile         *tiles;
     Action       *actions;
     uint32_t     currentAction;
-    const char   *projectName;
+    StringView   projectName;
+    StringView   currentFile;
     bool         confirmed;
-    const char   *currentFile;
 }
 EditorData;
 
