@@ -150,50 +150,48 @@ void mapedit_init
     keycodes[MAPEDIT_KEY_Y]          = river2D_interpretCharAsKey('y');
     keycodes[MAPEDIT_KEY_Z]          = river2D_interpretCharAsKey('z');
 
-    // JANKY: I'm loading text by creating a button, then overwriting it.
-    // maybe allow for float-centric text loading in the future?
+    StringView title_sv  = cstr_sv("RIVER2D MAP EDITOR");
+    StringView new_sv  = cstr_sv("NEW PROJECT");
+    StringView load_sv = cstr_sv("LOAD PROJECT");
+    StringView save_sv = cstr_sv("SAVE PROJECT");
+    StringView quit_sv = cstr_sv("QUIT");
+    StringView close  = cstr_sv("CLOSE");
+
+    // JANKY: I'm loading text by creating a button, then overwriting it. pause/main
     Coordinates point = { .x = 0.5f, .y = 0.2f };
 
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],
-                         "RIVER2D MAP EDITOR", MAPEDIT_PLANE_FONT16, 16, 1,
-                         point, &editor->button_new);
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU], &title_sv,
+                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->new_b);
 
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU],
-                         "RIVER2D MAP EDITOR", MAPEDIT_PLANE_FONT16, 16, 1,
-                         point, &editor->button_new);
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], &title_sv,
+                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->new_b);
     point.y = 0.4f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],
-                         "NEW PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, point,
-                         &editor->button_new);
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU], &new_sv,
+                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->new_b);
 
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU],
-                         "NEW PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, point,
-                         &editor->button_new);
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], &new_sv,
+                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->new_b);
 
     point.y = 0.5f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],
-                         "LOAD PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, point,
-                         &editor->button_load);
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU], &load_sv,
+                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->load_b);
 
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU],
-                         "LOAD PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, point,
-                         &editor->button_load);
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], &load_sv,
+                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->load_b);
     point.y = 0.6f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU],
-                         "SAVE PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, point,
-                         &editor->button_save);
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], &save_sv,
+                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->save_b);
     point.y = 0.8f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],  "QUIT",
-                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_quit);
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU], &quit_sv,
+                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->quit_b);
 
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], "QUIT",
-                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_quit);
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], &quit_sv,
+                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->quit_b);
 
     point.x = 0.175f;
     point.y = 0.86f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE],
-                         "CLOSE", MAPEDIT_PLANE_FONT16, 16, 1, point,
-                         &editor->button_tilepicker_close);
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE], &close,
+                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->close_b);
 
     // HACK: load upfront for now
     // TODO: load all .qoi files from folder, then append to one big tilesheet
@@ -409,17 +407,17 @@ internal void checkMainMenuButtons
         return;
     }
 
-    if(river2D_insideRect(&engine->controls.pointer, &editor->button_new))
+    if(river2D_insideRect(&engine->controls.pointer, &editor->new_b.area))
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
-        float length = editor->button_new.lowRight.x - editor->button_new.upLeft.x;
+        float length = editor->new_b.area.lowRight.x - editor->new_b.area.upLeft.x;
         float fX     = (float)(engine->backbuffer.width);
         float fY     = (float)(engine->backbuffer.height);
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
-                               (uint32_t)(editor->button_new.upLeft.x * fX),
-                               (uint32_t)(editor->button_new.upLeft.y * fY + 20),
+                               (uint32_t)(editor->new_b.area.upLeft.x * fX),
+                               (uint32_t)(editor->new_b.area.upLeft.y * fY + 20),
                                0, 0,
                                (uint32_t)(length * fX), 5);
 
@@ -440,17 +438,17 @@ internal void checkMainMenuButtons
             engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
         }
     }
-    else if(river2D_insideRect(&engine->controls.pointer, &editor->button_load))
+    else if(river2D_insideRect(&engine->controls.pointer, &editor->load_b.area))
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
-        float length = editor->button_load.lowRight.x - editor->button_load.upLeft.x;
+        float length = editor->load_b.area.lowRight.x - editor->load_b.area.upLeft.x;
         float fX     = (float)(engine->backbuffer.width);
         float fY     = (float)(engine->backbuffer.height);
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
-                               (uint32_t)(editor->button_load.upLeft.x * fX),
-                               (uint32_t)(editor->button_load.upLeft.y * fY + 20),
+                               (uint32_t)(editor->load_b.area.upLeft.x * fX),
+                               (uint32_t)(editor->load_b.area.upLeft.y * fY + 20),
                                0, 0,
                                (uint32_t)(length * fX), 5);
 
@@ -460,17 +458,17 @@ internal void checkMainMenuButtons
             engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
         }
     }
-    else if(river2D_insideRect(&engine->controls.pointer, &editor->button_quit))
+    else if(river2D_insideRect(&engine->controls.pointer, &editor->quit_b.area))
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
-        float length = editor->button_quit.lowRight.x - editor->button_quit.upLeft.x;
+        float length = editor->quit_b.area.lowRight.x - editor->quit_b.area.upLeft.x;
         float fX     = (float)(engine->backbuffer.width);
         float fY     = (float)(engine->backbuffer.height);
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
-                               (uint32_t)(editor->button_quit.upLeft.x * fX),
-                               (uint32_t)(editor->button_quit.upLeft.y * fY + 20),
+                               (uint32_t)(editor->quit_b.area.upLeft.x * fX),
+                               (uint32_t)(editor->quit_b.area.upLeft.y * fY + 20),
                                0, 0,
                                (uint32_t)(length * fX), 5);
 
@@ -480,17 +478,17 @@ internal void checkMainMenuButtons
         }
     }
     else if(editor->previousState &&
-            river2D_insideRect(&engine->controls.pointer, &editor->button_save)
+            river2D_insideRect(&engine->controls.pointer, &editor->save_b.area)
     ){
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
-        float length = editor->button_save.lowRight.x - editor->button_save.upLeft.x;
+        float length = editor->save_b.area.lowRight.x - editor->save_b.area.upLeft.x;
         float fX     = (float)(engine->backbuffer.width);
         float fY     = (float)(engine->backbuffer.height);
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
-                               (uint32_t)(editor->button_save.upLeft.x * fX),
-                               (uint32_t)(editor->button_save.upLeft.y * fY + 20),
+                               (uint32_t)(editor->save_b.area.upLeft.x * fX),
+                               (uint32_t)(editor->save_b.area.upLeft.y * fY + 20),
                                0, 0, (uint32_t)(length * fX), 5);
 
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
@@ -572,8 +570,10 @@ internal void drawEditor
     char layerStr[2];
     snprintf(layerStr, 2, "%hhu", editor->currentLayer);
 
-    engine->loadText(engine, &engine->planes[MAPEDIT_PLANE_CURRENTLAYER],
-                     layerStr, MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
+    StringView layer_sv = cstr_sv(layerStr);
+
+    engine->loadText(engine, &engine->planes[MAPEDIT_PLANE_CURRENTLAYER], &layer_sv,
+                     MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
 
     engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTLAYER],
                            &engine->backbuffer, RIVER2D_PICTOP_OVER,
@@ -872,12 +872,11 @@ internal void checkEditorButtons
         // TODO: scrollwheel changes size, 2x2 smallest, 96x96 biggest? only
         // limitation is the highlighting, lol
 
-        if(river2D_insideRect(&engine->controls.pointer,
-                              &editor->button_tilepicker_close)
-        ){
+        if(river2D_insideRect(&engine->controls.pointer, &editor->close_b.area))
+        {
             river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
-            Rect  close  = editor->button_tilepicker_close;
+            Rect  close  = editor->close_b.area;
             float length = close.lowRight.x - close.upLeft.x;
             engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                    &engine->backbuffer, RIVER2D_PICTOP_OVER,
@@ -1157,7 +1156,7 @@ internal void checkFilePickerButtons
     // dynamically change string view content with keyboard input
 
     engine->loadText(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE],
-                     editor->currentFile.data, MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
+                     &editor->currentFile, MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
 
     engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE],
                            &engine->backbuffer, RIVER2D_PICTOP_OVER,
@@ -1266,7 +1265,7 @@ internal uint8_t processKey_function
 }
 
 #define processKey(kmacro, bitmacro) \
-processButton_function(controls, kmacro, key, bitmacro, isDown)
+processKey_function(controls, kmacro, key, bitmacro, isDown)
 
 void mapedit_processButtons
 (
