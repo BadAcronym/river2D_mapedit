@@ -105,50 +105,51 @@ void mapedit_init
     engine->controls.buttoncodes[MAPEDIT_BUTTON_RIGHTM]  = RIVER2D_MOUSE3;
 
     uint8_t *keycodes = engine->controls.keycodes;
-    keycodes[MAPEDIT_KEY_ESCAPE]     = river2D_interpretCharAsKey(RIVER2D_ASCII_ESCAPE);
-    keycodes[MAPEDIT_KEY_LSHIFT]     = river2D_interpretCharAsKey(RIVER2D_ASCII_LSHIFT);
-    keycodes[MAPEDIT_KEY_LCTRL]      = river2D_interpretCharAsKey(RIVER2D_ASCII_LCTRL);
-    keycodes[MAPEDIT_KEY_QUIT]       = river2D_interpretCharAsKey('q');
-    keycodes[MAPEDIT_KEY_SAVE]       = river2D_interpretCharAsKey('s');
-    keycodes[MAPEDIT_KEY_TILEPICKER] = river2D_interpretCharAsKey('t');
-    keycodes[MAPEDIT_KEY_INC_SIZE]   = river2D_interpretCharAsKey('=');
-    keycodes[MAPEDIT_KEY_RED_SIZE]   = river2D_interpretCharAsKey('-');
-    keycodes[MAPEDIT_KEY_LAYER0]     = river2D_interpretCharAsKey('0');
-    keycodes[MAPEDIT_KEY_LAYER1]     = river2D_interpretCharAsKey('1');
-    keycodes[MAPEDIT_KEY_LAYER2]     = river2D_interpretCharAsKey('2');
-    keycodes[MAPEDIT_KEY_LAYER3]     = river2D_interpretCharAsKey('3');
-    keycodes[MAPEDIT_KEY_LAYER4]     = river2D_interpretCharAsKey('4');
-    keycodes[MAPEDIT_KEY_LAYER5]     = river2D_interpretCharAsKey('5');
-    keycodes[MAPEDIT_KEY_LAYER6]     = river2D_interpretCharAsKey('6');
-    keycodes[MAPEDIT_KEY_LAYER7]     = river2D_interpretCharAsKey('7');
-    keycodes[MAPEDIT_KEY_LAYER8]     = river2D_interpretCharAsKey('8');
-    keycodes[MAPEDIT_KEY_LAYER9]     = river2D_interpretCharAsKey('9');
-    keycodes[MAPEDIT_KEY_A]          = river2D_interpretCharAsKey('a');
-    keycodes[MAPEDIT_KEY_B]          = river2D_interpretCharAsKey('b');
-    keycodes[MAPEDIT_KEY_C]          = river2D_interpretCharAsKey('c');
-    keycodes[MAPEDIT_KEY_D]          = river2D_interpretCharAsKey('d');
-    keycodes[MAPEDIT_KEY_E]          = river2D_interpretCharAsKey('e');
-    keycodes[MAPEDIT_KEY_F]          = river2D_interpretCharAsKey('f');
-    keycodes[MAPEDIT_KEY_G]          = river2D_interpretCharAsKey('g');
-    keycodes[MAPEDIT_KEY_H]          = river2D_interpretCharAsKey('h');
-    keycodes[MAPEDIT_KEY_I]          = river2D_interpretCharAsKey('i');
-    keycodes[MAPEDIT_KEY_J]          = river2D_interpretCharAsKey('j');
-    keycodes[MAPEDIT_KEY_K]          = river2D_interpretCharAsKey('k');
-    keycodes[MAPEDIT_KEY_L]          = river2D_interpretCharAsKey('l');
-    keycodes[MAPEDIT_KEY_M]          = river2D_interpretCharAsKey('m');
-    keycodes[MAPEDIT_KEY_N]          = river2D_interpretCharAsKey('n');
-    keycodes[MAPEDIT_KEY_O]          = river2D_interpretCharAsKey('o');
-    keycodes[MAPEDIT_KEY_P]          = river2D_interpretCharAsKey('p');
-    keycodes[MAPEDIT_KEY_Q]          = river2D_interpretCharAsKey('q');
-    keycodes[MAPEDIT_KEY_R]          = river2D_interpretCharAsKey('r');
-    keycodes[MAPEDIT_KEY_S]          = river2D_interpretCharAsKey('s');
-    keycodes[MAPEDIT_KEY_T]          = river2D_interpretCharAsKey('t');
-    keycodes[MAPEDIT_KEY_U]          = river2D_interpretCharAsKey('u');
-    keycodes[MAPEDIT_KEY_V]          = river2D_interpretCharAsKey('v');
-    keycodes[MAPEDIT_KEY_W]          = river2D_interpretCharAsKey('w');
-    keycodes[MAPEDIT_KEY_X]          = river2D_interpretCharAsKey('x');
-    keycodes[MAPEDIT_KEY_Y]          = river2D_interpretCharAsKey('y');
-    keycodes[MAPEDIT_KEY_Z]          = river2D_interpretCharAsKey('z');
+    keycodes[MAPEDIT_KEY_ESCAPE]     = river2D_charToKey(RIVER2D_ASCII_ESCAPE);
+    keycodes[MAPEDIT_KEY_LSHIFT]     = river2D_charToKey(RIVER2D_ASCII_LSHIFT);
+    keycodes[MAPEDIT_KEY_LCTRL]      = river2D_charToKey(RIVER2D_ASCII_LCTRL);
+    keycodes[MAPEDIT_KEY_BACKSPACE]  = river2D_charToKey(RIVER2D_ASCII_BACKSPACE);
+    keycodes[MAPEDIT_KEY_QUIT]       = river2D_charToKey('q');
+    keycodes[MAPEDIT_KEY_SAVE]       = river2D_charToKey('s');
+    keycodes[MAPEDIT_KEY_TILEPICKER] = river2D_charToKey('t');
+    keycodes[MAPEDIT_KEY_INC_SIZE]   = river2D_charToKey('=');
+    keycodes[MAPEDIT_KEY_RED_SIZE]   = river2D_charToKey('-');
+    keycodes[MAPEDIT_KEY_LAYER0]     = river2D_charToKey('0');
+    keycodes[MAPEDIT_KEY_LAYER1]     = river2D_charToKey('1');
+    keycodes[MAPEDIT_KEY_LAYER2]     = river2D_charToKey('2');
+    keycodes[MAPEDIT_KEY_LAYER3]     = river2D_charToKey('3');
+    keycodes[MAPEDIT_KEY_LAYER4]     = river2D_charToKey('4');
+    keycodes[MAPEDIT_KEY_LAYER5]     = river2D_charToKey('5');
+    keycodes[MAPEDIT_KEY_LAYER6]     = river2D_charToKey('6');
+    keycodes[MAPEDIT_KEY_LAYER7]     = river2D_charToKey('7');
+    keycodes[MAPEDIT_KEY_LAYER8]     = river2D_charToKey('8');
+    keycodes[MAPEDIT_KEY_LAYER9]     = river2D_charToKey('9');
+    keycodes[MAPEDIT_KEY_A]          = river2D_charToKey('a');
+    keycodes[MAPEDIT_KEY_B]          = river2D_charToKey('b');
+    keycodes[MAPEDIT_KEY_C]          = river2D_charToKey('c');
+    keycodes[MAPEDIT_KEY_D]          = river2D_charToKey('d');
+    keycodes[MAPEDIT_KEY_E]          = river2D_charToKey('e');
+    keycodes[MAPEDIT_KEY_F]          = river2D_charToKey('f');
+    keycodes[MAPEDIT_KEY_G]          = river2D_charToKey('g');
+    keycodes[MAPEDIT_KEY_H]          = river2D_charToKey('h');
+    keycodes[MAPEDIT_KEY_I]          = river2D_charToKey('i');
+    keycodes[MAPEDIT_KEY_J]          = river2D_charToKey('j');
+    keycodes[MAPEDIT_KEY_K]          = river2D_charToKey('k');
+    keycodes[MAPEDIT_KEY_L]          = river2D_charToKey('l');
+    keycodes[MAPEDIT_KEY_M]          = river2D_charToKey('m');
+    keycodes[MAPEDIT_KEY_N]          = river2D_charToKey('n');
+    keycodes[MAPEDIT_KEY_O]          = river2D_charToKey('o');
+    keycodes[MAPEDIT_KEY_P]          = river2D_charToKey('p');
+    keycodes[MAPEDIT_KEY_Q]          = river2D_charToKey('q');
+    keycodes[MAPEDIT_KEY_R]          = river2D_charToKey('r');
+    keycodes[MAPEDIT_KEY_S]          = river2D_charToKey('s');
+    keycodes[MAPEDIT_KEY_T]          = river2D_charToKey('t');
+    keycodes[MAPEDIT_KEY_U]          = river2D_charToKey('u');
+    keycodes[MAPEDIT_KEY_V]          = river2D_charToKey('v');
+    keycodes[MAPEDIT_KEY_W]          = river2D_charToKey('w');
+    keycodes[MAPEDIT_KEY_X]          = river2D_charToKey('x');
+    keycodes[MAPEDIT_KEY_Y]          = river2D_charToKey('y');
+    keycodes[MAPEDIT_KEY_Z]          = river2D_charToKey('z');
 
     StringView title_sv  = cstr_sv("RIVER2D MAP EDITOR");
     StringView new_sv  = cstr_sv("NEW PROJECT");
@@ -250,6 +251,7 @@ void mapedit_init
     engine->controls.lastScrollTime = now;
 
     editor->currentState = MAPEDIT_STATE_MENU;
+    editor->currentFile = cstr_sv("HELLO, WORLD.");
 }
 
 int32_t mapedit_shutdown
@@ -1034,11 +1036,19 @@ internal void drawFilePicker
 (
     EngineData *engine
 ){
-    // void for now, file picker UI goes here
-    engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_VOID],
+    // background for now, file picker UI goes here
+    engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_BACKGROUND],
                            &engine->backbuffer, RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
                            engine->planes[MAPEDIT_PLANE_VOID].width,
                            engine->planes[MAPEDIT_PLANE_VOID].height);
+
+    engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE],
+                           &engine->backbuffer, RIVER2D_PICTOP_OVER,
+                           (uint32_t)(0.2f * (float)engine->backbuffer.width),
+                           (uint32_t)(0.4f * (float)engine->backbuffer.height),
+                           0, 0,
+                           engine->planes[MAPEDIT_PLANE_CURRENTFILE].width,
+                           engine->planes[MAPEDIT_PLANE_CURRENTFILE].height);
 }
 
 internal void loadProject
@@ -1127,12 +1137,6 @@ internal void loadProject
     engine->planes[MAPEDIT_PLANE_TILESHEET].path = "imgsurf_load_ptr in loadProject";
 
     fclose(file);
-    // free((void*)dirlist);
-
-    // if(filename)
-    // {
-    //     free((void*)filename);
-    // }
 }
 
 internal void checkFilePickerButtons
@@ -1154,7 +1158,14 @@ internal void checkFilePickerButtons
         return;
     }
 
-    editor->currentFile = cstr_sv("HELLO, WORLD.");
+    // FIXME: not appearing here
+    if(engine->controls.keymap & MAPEDIT_BIT_BACKSPACE)
+    {
+        sv_trim(&editor->currentFile, 1, SV_RIGHT);
+        engine->controls.keymap &= ~MAPEDIT_BIT_BACKSPACE;
+    }
+
+    // TODO: the keyboard adds a character (check in loop)
 
     // CURRENT: text input!
     // dynamically change string view content with keyboard input
@@ -1162,13 +1173,6 @@ internal void checkFilePickerButtons
     engine->loadText(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE],
                      &editor->currentFile, MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
 
-    engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE],
-                           &engine->backbuffer, RIVER2D_PICTOP_OVER,
-                           (uint32_t)(0.2f * (float)engine->backbuffer.width),
-                           (uint32_t)(0.4f * (float)engine->backbuffer.height),
-                           0, 0,
-                           engine->planes[MAPEDIT_PLANE_CURRENTFILE].width,
-                           engine->planes[MAPEDIT_PLANE_CURRENTFILE].height);
 }
 
 void mapedit_update
@@ -1304,6 +1308,7 @@ void mapedit_processKeys
     if(processKey(MAPEDIT_KEY_ESCAPE,     MAPEDIT_BIT_ESCAPE    )){ return; }
     if(processKey(MAPEDIT_KEY_LSHIFT,     MAPEDIT_BIT_LSHIFT    )){ return; }
     if(processKey(MAPEDIT_KEY_LCTRL,      MAPEDIT_BIT_LCTRL     )){ return; }
+    if(processKey(MAPEDIT_KEY_BACKSPACE,  MAPEDIT_BIT_BACKSPACE )){ return; }
     if(processKey(MAPEDIT_KEY_SAVE,       MAPEDIT_BIT_SAVE      )){ return; }
     if(processKey(MAPEDIT_KEY_QUIT,       MAPEDIT_BIT_QUIT      )){ return; }
     if(processKey(MAPEDIT_KEY_SAVE,       MAPEDIT_BIT_SAVE      )){ return; }
