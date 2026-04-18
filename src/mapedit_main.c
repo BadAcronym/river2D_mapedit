@@ -889,8 +889,6 @@ internal void checkEditorButtons
         return;
     }
 
-    // TODAY: allow isolating view to a selected layer
-
     // TODO: allow resizing the view to zoom in or out freely into the backbuffer.
     // TODO: allow scrolling and panning the view, as well as expanding the tilemap
 
@@ -1098,7 +1096,7 @@ internal void checkFilePickerButtons
     editor->currentFile = "HELLO, WORLD.";
 
     // CURRENT: text input when I have string views done!
-    // dynamically change string view content
+    // dynamically change string view content with text input
 
     engine->loadText(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE], editor->currentFile, MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
     engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE], &engine->backbuffer,
