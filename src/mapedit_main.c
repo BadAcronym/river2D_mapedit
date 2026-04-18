@@ -1,6 +1,8 @@
 #include "mapedit_main.h"
-
 #include "imgsurf_main.h"
+
+#define STRING_VIEW_IMPL
+#include "string_view.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -8,60 +10,80 @@
 #include <stdlib.h>
 #include <memory.h>
 
-// BACKLOG: write logging function (or library, lmfao) that writes to file, as well as stderr
-// copy some river3D code for that?
+// BACKLOG: write logging function (or library, lmfao) that writes to file, as
+// well as stderr copy some river3D code for that?
 
 void mapedit_init
 (
     EngineData *engine,
     EditorData *editor
 ){
-    river2D_loadImage_file(engine, "assets/background.qoi", &engine->planes[MAPEDIT_PLANE_BACKGROUND], RIVER2D_CHANNELS_BGRA, 8);
+    river2D_loadImage_file(engine, "assets/background.qoi",
+                           &engine->planes[MAPEDIT_PLANE_BACKGROUND],
+                           RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_BACKGROUND].data)
     {
-        fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load background image!\033[0m\n");
+        fprintf(stderr,
+                "\n\033[31;1;7mERROR: Unable to load background image!\033[0m\n");
     }
 
-    river2D_loadImage_file(engine, "assets/black.qoi", &engine->planes[MAPEDIT_PLANE_VOID], RIVER2D_CHANNELS_BGRA, 8);
+    river2D_loadImage_file(engine, "assets/black.qoi",
+                           &engine->planes[MAPEDIT_PLANE_VOID],
+                           RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_VOID].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load black image!\033[0m\n");
     }
 
-    river2D_loadImage_file(engine, "assets/highlight.qoi", &engine->planes[MAPEDIT_PLANE_HIGHLIGHT], RIVER2D_CHANNELS_BGRA, 8);
+    river2D_loadImage_file(engine, "assets/highlight.qoi",
+                           &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
+                           RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_HIGHLIGHT].data)
     {
-        fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load highlight image!\033[0m\n");
+        fprintf(stderr,
+                "\n\033[31;1;7mERROR: Unable to load highlight image!\033[0m\n");
     }
 
-    river2D_loadImage_file(engine, "assets/saving.qoi", &engine->planes[MAPEDIT_PLANE_ICON_SAVING], RIVER2D_CHANNELS_BGRA, 8);
+    river2D_loadImage_file(engine, "assets/saving.qoi",
+                           &engine->planes[MAPEDIT_PLANE_ICON_SAVING],
+                           RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_ICON_SAVING].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load saving icon!\033[0m\n");
     }
-    river2D_loadImage_file(engine, "assets/saved.qoi", &engine->planes[MAPEDIT_PLANE_ICON_SAVED], RIVER2D_CHANNELS_BGRA, 8);
+    river2D_loadImage_file(engine, "assets/saved.qoi",
+                           &engine->planes[MAPEDIT_PLANE_ICON_SAVED],
+                           RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_ICON_SAVED].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load saved icon!\033[0m\n");
     }
 
-    river2D_loadImage_file(engine, "assets/cursor_default.qoi", &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT], RIVER2D_CHANNELS_BGRA, 8);
+    river2D_loadImage_file(engine, "assets/cursor_default.qoi",
+                           &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT],
+                           RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load default cursor!\033[0m\n");
     }
-    river2D_loadImage_file(engine, "assets/cursor_hover.qoi", &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER], RIVER2D_CHANNELS_BGRA, 8);
+    river2D_loadImage_file(engine, "assets/cursor_hover.qoi",
+                           &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER],
+                           RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_CURSOR_HOVER].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load hover cursor!\033[0m\n");
     }
-    river2D_loadImage_file(engine, "assets/cursor_place.qoi", &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE], RIVER2D_CHANNELS_BGRA, 8);
+    river2D_loadImage_file(engine, "assets/cursor_place.qoi",
+                           &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE],
+                           RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_CURSOR_PLACE].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load place cursor!\033[0m\n");
     }
 
-    river2D_loadImage_file(engine, "assets/font_default_16.qoi", &engine->planes[MAPEDIT_PLANE_FONT16], RIVER2D_CHANNELS_BGRA, 8);
+    river2D_loadImage_file(engine, "assets/font_default_16.qoi",
+                           &engine->planes[MAPEDIT_PLANE_FONT16],
+                           RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_FONT16].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load font image!\033[0m\n");
@@ -69,85 +91,97 @@ void mapedit_init
 
     river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_NULL], 32, 32);
     river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE], 32, 32);
-    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],   engine->backbuffer.width, engine->backbuffer.height);
-    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU],  engine->backbuffer.width, engine->backbuffer.height);
-    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE], engine->backbuffer.width, engine->backbuffer.height);
+    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],
+                        engine->backbuffer.width, engine->backbuffer.height);
+    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU],
+                        engine->backbuffer.width, engine->backbuffer.height);
+    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE],
+                        engine->backbuffer.width, engine->backbuffer.height);
 
-    // BACKLOG: transfer to mapedit_loadConfig at some point, when keybinds should be remappable
-    engine->controls.buttoncodes[MAPEDIT_BUTTON_LEFTM]      = RIVER2D_MOUSE1;
-    engine->controls.buttoncodes[MAPEDIT_BUTTON_MIDDLEM]    = RIVER2D_MOUSE2;
-    engine->controls.buttoncodes[MAPEDIT_BUTTON_RIGHTM]     = RIVER2D_MOUSE3;
+    // BACKLOG: transfer to mapedit_loadConfig at some point, when keybinds
+    // should be remappable
+    engine->controls.buttoncodes[MAPEDIT_BUTTON_LEFTM]   = RIVER2D_MOUSE1;
+    engine->controls.buttoncodes[MAPEDIT_BUTTON_MIDDLEM] = RIVER2D_MOUSE2;
+    engine->controls.buttoncodes[MAPEDIT_BUTTON_RIGHTM]  = RIVER2D_MOUSE3;
 
-    engine->controls.keycodes[MAPEDIT_KEY_ESCAPE]     = river2D_interpretCharAsKey(RIVER2D_ASCII_ESCAPE);
-    engine->controls.keycodes[MAPEDIT_KEY_LSHIFT]     = river2D_interpretCharAsKey(RIVER2D_ASCII_LSHIFT);
-    engine->controls.keycodes[MAPEDIT_KEY_LCTRL]      = river2D_interpretCharAsKey(RIVER2D_ASCII_LCTRL);
-    engine->controls.keycodes[MAPEDIT_KEY_QUIT]       = river2D_interpretCharAsKey('q');
-    engine->controls.keycodes[MAPEDIT_KEY_SAVE]       = river2D_interpretCharAsKey('s');
-    engine->controls.keycodes[MAPEDIT_KEY_TILEPICKER] = river2D_interpretCharAsKey('t');
-    engine->controls.keycodes[MAPEDIT_KEY_INC_SIZE]   = river2D_interpretCharAsKey('=');
-    engine->controls.keycodes[MAPEDIT_KEY_RED_SIZE]   = river2D_interpretCharAsKey('-');
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER0]     = river2D_interpretCharAsKey('0');
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER1]     = river2D_interpretCharAsKey('1');
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER2]     = river2D_interpretCharAsKey('2');
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER3]     = river2D_interpretCharAsKey('3');
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER4]     = river2D_interpretCharAsKey('4');
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER5]     = river2D_interpretCharAsKey('5');
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER6]     = river2D_interpretCharAsKey('6');
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER7]     = river2D_interpretCharAsKey('7');
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER8]     = river2D_interpretCharAsKey('8');
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER9]     = river2D_interpretCharAsKey('9');
-    engine->controls.keycodes[MAPEDIT_KEY_A]          = river2D_interpretCharAsKey('a');
-    engine->controls.keycodes[MAPEDIT_KEY_B]          = river2D_interpretCharAsKey('b');
-    engine->controls.keycodes[MAPEDIT_KEY_C]          = river2D_interpretCharAsKey('c');
-    engine->controls.keycodes[MAPEDIT_KEY_D]          = river2D_interpretCharAsKey('d');
-    engine->controls.keycodes[MAPEDIT_KEY_E]          = river2D_interpretCharAsKey('e');
-    engine->controls.keycodes[MAPEDIT_KEY_F]          = river2D_interpretCharAsKey('f');
-    engine->controls.keycodes[MAPEDIT_KEY_G]          = river2D_interpretCharAsKey('g');
-    engine->controls.keycodes[MAPEDIT_KEY_H]          = river2D_interpretCharAsKey('h');
-    engine->controls.keycodes[MAPEDIT_KEY_I]          = river2D_interpretCharAsKey('i');
-    engine->controls.keycodes[MAPEDIT_KEY_J]          = river2D_interpretCharAsKey('j');
-    engine->controls.keycodes[MAPEDIT_KEY_K]          = river2D_interpretCharAsKey('k');
-    engine->controls.keycodes[MAPEDIT_KEY_L]          = river2D_interpretCharAsKey('l');
-    engine->controls.keycodes[MAPEDIT_KEY_M]          = river2D_interpretCharAsKey('m');
-    engine->controls.keycodes[MAPEDIT_KEY_N]          = river2D_interpretCharAsKey('n');
-    engine->controls.keycodes[MAPEDIT_KEY_O]          = river2D_interpretCharAsKey('o');
-    engine->controls.keycodes[MAPEDIT_KEY_P]          = river2D_interpretCharAsKey('p');
-    engine->controls.keycodes[MAPEDIT_KEY_Q]          = river2D_interpretCharAsKey('q');
-    engine->controls.keycodes[MAPEDIT_KEY_R]          = river2D_interpretCharAsKey('r');
-    engine->controls.keycodes[MAPEDIT_KEY_S]          = river2D_interpretCharAsKey('s');
-    engine->controls.keycodes[MAPEDIT_KEY_T]          = river2D_interpretCharAsKey('t');
-    engine->controls.keycodes[MAPEDIT_KEY_U]          = river2D_interpretCharAsKey('u');
-    engine->controls.keycodes[MAPEDIT_KEY_V]          = river2D_interpretCharAsKey('v');
-    engine->controls.keycodes[MAPEDIT_KEY_W]          = river2D_interpretCharAsKey('w');
-    engine->controls.keycodes[MAPEDIT_KEY_X]          = river2D_interpretCharAsKey('x');
-    engine->controls.keycodes[MAPEDIT_KEY_Y]          = river2D_interpretCharAsKey('y');
-    engine->controls.keycodes[MAPEDIT_KEY_Z]          = river2D_interpretCharAsKey('z');
+    uint8_t *keycodes = engine->controls.keycodes;
+    keycodes[MAPEDIT_KEY_ESCAPE]     = river2D_interpretCharAsKey(RIVER2D_ASCII_ESCAPE);
+    keycodes[MAPEDIT_KEY_LSHIFT]     = river2D_interpretCharAsKey(RIVER2D_ASCII_LSHIFT);
+    keycodes[MAPEDIT_KEY_LCTRL]      = river2D_interpretCharAsKey(RIVER2D_ASCII_LCTRL);
+    keycodes[MAPEDIT_KEY_QUIT]       = river2D_interpretCharAsKey('q');
+    keycodes[MAPEDIT_KEY_SAVE]       = river2D_interpretCharAsKey('s');
+    keycodes[MAPEDIT_KEY_TILEPICKER] = river2D_interpretCharAsKey('t');
+    keycodes[MAPEDIT_KEY_INC_SIZE]   = river2D_interpretCharAsKey('=');
+    keycodes[MAPEDIT_KEY_RED_SIZE]   = river2D_interpretCharAsKey('-');
+    keycodes[MAPEDIT_KEY_LAYER0]     = river2D_interpretCharAsKey('0');
+    keycodes[MAPEDIT_KEY_LAYER1]     = river2D_interpretCharAsKey('1');
+    keycodes[MAPEDIT_KEY_LAYER2]     = river2D_interpretCharAsKey('2');
+    keycodes[MAPEDIT_KEY_LAYER3]     = river2D_interpretCharAsKey('3');
+    keycodes[MAPEDIT_KEY_LAYER4]     = river2D_interpretCharAsKey('4');
+    keycodes[MAPEDIT_KEY_LAYER5]     = river2D_interpretCharAsKey('5');
+    keycodes[MAPEDIT_KEY_LAYER6]     = river2D_interpretCharAsKey('6');
+    keycodes[MAPEDIT_KEY_LAYER7]     = river2D_interpretCharAsKey('7');
+    keycodes[MAPEDIT_KEY_LAYER8]     = river2D_interpretCharAsKey('8');
+    keycodes[MAPEDIT_KEY_LAYER9]     = river2D_interpretCharAsKey('9');
+    keycodes[MAPEDIT_KEY_A]          = river2D_interpretCharAsKey('a');
+    keycodes[MAPEDIT_KEY_B]          = river2D_interpretCharAsKey('b');
+    keycodes[MAPEDIT_KEY_C]          = river2D_interpretCharAsKey('c');
+    keycodes[MAPEDIT_KEY_D]          = river2D_interpretCharAsKey('d');
+    keycodes[MAPEDIT_KEY_E]          = river2D_interpretCharAsKey('e');
+    keycodes[MAPEDIT_KEY_F]          = river2D_interpretCharAsKey('f');
+    keycodes[MAPEDIT_KEY_G]          = river2D_interpretCharAsKey('g');
+    keycodes[MAPEDIT_KEY_H]          = river2D_interpretCharAsKey('h');
+    keycodes[MAPEDIT_KEY_I]          = river2D_interpretCharAsKey('i');
+    keycodes[MAPEDIT_KEY_J]          = river2D_interpretCharAsKey('j');
+    keycodes[MAPEDIT_KEY_K]          = river2D_interpretCharAsKey('k');
+    keycodes[MAPEDIT_KEY_L]          = river2D_interpretCharAsKey('l');
+    keycodes[MAPEDIT_KEY_M]          = river2D_interpretCharAsKey('m');
+    keycodes[MAPEDIT_KEY_N]          = river2D_interpretCharAsKey('n');
+    keycodes[MAPEDIT_KEY_O]          = river2D_interpretCharAsKey('o');
+    keycodes[MAPEDIT_KEY_P]          = river2D_interpretCharAsKey('p');
+    keycodes[MAPEDIT_KEY_Q]          = river2D_interpretCharAsKey('q');
+    keycodes[MAPEDIT_KEY_R]          = river2D_interpretCharAsKey('r');
+    keycodes[MAPEDIT_KEY_S]          = river2D_interpretCharAsKey('s');
+    keycodes[MAPEDIT_KEY_T]          = river2D_interpretCharAsKey('t');
+    keycodes[MAPEDIT_KEY_U]          = river2D_interpretCharAsKey('u');
+    keycodes[MAPEDIT_KEY_V]          = river2D_interpretCharAsKey('v');
+    keycodes[MAPEDIT_KEY_W]          = river2D_interpretCharAsKey('w');
+    keycodes[MAPEDIT_KEY_X]          = river2D_interpretCharAsKey('x');
+    keycodes[MAPEDIT_KEY_Y]          = river2D_interpretCharAsKey('y');
+    keycodes[MAPEDIT_KEY_Z]          = river2D_interpretCharAsKey('z');
 
     // JANKY: I'm loading text by creating a button, then overwriting it.
     // maybe allow for float-centric text loading in the future?
     Coordinates point = { .x = 0.5f, .y = 0.2f };
 
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU], "RIVER2D MAP EDITOR",
-                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_new);
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],
+                         "RIVER2D MAP EDITOR", MAPEDIT_PLANE_FONT16, 16, 1,
+                         point, &editor->button_new);
 
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], "RIVER2D MAP EDITOR",
-                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_new);
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU],
+                         "RIVER2D MAP EDITOR", MAPEDIT_PLANE_FONT16, 16, 1,
+                         point, &editor->button_new);
     point.y = 0.4f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],  "NEW PROJECT",
-                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_new);
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],
+                         "NEW PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, point,
+                         &editor->button_new);
 
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], "NEW PROJECT",
-                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_new);
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU],
+                         "NEW PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, point,
+                         &editor->button_new);
 
     point.y = 0.5f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],  "LOAD PROJECT",
-                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_load);
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],
+                         "LOAD PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, point,
+                         &editor->button_load);
 
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], "LOAD PROJECT",
-                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_load);
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU],
+                         "LOAD PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, point,
+                         &editor->button_load);
     point.y = 0.6f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], "SAVE PROJECT",
-                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_save);
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU],
+                         "SAVE PROJECT", MAPEDIT_PLANE_FONT16, 16, 1, point,
+                         &editor->button_save);
     point.y = 0.8f;
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],  "QUIT",
                          MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_quit);
@@ -157,21 +191,26 @@ void mapedit_init
 
     point.x = 0.175f;
     point.y = 0.86f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE], "CLOSE",
-                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->button_tilepicker_close);
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE],
+                         "CLOSE", MAPEDIT_PLANE_FONT16, 16, 1, point,
+                         &editor->button_tilepicker_close);
 
     // HACK: load upfront for now
-    // TODO: load all .qoi files from folder, then append to one big tilesheet in memory
-    // BACKLOG: allow replacing this tilesheet by selecting one or multiple files with a file browser...
-    river2D_loadImage_file(engine, "assets/tiles/tilesheet.qoi", &engine->planes[MAPEDIT_PLANE_TILESHEET], RIVER2D_CHANNELS_BGRA, 8);
+    // TODO: load all .qoi files from folder, then append to one big tilesheet
+    // in memory BACKLOG: allow replacing this tilesheet by selecting one or
+    // multiple files with a file browser...
+    river2D_loadImage_file(engine, "assets/tiles/tilesheet.qoi",
+                           &engine->planes[MAPEDIT_PLANE_TILESHEET],
+                           RIVER2D_CHANNELS_BGRA, 8);
 
     // BACKLOG: allow decreasing/increasing this minimum tilesize
     editor->tilesize   = 8;
     editor->selectMult = 1;
 
     // allow 10 layers by default, any other layer you'd have to add to the UI selector
-    // PERF: start with 1 layer, only poll and draw that layer, until there's any data written to the other layers 🤔
-    // means to keep track of what layer has had data written to it, and only go through those??
+    // PERF: start with 1 layer, only poll and draw that layer, until
+    // there's any data written to the other layers 🤔 means to keep track of
+    // what layer has had data written to it, and only go through those??
     editor->layers       = 10;
     editor->currentLayer = 1;
 
@@ -194,13 +233,15 @@ void mapedit_init
         editor->actions[i].action_start.ns = INT64_MIN;
     }
 
-    // TODO: allow changing project name with a menu item or hotkey, pop-up textbox and user keyboard input
-    if(!editor->projectName)
+    // TODO: allow changing project name with a menu item or hotkey, pop-up
+    // textbox and user keyboard input
+    if(!editor->projectName.data)
     {
-        editor->projectName = "unnamed_project";
+        editor->projectName = cstr_sv("unnamed_project");
     }
 
-    editor->currentFile = calloc(255, 1);
+    editor->currentFile.data = calloc(255, 1);
+    editor->currentFile.size = 255;
 
     River2D_Time now                = river2D_queryTime();
     editor->lastPresentTime         = now;
@@ -227,7 +268,8 @@ internal void changeState
 ){
     if(editor->currentState == nextState)
     {
-        fprintf(stderr, "\n\033[33;1;7mWARNING: trying to change state to the same state: %u.\033[0m\n", editor->currentState);
+        fprintf(stderr, "\n\033[33;1;7mWARNING: trying to change state to the same "
+        "state: %u.\033[0m\n", editor->currentState);
         return;
     }
 
@@ -244,21 +286,22 @@ internal void saveCurrentProject
     EngineData *engine,
     EditorData *editor
 ){
-    engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_ICON_SAVING], &engine->backbuffer,
-                           RIVER2D_PICTOP_OVER, 16, 16, 0, 0,
+    engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_ICON_SAVING],
+                           &engine->backbuffer, RIVER2D_PICTOP_OVER, 16, 16, 0, 0,
                            engine->planes[MAPEDIT_PLANE_ICON_SAVING].width,
                            engine->planes[MAPEDIT_PLANE_ICON_SAVING].height);
 
     engine->bltBuffer(engine);
 
-    char *filename = malloc(256);
-    sprintf(filename, "%s.rte", editor->projectName);
+    char *filename_cstr = malloc(256);
+    sprintf(filename_cstr, "%s.rte", editor->projectName.data);
 
-    FILE *file = fopen(filename, "wb");
+    FILE *file = fopen(filename_cstr, "wb");
     if(!file)
     {
-        fprintf(stderr, "\n\033[31;1;7mERROR: could not open file for saving: %s.\033[0m\n", editor->projectName);
-        free(filename);
+        fprintf(stderr, "\n\033[31;1;7mERROR: could not open file for saving: "
+                "%s.\033[0m\n", editor->projectName.data);
+        free(filename_cstr);
         return;
     }
 
@@ -269,36 +312,41 @@ internal void saveCurrentProject
 
     if((elements = fwrite(&editor->tilesize, 2, 1, file)) != 1)
     {
-        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
+        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. "
+                "fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
         return;
     }
     if((elements = fwrite(&editor->mapWidth, 2, 1, file)) != 1)
     {
-        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
+        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. "
+                "fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
         return;
     }
     if((elements = fwrite(&editor->mapHeight, 2, 1, file)) != 1)
     {
-        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
+        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. "
+                "fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
         return;
     }
     if((elements = fwrite(&editor->layers, 1, 1, file)) != 1)
     {
-        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile.\033[0m\n");
+        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile."
+                "\033[0m\n");
         return;
     }
 
     uint64_t tilecount = editor->layers * editor->mapHeight * editor->mapWidth;
     fwrite(editor->tiles, sizeof(Tile), tilecount, file);
 
-    imgsurf_write_ptr(file, engine->planes[MAPEDIT_PLANE_TILESHEET].data, IMGSURF_FILE_QOI,
+    imgsurf_write_ptr(file, engine->planes[MAPEDIT_PLANE_TILESHEET].data,
+                      IMGSURF_FILE_QOI,
                       engine->planes[MAPEDIT_PLANE_TILESHEET].width,
                       engine->planes[MAPEDIT_PLANE_TILESHEET].height,
                       IMGSURF_CHANNELS_BGRA, 8);
 
     fclose(file);
 
-    free(filename);
+    free(filename_cstr);
     fprintf(stdout, "Project saved successfully.\n");
 
     editor->lastSaveTime = river2D_queryTime();
@@ -329,12 +377,13 @@ internal void drawMainMenu
                                engine->planes[MAPEDIT_PLANE_PAUSEMENU].height);
     }
 
-    // BACKLOG: make these icons use some sort of opacity, fade-out animation (and / or animation in general)...
+    // BACKLOG: make these icons use some sort of opacity, fade-out animation
+    // (and / or animation in general)...
     float deltaMS = river2D_deltaTime_now_ms(&editor->lastSaveTime);
     if(deltaMS < 250)
     {
-        engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_ICON_SAVED], &engine->backbuffer,
-                               RIVER2D_PICTOP_OVER, 16, 16, 0, 0,
+        engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_ICON_SAVED],
+                               &engine->backbuffer, RIVER2D_PICTOP_OVER, 16, 16, 0, 0,
                                engine->planes[MAPEDIT_PLANE_ICON_SAVED].width,
                                engine->planes[MAPEDIT_PLANE_ICON_SAVED].height);
     }
@@ -352,8 +401,9 @@ internal void checkMainMenuButtons
         return;
     }
 
-    if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE && editor->previousState != MAPEDIT_STATE_NULL)
-    {
+    if(engine->controls.keymap &  MAPEDIT_BIT_ESCAPE &&
+       editor->previousState   != MAPEDIT_STATE_NULL
+    ){
         changeState(editor, editor->previousState);
         engine->controls.keymap &= ~MAPEDIT_BIT_ESCAPE;
         return;
@@ -363,18 +413,22 @@ internal void checkMainMenuButtons
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
-        float length = editor->button_new.lowerRight.x - editor->button_new.upperLeft.x;
+        float length = editor->button_new.lowRight.x - editor->button_new.upLeft.x;
+        float fX     = (float)(engine->backbuffer.width);
+        float fY     = (float)(engine->backbuffer.height);
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
-                               (uint32_t)(editor->button_new.upperLeft.x * (float)engine->backbuffer.width),
-                               (uint32_t)(editor->button_new.upperLeft.y * (float)engine->backbuffer.height + 20),
-                               0, 0, (uint32_t)(length * (float)engine->backbuffer.width), 5);
+                               (uint32_t)(editor->button_new.upLeft.x * fX),
+                               (uint32_t)(editor->button_new.upLeft.y * fY + 20),
+                               0, 0,
+                               (uint32_t)(length * fX), 5);
 
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
             if(editor->previousState != MAPEDIT_STATE_NULL && editor->tiles)
             {
-                uint64_t tilecount = editor->layers * editor->mapHeight * editor->mapWidth;
+                uint64_t tilecount = editor->layers *
+                                     editor->mapHeight * editor->mapWidth;
                 for(uint32_t i = 0; i < tilecount; ++i)
                 {
                     editor->tiles[i].x = UINT16_MAX;
@@ -390,12 +444,15 @@ internal void checkMainMenuButtons
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
-        float length = editor->button_load.lowerRight.x - editor->button_load.upperLeft.x;
+        float length = editor->button_load.lowRight.x - editor->button_load.upLeft.x;
+        float fX     = (float)(engine->backbuffer.width);
+        float fY     = (float)(engine->backbuffer.height);
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
-                               (uint32_t)(editor->button_load.upperLeft.x * (float)engine->backbuffer.width),
-                               (uint32_t)(editor->button_load.upperLeft.y * (float)engine->backbuffer.height + 20),
-                               0, 0, (uint32_t)(length * (float)engine->backbuffer.width), 5);
+                               (uint32_t)(editor->button_load.upLeft.x * fX),
+                               (uint32_t)(editor->button_load.upLeft.y * fY + 20),
+                               0, 0,
+                               (uint32_t)(length * fX), 5);
 
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
@@ -407,28 +464,34 @@ internal void checkMainMenuButtons
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
-        float length = editor->button_quit.lowerRight.x - editor->button_quit.upperLeft.x;
+        float length = editor->button_quit.lowRight.x - editor->button_quit.upLeft.x;
+        float fX     = (float)(engine->backbuffer.width);
+        float fY     = (float)(engine->backbuffer.height);
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
-                               (uint32_t)(editor->button_quit.upperLeft.x * (float)engine->backbuffer.width),
-                               (uint32_t)(editor->button_quit.upperLeft.y * (float)engine->backbuffer.height + 20),
-                               0, 0, (uint32_t)(length * (float)engine->backbuffer.width), 5);
+                               (uint32_t)(editor->button_quit.upLeft.x * fX),
+                               (uint32_t)(editor->button_quit.upLeft.y * fY + 20),
+                               0, 0,
+                               (uint32_t)(length * fX), 5);
 
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
             engine->running = false;
         }
     }
-    else if(editor->previousState && river2D_insideRect(&engine->controls.pointer, &editor->button_save))
-    {
+    else if(editor->previousState &&
+            river2D_insideRect(&engine->controls.pointer, &editor->button_save)
+    ){
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
-        float length = editor->button_save.lowerRight.x - editor->button_save.upperLeft.x;
+        float length = editor->button_save.lowRight.x - editor->button_save.upLeft.x;
+        float fX     = (float)(engine->backbuffer.width);
+        float fY     = (float)(engine->backbuffer.height);
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
-                               (uint32_t)(editor->button_save.upperLeft.x * (float)engine->backbuffer.width),
-                               (uint32_t)(editor->button_save.upperLeft.y * (float)engine->backbuffer.height + 20),
-                               0, 0, (uint32_t)(length * (float)engine->backbuffer.width), 5);
+                               (uint32_t)(editor->button_save.upLeft.x * fX),
+                               (uint32_t)(editor->button_save.upLeft.y * fY + 20),
+                               0, 0, (uint32_t)(length * fX), 5);
 
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
@@ -444,7 +507,8 @@ internal void checkMainMenuButtons
         #ifdef DEBUG
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
-            fprintf(stderr, "clicked @ X: %f Y: %f\n", engine->controls.pointer.x, engine->controls.pointer.y);
+            fprintf(stderr, "clicked @ X: %f Y: %f\n",
+                    engine->controls.pointer.x, engine->controls.pointer.y);
             engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
         }
         #endif
@@ -487,10 +551,13 @@ internal void drawEditor
         {
             for(uint32_t x = 0; x < editor->mapWidth; ++x)
             {
-                uint64_t index = z * editor->mapWidth * editor->mapHeight + y * editor->mapWidth + x;
-                if(editor->tiles[index].x != UINT16_MAX && editor->tiles[index].y != UINT16_MAX)
-                {
-                    engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET],
+                uint64_t index = z * editor->mapWidth * editor->mapHeight +
+                                 y * editor->mapWidth + x;
+                if(editor->tiles[index].x != UINT16_MAX &&
+                   editor->tiles[index].y != UINT16_MAX
+                ){
+                    engine->compositeImage(engine,
+                                           &engine->planes[MAPEDIT_PLANE_TILESHEET],
                                            &engine->backbuffer, RIVER2D_PICTOP_OVER,
                                            x * editor->tilesize,
                                            y * editor->tilesize,
@@ -508,20 +575,21 @@ internal void drawEditor
     engine->loadText(engine, &engine->planes[MAPEDIT_PLANE_CURRENTLAYER],
                      layerStr, MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
 
-    engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTLAYER], &engine->backbuffer,
-                           RIVER2D_PICTOP_OVER,
+    engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTLAYER],
+                           &engine->backbuffer, RIVER2D_PICTOP_OVER,
                            (uint32_t)(0.95f * (float)engine->backbuffer.width),
                            (uint32_t)(0.025f * (float)engine->backbuffer.width),
                            0, 0,
                            engine->planes[MAPEDIT_PLANE_CURRENTLAYER].width,
                            engine->planes[MAPEDIT_PLANE_CURRENTLAYER].height);
 
-    // BACKLOG: make these icons use some sort of opacity, fade-out animation (and / or animation in general)...
+    // BACKLOG: make these icons use some sort of opacity, fade-out animation
+    // (and / or animation in general)...
     float deltaMS = river2D_deltaTime_now_ms(&editor->lastSaveTime);
     if(deltaMS < 250)
     {
-        engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_ICON_SAVED], &engine->backbuffer,
-                               RIVER2D_PICTOP_OVER, 16, 16, 0, 0,
+        engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_ICON_SAVED],
+                               &engine->backbuffer, RIVER2D_PICTOP_OVER, 16, 16, 0, 0,
                                engine->planes[MAPEDIT_PLANE_ICON_SAVED].width,
                                engine->planes[MAPEDIT_PLANE_ICON_SAVED].height);
     }
@@ -598,8 +666,9 @@ internal void undo
         prevAction = editor->actions[editor->currentAction - 1];
     }
 
-    if(prevAction.action_start.s == INT64_MIN && prevAction.action_start.ns == INT64_MIN)
-    {
+    if(prevAction.action_start.s == INT64_MIN &&
+       prevAction.action_start.ns == INT64_MIN
+    ){
         return;
     }
 
@@ -618,9 +687,11 @@ internal void undo
 
         readAction_undo(editor);
 
-        editor->currentLayer = (uint8_t)floor((double)currentAction.map_index / (editor->mapWidth * editor->mapHeight));
+        editor->currentLayer = (uint8_t)floor((double)currentAction.map_index /
+                                              (editor->mapWidth * editor->mapHeight));
 
-        int64_t deltaNS = river2D_deltaTime_ns(&prevAction.action_start, &currentAction.action_start);
+        int64_t deltaNS = river2D_deltaTime_ns(&prevAction.action_start,
+                                               &currentAction.action_start);
         if(deltaNS != 0)
         {
             break;
@@ -633,8 +704,9 @@ internal void redo
     EditorData *editor
 ){
     Action currentAction = editor->actions[editor->currentAction];
-    if(currentAction.action_start.s == INT64_MIN && currentAction.action_start.ns == INT64_MIN)
-    {
+    if(currentAction.action_start.s == INT64_MIN &&
+       currentAction.action_start.ns == INT64_MIN
+    ){
         return;
     }
 
@@ -667,10 +739,12 @@ internal void redo
         }
 
         readAction_redo(editor);
-        editor->currentLayer = (uint8_t)floor((double)currentAction.map_index / (editor->mapWidth * editor->mapHeight));
+        editor->currentLayer = (uint8_t)floor((double)currentAction.map_index /
+                                              (editor->mapWidth * editor->mapHeight));
         incrementAction(editor);
 
-        int64_t deltaNS = river2D_deltaTime_ns(&nextAction.action_start, &currentAction.action_start);
+        int64_t deltaNS = river2D_deltaTime_ns(&nextAction.action_start,
+                                               &currentAction.action_start);
         if(deltaNS != 0)
         {
             break;
@@ -686,7 +760,8 @@ internal void placeSelectedTiles
 ){
     bool     break_outer = false;
     uint64_t sliceSize   = editor->mapWidth * editor->mapHeight;
-    uint64_t topLeft     = editor->currentLayer * sliceSize + tileY * editor->mapWidth + tileX;
+    uint64_t topLeft     = editor->currentLayer * sliceSize +
+                           tileY * editor->mapWidth + tileX;
     uint64_t maxCurIndex = sliceSize + editor->currentLayer * sliceSize - 1;
 
     if(topLeft > maxCurIndex)
@@ -737,13 +812,17 @@ internal void checkEditorButtons
     // TODO: (mapedit #6): make backbuffer moveable,
     // move grid along with it (so it might be offset)
 
-    // TODO: (mapedit #2): add some descriptions or UI elements to delimit what mode one is in
+    // TODO: (mapedit #2): add some descriptions or UI elements to delimit what
+    // mode one is in
 
     if(engine->controls.keymap & MAPEDIT_BIT_TILEPICKER)
     {
         editor->editorflags     ^= MAPEDIT_FLAG_BIT_TILEPICKER;
         engine->controls.keymap &= ~MAPEDIT_BIT_TILEPICKER;
     }
+
+    float fX = (float)engine->backbuffer.width;
+    float fY = (float)engine->backbuffer.width;
 
     if(editor->editorflags & MAPEDIT_FLAG_BIT_TILEPICKER)
     {
@@ -766,39 +845,45 @@ internal void checkEditorButtons
                                engine->planes[MAPEDIT_PLANE_SELECTTILE].width,
                                engine->planes[MAPEDIT_PLANE_SELECTTILE].height);
 
-        // TODO: load each and every file that is in assets/tiles, then display their thumbnails 🤔
+        // TODO: load each and every file that is in assets/tiles, then display
+        // their thumbnails 🤔
 
         // HACK: just load the one file for now and use it here... lmfao
+        uint32_t sheet_width  = engine->planes[MAPEDIT_PLANE_TILESHEET].width;
+        uint32_t sheet_height = engine->planes[MAPEDIT_PLANE_TILESHEET].height;
         engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
                                engine->backbuffer.width  / 10 + editor->tilesize,
                                engine->backbuffer.height / 10 + editor->tilesize,
-                               0, 0,
-                               engine->planes[MAPEDIT_PLANE_TILESHEET].width,
-                               engine->planes[MAPEDIT_PLANE_TILESHEET].height);
+                               0, 0, sheet_width, sheet_height);
 
-        Rect tilesheet = {0};
-        tilesheet.upperLeft.x  = 0.095f + (float)((float)editor->tilesize / (float)engine->backbuffer.width);
-        tilesheet.upperLeft.y  = 0.095f + (float)((float)editor->tilesize / (float)engine->backbuffer.height);
-        tilesheet.lowerRight.x = tilesheet.upperLeft.x + (float)engine->planes[MAPEDIT_PLANE_TILESHEET].width  / (float)engine->backbuffer.width;
-        tilesheet.lowerRight.y = tilesheet.upperLeft.y + (float)engine->planes[MAPEDIT_PLANE_TILESHEET].height / (float)engine->backbuffer.height;
+        Rect tiles = {0};
+        tiles.upLeft.x  = 0.095f + (float)((float)editor->tilesize / fX);
+        tiles.upLeft.y  = 0.095f + (float)((float)editor->tilesize / fY);
+        tiles.lowRight.x = tiles.upLeft.x + (float)sheet_width / fX;
+        tiles.lowRight.y = tiles.upLeft.y + (float)sheet_height / fY;
 
-        // TODO: load all files inside the specified folder, separate the spreadsheets visually but have them be one image
+        // TODO: load all files inside the specified folder, separate the
+        // spreadsheets visually but have them be one image
 
-        // TODO: river2D_appendImage (either by x or y) would be super handy to have in general
+        // TODO: river2D_appendImage (either by x or y) would be super handy to
+        // have in general
 
-        // TODO: scrollwheel changes size, 2x2 smallest, 96x96 biggest? only limitation is the highlighting, lol
+        // TODO: scrollwheel changes size, 2x2 smallest, 96x96 biggest? only
+        // limitation is the highlighting, lol
 
-        if(river2D_insideRect(&engine->controls.pointer, &editor->button_tilepicker_close))
-        {
+        if(river2D_insideRect(&engine->controls.pointer,
+                              &editor->button_tilepicker_close)
+        ){
             river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
-            float length = editor->button_tilepicker_close.lowerRight.x - editor->button_tilepicker_close.upperLeft.x;
+            Rect  close  = editor->button_tilepicker_close;
+            float length = close.lowRight.x - close.upLeft.x;
             engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                    &engine->backbuffer, RIVER2D_PICTOP_OVER,
-                                   (uint32_t)(editor->button_tilepicker_close.upperLeft.x * (float)engine->backbuffer.width),
-                                   (uint32_t)(editor->button_tilepicker_close.upperLeft.y * (float)engine->backbuffer.height + 20),
-                                   0, 0, (uint32_t)(length * (float)engine->backbuffer.width), 5);
+                                   (uint32_t)(close.upLeft.x * fX),
+                                   (uint32_t)(close.upLeft.y * fY + 20),
+                                   0, 0, (uint32_t)(length * fX), 5);
 
             if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
             {
@@ -806,25 +891,24 @@ internal void checkEditorButtons
                 engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
             }
         }
-        else if(river2D_insideRect(&engine->controls.pointer, &tilesheet))
+        else if(river2D_insideRect(&engine->controls.pointer, &tiles))
         {
             river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_NULL]);
 
-            float   deltaX = engine->controls.pointer.x - tilesheet.upperLeft.x;
-            float   deltaY = engine->controls.pointer.y - tilesheet.upperLeft.y;
-            uint8_t  tileX  = (uint8_t)(deltaX * (float)engine->backbuffer.width  / editor->tilesize);
-            uint8_t  tileY  = (uint8_t)(deltaY * (float)engine->backbuffer.height / editor->tilesize);
+            float    deltaX = engine->controls.pointer.x - tiles.upLeft.x;
+            float    deltaY = engine->controls.pointer.y - tiles.upLeft.y;
+            uint8_t  tileX  = (uint8_t)(deltaX * fX  / editor->tilesize);
+            uint8_t  tileY  = (uint8_t)(deltaY * fY / editor->tilesize);
+            uint16_t sheetX = (uint16_t)(sheet_width / editor->tilesize);
+            uint16_t sheetY = (uint16_t)(sheet_height / editor->tilesize);
 
-            uint16_t tilesheet_width  = (uint16_t)(engine->planes[MAPEDIT_PLANE_TILESHEET].width  / editor->tilesize);
-            uint16_t tilesheet_height = (uint16_t)(engine->planes[MAPEDIT_PLANE_TILESHEET].height / editor->tilesize);
-
-            if(tileX + editor->selectMult > tilesheet_width)
+            if(tileX + editor->selectMult > sheetX)
             {
-                tileX = (uint8_t)(tilesheet_width - editor->selectMult);
+                tileX = (uint8_t)(sheetX - editor->selectMult);
             }
-            if(tileY + editor->selectMult > tilesheet_height)
+            if(tileY + editor->selectMult > sheetY)
             {
-                tileY = (uint8_t)(tilesheet_height - editor->selectMult);
+                tileY = (uint8_t)(sheetY - editor->selectMult);
             }
 
             if(engine->controls.keymap & MAPEDIT_BIT_INC_SIZE)
@@ -841,8 +925,10 @@ internal void checkEditorButtons
 
             engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                    &engine->backbuffer, RIVER2D_PICTOP_OVER,
-                                   (uint32_t)((float)engine->backbuffer.width  * (tilesheet.upperLeft.x + 0.0055f) + tileX * editor->tilesize),
-                                   (uint32_t)((float)engine->backbuffer.height * (tilesheet.upperLeft.y + 0.006f)  + tileY * editor->tilesize),
+                                   (uint32_t)(fX  * (tiles.upLeft.x + 0.0055f) +
+                                              tileX * editor->tilesize),
+                                   (uint32_t)(fY * (tiles.upLeft.y + 0.006f) +
+                                              tileY * editor->tilesize),
                                    0, 0,
                                    editor->tilesize * editor->selectMult,
                                    editor->tilesize * editor->selectMult);
@@ -896,10 +982,11 @@ internal void checkEditorButtons
     // always keep a copy of the largest backbuffer in memory, so data is not lost when
     // sizing down, then back up?
 
-    // TODO: wheel or menu of recently used tiles and a hotbar with specific ones, somewhere.
+    // TODO: wheel or menu of recently used tiles and a hotbar with specific
+    // ones, somewhere.
 
-    uint16_t tileX = (uint16_t)(engine->controls.pointer.x * (float)engine->backbuffer.width  / editor->tilesize);
-    uint16_t tileY = (uint16_t)(engine->controls.pointer.y * (float)engine->backbuffer.height / editor->tilesize);
+    uint16_t tileX = (uint16_t)(engine->controls.pointer.x * fX  / editor->tilesize);
+    uint16_t tileY = (uint16_t)(engine->controls.pointer.y * fY / editor->tilesize);
 
     uint8_t modX = tileX % editor->selectMult;
     uint8_t modY = tileY % editor->selectMult;
@@ -925,7 +1012,7 @@ internal void checkEditorButtons
                            editor->tilesize  * editor->selectMult,
                            editor->tilesize  * editor->selectMult);
 
-    //if(river2D_insideRect(&engine->controls.pointer, &editor->100button_someothereditorbutton))
+    //if(river2D_insideRect(&engine->controls.pointer, &editor->button))
     // {
     //     river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
     // }
@@ -955,49 +1042,12 @@ internal void loadProject
 (
     EngineData *engine,
     EditorData *editor,
-    const char *filename
+    StringView *filename
 ){
-    // const char *dirlist = river2D_listFiles(".");
-    // if(!dirlist)
-    // {
-    //     fprintf(stderr, "\n\033[31;1;7mERROR: failed to list directory!\033[0m\n");
-    //     changeState(editor, MAPEDIT_STATE_EDIT);
-    //     return;
-    // }
-    //
-    // char     *filename  = 0;
-    // uint32_t fileOffset = 0;
-    // for(uint32_t i = 0; dirlist[i] != '\0'; ++i)
-    // {
-    //     if(dirlist[i] == ';')
-    //     {
-    //         fileOffset = i + 1;
-    //         continue;
-    //     }
-    //
-    //     if(dirlist[i] == '\0' || dirlist[i + 1] == '\0' || dirlist[i + 2] == '\0' || dirlist[i + 3] == '\0')
-    //     {
-    //         break;
-    //     }
-    //
-    //     if(dirlist[i] == 'r' && dirlist[i + 1] == 't' && dirlist[i + 2] == 'e')
-    //     {
-    //         filename = (char*)malloc(255);
-    //
-    //         uint8_t j = 0;
-    //         for(; j < 255 && dirlist[fileOffset + j] != ';'; ++j)
-    //         {
-    //             filename[j] = dirlist[fileOffset + j];
-    //         }
-    //         filename[j] = '\0';
-    //
-    //         break;
-    //     }
-    // }
-
     if(!filename)
     {
-        fprintf(stderr, "\n\033[31;1;7mERROR: failed to find .rte file to load!\033[0m\n");
+        fprintf(stderr, "\n\033[31;1;7mERROR: failed to find .rte file to load!"
+                "\033[0m\n");
         changeState(editor, MAPEDIT_STATE_MENU);
         return;
     }
@@ -1006,10 +1056,11 @@ internal void loadProject
     fprintf(stderr, "\nloading file: %s\n", filename);
     #endif
 
-    FILE *file = fopen(filename, "rb");
+    FILE *file = fopen(filename->data, "rb");
     if(!file)
     {
-        fprintf(stderr, "\033[31;1;7mERROR: could not open file: %s.\033[0m\n", filename);
+        fprintf(stderr, "\033[31;1;7mERROR: could not open file: %s.\033[0m\n",
+                filename->data);
         changeState(editor, MAPEDIT_STATE_MENU);
         return;
     }
@@ -1021,7 +1072,8 @@ internal void loadProject
     {
         if(byte != header[i])
         {
-            fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
+            fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
+                    "\033[0m\n", filename->data);
             return;
         }
     }
@@ -1030,22 +1082,26 @@ internal void loadProject
 
     if((elements = fread(&editor->tilesize, 2, 1, file)) != 1)
     {
-        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
+        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
+                "\033[0m\n", filename->data);
         return;
     }
     if((elements = fread(&editor->mapWidth, 2, 1, file)) != 1)
     {
-        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
+        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
+                "\033[0m\n", filename->data);
         return;
     }
     if((elements = fread(&editor->mapHeight, 2, 1, file)) != 1)
     {
-        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
+        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
+                "\033[0m\n", filename->data);
         return;
     }
     if((elements = fread(&editor->layers, 1, 1, file)) != 1)
     {
-        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s.\033[0m\n", filename);
+        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
+                "\033[0m\n", filename->data);
         return;
     }
 
@@ -1062,7 +1118,9 @@ internal void loadProject
     }
 
     // NOTE: might not be BGRA
-    engine->planes[MAPEDIT_PLANE_TILESHEET].data = imgsurf_load_ptr(file, IMGSURF_FILE_QOI, &engine->planes[MAPEDIT_PLANE_TILESHEET].width, &engine->planes[MAPEDIT_PLANE_TILESHEET].height, IMGSURF_CHANNELS_BGRA, 8);
+    engine->planes[MAPEDIT_PLANE_TILESHEET].data = imgsurf_load_ptr(file,
+            IMGSURF_FILE_QOI, &engine->planes[MAPEDIT_PLANE_TILESHEET].width,
+            &engine->planes[MAPEDIT_PLANE_TILESHEET].height, IMGSURF_CHANNELS_BGRA, 8);
     engine->planes[MAPEDIT_PLANE_TILESHEET].path = "imgsurf_load_ptr in loadProject";
 
     fclose(file);
@@ -1088,19 +1146,21 @@ internal void checkFilePickerButtons
 
     if(editor->confirmed)
     {
-        loadProject(engine, editor, editor->currentFile);
+        loadProject(engine, editor, &editor->currentFile);
         changeState(editor, MAPEDIT_STATE_EDIT);
         return;
     }
 
-    editor->currentFile = "HELLO, WORLD.";
+    editor->currentFile = cstr_sv("HELLO, WORLD.");
 
-    // CURRENT: text input when I have string views done!
-    // dynamically change string view content with text input
+    // CURRENT: text input!
+    // dynamically change string view content with keyboard input
 
-    engine->loadText(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE], editor->currentFile, MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
-    engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE], &engine->backbuffer,
-                           RIVER2D_PICTOP_OVER,
+    engine->loadText(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE],
+                     editor->currentFile.data, MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
+
+    engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE],
+                           &engine->backbuffer, RIVER2D_PICTOP_OVER,
                            (uint32_t)(0.2f * (float)engine->backbuffer.width),
                            (uint32_t)(0.4f * (float)engine->backbuffer.height),
                            0, 0,
@@ -1130,7 +1190,8 @@ void mapedit_update
     }
     else
     {
-        fprintf(stderr, "\033[31;1;7mERROR: invalid state: %u, previous: %u\033[0m\n", editor->currentState, editor->previousState);
+        fprintf(stderr, "\033[31;1;7mERROR: invalid state: %u, previous: %u\033[0m\n",
+                editor->currentState, editor->previousState);
     }
 }
 
@@ -1152,7 +1213,7 @@ void mapedit_updateSelectSize
 #define CONTROL_NOTFOUND 0
 #define CONTROL_FOUND    1
 
-internal uint8_t processButton
+internal uint8_t processButton_function
 (
     River2D_ControlMap *controls,
     uint64_t           desired,
@@ -1177,7 +1238,10 @@ internal uint8_t processButton
     return CONTROL_NOTFOUND;
 }
 
-internal uint8_t processKey
+#define processButton(bmacro, bitmacro) \
+processButton_function(controls, bmacro, button, bitmacro, isDown)
+
+internal uint8_t processKey_function
 (
     River2D_ControlMap *controls,
     uint64_t           desired,
@@ -1201,6 +1265,9 @@ internal uint8_t processKey
     return CONTROL_NOTFOUND;
 }
 
+#define processKey(kmacro, bitmacro) \
+processButton_function(controls, kmacro, key, bitmacro, isDown)
+
 void mapedit_processButtons
 (
     EditorData         *editor,
@@ -1208,7 +1275,7 @@ void mapedit_processButtons
     uint64_t           button,
     bool               isDown
 ){
-    if(processButton(controls, MAPEDIT_BUTTON_LEFTM, button, MAPEDIT_BIT_LEFTM, isDown))
+    if(processButton(MAPEDIT_BUTTON_LEFTM, MAPEDIT_BIT_LEFTM))
     {
         if(isDown)
         {
@@ -1217,8 +1284,8 @@ void mapedit_processButtons
 
         return;
     }
-    if(processButton(controls, MAPEDIT_BUTTON_MIDDLEM,    button, MAPEDIT_BIT_MIDDLEM, isDown)){ return; }
-    if(processButton(controls, MAPEDIT_BUTTON_RIGHTM,     button, MAPEDIT_BIT_RIGHTM,  isDown)){ return; }
+    if(processButton(MAPEDIT_BUTTON_MIDDLEM, MAPEDIT_BIT_MIDDLEM)){ return; }
+    if(processButton(MAPEDIT_BUTTON_RIGHTM,  MAPEDIT_BIT_RIGHTM )){ return; }
 
 #ifdef DEBUG
     fprintf(stderr, "button pressed: %" PRIx64 "\n", button);
@@ -1231,53 +1298,53 @@ void mapedit_processKeys
     uint64_t           key,
     bool               isDown
 ){
-    if(processKey(controls, MAPEDIT_KEY_ESCAPE,     key, MAPEDIT_BIT_ESCAPE,     isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_LSHIFT,     key, MAPEDIT_BIT_LSHIFT,     isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_LCTRL,      key, MAPEDIT_BIT_LCTRL,      isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_SAVE,       key, MAPEDIT_BIT_SAVE,       isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_QUIT,       key, MAPEDIT_BIT_QUIT,       isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_SAVE,       key, MAPEDIT_BIT_SAVE,       isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_TILEPICKER, key, MAPEDIT_BIT_TILEPICKER, isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_INC_SIZE,   key, MAPEDIT_BIT_INC_SIZE,   isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_RED_SIZE,   key, MAPEDIT_BIT_RED_SIZE,   isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_LAYER0,     key, MAPEDIT_BIT_LAYER0,     isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_LAYER1,     key, MAPEDIT_BIT_LAYER1,     isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_LAYER2,     key, MAPEDIT_BIT_LAYER2,     isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_LAYER3,     key, MAPEDIT_BIT_LAYER3,     isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_LAYER4,     key, MAPEDIT_BIT_LAYER4,     isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_LAYER5,     key, MAPEDIT_BIT_LAYER5,     isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_LAYER6,     key, MAPEDIT_BIT_LAYER6,     isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_LAYER7,     key, MAPEDIT_BIT_LAYER7,     isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_LAYER8,     key, MAPEDIT_BIT_LAYER8,     isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_LAYER9,     key, MAPEDIT_BIT_LAYER9,     isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_ZOOMIN,     key, MAPEDIT_BIT_ZOOMIN,     isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_ZOOMOUT,    key, MAPEDIT_BIT_ZOOMOUT,    isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_A,          key, MAPEDIT_BIT_A,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_B,          key, MAPEDIT_BIT_B,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_C,          key, MAPEDIT_BIT_C,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_D,          key, MAPEDIT_BIT_D,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_E,          key, MAPEDIT_BIT_E,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_F,          key, MAPEDIT_BIT_F,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_G,          key, MAPEDIT_BIT_G,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_H,          key, MAPEDIT_BIT_H,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_I,          key, MAPEDIT_BIT_I,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_J,          key, MAPEDIT_BIT_J,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_K,          key, MAPEDIT_BIT_K,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_L,          key, MAPEDIT_BIT_L,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_M,          key, MAPEDIT_BIT_M,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_N,          key, MAPEDIT_BIT_N,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_O,          key, MAPEDIT_BIT_O,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_P,          key, MAPEDIT_BIT_P,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_Q,          key, MAPEDIT_BIT_Q,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_R,          key, MAPEDIT_BIT_R,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_S,          key, MAPEDIT_BIT_S,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_T,          key, MAPEDIT_BIT_T,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_U,          key, MAPEDIT_BIT_U,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_V,          key, MAPEDIT_BIT_V,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_W,          key, MAPEDIT_BIT_W,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_X,          key, MAPEDIT_BIT_X,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_Y,          key, MAPEDIT_BIT_Y,          isDown)){ return; }
-    if(processKey(controls, MAPEDIT_KEY_Z,          key, MAPEDIT_BIT_Z,          isDown)){ return; }
+    if(processKey(MAPEDIT_KEY_ESCAPE,     MAPEDIT_BIT_ESCAPE    )){ return; }
+    if(processKey(MAPEDIT_KEY_LSHIFT,     MAPEDIT_BIT_LSHIFT    )){ return; }
+    if(processKey(MAPEDIT_KEY_LCTRL,      MAPEDIT_BIT_LCTRL     )){ return; }
+    if(processKey(MAPEDIT_KEY_SAVE,       MAPEDIT_BIT_SAVE      )){ return; }
+    if(processKey(MAPEDIT_KEY_QUIT,       MAPEDIT_BIT_QUIT      )){ return; }
+    if(processKey(MAPEDIT_KEY_SAVE,       MAPEDIT_BIT_SAVE      )){ return; }
+    if(processKey(MAPEDIT_KEY_TILEPICKER, MAPEDIT_BIT_TILEPICKER)){ return; }
+    if(processKey(MAPEDIT_KEY_INC_SIZE,   MAPEDIT_BIT_INC_SIZE  )){ return; }
+    if(processKey(MAPEDIT_KEY_RED_SIZE,   MAPEDIT_BIT_RED_SIZE  )){ return; }
+    if(processKey(MAPEDIT_KEY_LAYER0,     MAPEDIT_BIT_LAYER0    )){ return; }
+    if(processKey(MAPEDIT_KEY_LAYER1,     MAPEDIT_BIT_LAYER1    )){ return; }
+    if(processKey(MAPEDIT_KEY_LAYER2,     MAPEDIT_BIT_LAYER2    )){ return; }
+    if(processKey(MAPEDIT_KEY_LAYER3,     MAPEDIT_BIT_LAYER3    )){ return; }
+    if(processKey(MAPEDIT_KEY_LAYER4,     MAPEDIT_BIT_LAYER4    )){ return; }
+    if(processKey(MAPEDIT_KEY_LAYER5,     MAPEDIT_BIT_LAYER5    )){ return; }
+    if(processKey(MAPEDIT_KEY_LAYER6,     MAPEDIT_BIT_LAYER6    )){ return; }
+    if(processKey(MAPEDIT_KEY_LAYER7,     MAPEDIT_BIT_LAYER7    )){ return; }
+    if(processKey(MAPEDIT_KEY_LAYER8,     MAPEDIT_BIT_LAYER8    )){ return; }
+    if(processKey(MAPEDIT_KEY_LAYER9,     MAPEDIT_BIT_LAYER9    )){ return; }
+    if(processKey(MAPEDIT_KEY_ZOOMIN,     MAPEDIT_BIT_ZOOMIN    )){ return; }
+    if(processKey(MAPEDIT_KEY_ZOOMOUT,    MAPEDIT_BIT_ZOOMOUT   )){ return; }
+    if(processKey(MAPEDIT_KEY_A,          MAPEDIT_BIT_A         )){ return; }
+    if(processKey(MAPEDIT_KEY_B,          MAPEDIT_BIT_B         )){ return; }
+    if(processKey(MAPEDIT_KEY_C,          MAPEDIT_BIT_C         )){ return; }
+    if(processKey(MAPEDIT_KEY_D,          MAPEDIT_BIT_D         )){ return; }
+    if(processKey(MAPEDIT_KEY_E,          MAPEDIT_BIT_E         )){ return; }
+    if(processKey(MAPEDIT_KEY_F,          MAPEDIT_BIT_F         )){ return; }
+    if(processKey(MAPEDIT_KEY_G,          MAPEDIT_BIT_G         )){ return; }
+    if(processKey(MAPEDIT_KEY_H,          MAPEDIT_BIT_H         )){ return; }
+    if(processKey(MAPEDIT_KEY_I,          MAPEDIT_BIT_I         )){ return; }
+    if(processKey(MAPEDIT_KEY_J,          MAPEDIT_BIT_J         )){ return; }
+    if(processKey(MAPEDIT_KEY_K,          MAPEDIT_BIT_K         )){ return; }
+    if(processKey(MAPEDIT_KEY_L,          MAPEDIT_BIT_L         )){ return; }
+    if(processKey(MAPEDIT_KEY_M,          MAPEDIT_BIT_M         )){ return; }
+    if(processKey(MAPEDIT_KEY_N,          MAPEDIT_BIT_N         )){ return; }
+    if(processKey(MAPEDIT_KEY_O,          MAPEDIT_BIT_O         )){ return; }
+    if(processKey(MAPEDIT_KEY_P,          MAPEDIT_BIT_P         )){ return; }
+    if(processKey(MAPEDIT_KEY_Q,          MAPEDIT_BIT_Q         )){ return; }
+    if(processKey(MAPEDIT_KEY_R,          MAPEDIT_BIT_R         )){ return; }
+    if(processKey(MAPEDIT_KEY_S,          MAPEDIT_BIT_S         )){ return; }
+    if(processKey(MAPEDIT_KEY_T,          MAPEDIT_BIT_T         )){ return; }
+    if(processKey(MAPEDIT_KEY_U,          MAPEDIT_BIT_U         )){ return; }
+    if(processKey(MAPEDIT_KEY_V,          MAPEDIT_BIT_V         )){ return; }
+    if(processKey(MAPEDIT_KEY_W,          MAPEDIT_BIT_W         )){ return; }
+    if(processKey(MAPEDIT_KEY_X,          MAPEDIT_BIT_X         )){ return; }
+    if(processKey(MAPEDIT_KEY_Y,          MAPEDIT_BIT_Y         )){ return; }
+    if(processKey(MAPEDIT_KEY_Z,          MAPEDIT_BIT_Z         )){ return; }
 
 #ifdef DEBUG
     fprintf(stderr, "key pressed: 0x%" PRIx64 "\n", key);
