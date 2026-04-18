@@ -142,7 +142,7 @@ Tile;
 
 typedef struct Action
 {
-    River2D_Time action_start;
+    River2D_Time stroke_start;
     uint64_t     map_index;
     Tile         prev_tile;
     Tile         new_tile;
