@@ -105,11 +105,14 @@ void mapedit_init
     engine->controls.buttoncodes[MAPEDIT_BUTTON_RIGHTM]  = RIVER2D_MOUSE3;
 
     engine->controls.keycodes[MAPEDIT_KEY_ESCAPE]     = RIVER2D_ASCII_ESCAPE;
+    engine->controls.keycodes[MAPEDIT_KEY_TAB]        = RIVER2D_ASCII_TAB;
+    engine->controls.keycodes[MAPEDIT_KEY_ENTER]      = RIVER2D_ASCII_ENTER;
     engine->controls.keycodes[MAPEDIT_KEY_LSHIFT]     = RIVER2D_ASCII_LSHIFT;
     engine->controls.keycodes[MAPEDIT_KEY_RSHIFT]     = RIVER2D_ASCII_RSHIFT;
     engine->controls.keycodes[MAPEDIT_KEY_LCTRL]      = RIVER2D_ASCII_LCTRL;
     engine->controls.keycodes[MAPEDIT_KEY_RCTRL]      = RIVER2D_ASCII_RCTRL;
     engine->controls.keycodes[MAPEDIT_KEY_BACKSPACE]  = RIVER2D_ASCII_BACKSPACE;
+    engine->controls.keycodes[MAPEDIT_KEY_SPACE]      = RIVER2D_ASCII_SPACE;
     engine->controls.keycodes[MAPEDIT_KEY_0]          = '0';
     engine->controls.keycodes[MAPEDIT_KEY_1]          = '1';
     engine->controls.keycodes[MAPEDIT_KEY_2]          = '2';
@@ -1059,15 +1062,15 @@ f_internal void loadProject
         return;
     }
 
-    #ifdef DEBUG
+#ifdef DEBUG
     fprintf(stderr, "\nloading file: "PRI_SV"\n", ARG_SV(*filename));
-    #endif
+#endif
 
     FILE *file = fopen(filename->data, "rb");
     if(!file)
     {
-        fprintf(stderr, "\033[31;1;7mERROR: could not open file: %s.\033[0m\n",
-                filename->data);
+        fprintf(stderr, "\033[31;1;7mERROR: could not open file "
+                "named \"%s\".\033[0m\n", filename->data);
         changeState(editor, MAPEDIT_STATE_MENU);
         return;
     }
@@ -1151,30 +1154,29 @@ f_internal void checkFilePickerButtons
         engine->controls.keymap &= ~MAPEDIT_BIT_BACKSPACE;
     }
 
+    bool shift = (engine->controls.keymap & MAPEDIT_BIT_LSHIFT) ||
+                 (engine->controls.keymap & MAPEDIT_BIT_RSHIFT);
+
     for(uint8_t i = 0; i < 26; ++i)
     {
         if(engine->controls.keymap & (MAPEDIT_BIT_A << i))
         {
-            // TESTING: just print for now
-            // FIXME: poll right shift
-            if(engine->controls.keymap & MAPEDIT_BIT_LSHIFT ||
-               engine->controls.keymap & MAPEDIT_BIT_RSHIFT
-            ){
+            engine->controls.keymap &= ~(MAPEDIT_BIT_A << i);
+            if(shift)
+            {
                 fprintf(stderr, "%c\n", 0x40 + i);
                 continue;
             }
 
             fprintf(stderr, "%c\n", 0x61 + i);
         }
-        engine->controls.keymap &= ~(MAPEDIT_BIT_A << i);
     }
 
-    // CURRENT: confirm with enter!
-    // if(engine->controls.keymap & MAPEDIT_BIT_ENTER)
-    // {
-    //     editor->confirmed = true;
-    //     engine->controls.keymap &= ~MAPEDIT_BIT_ENTER;
-    // }
+    if(engine->controls.keymap & MAPEDIT_BIT_ENTER)
+    {
+        editor->confirmed = true;
+        engine->controls.keymap &= ~MAPEDIT_BIT_ENTER;
+    }
 
     if(editor->confirmed)
     {
@@ -1318,6 +1320,7 @@ void mapedit_processKeys
     bool               isDown
 ){
     if(processKey(MAPEDIT_KEY_ESCAPE,     MAPEDIT_BIT_ESCAPE    )){ return; }
+    if(processKey(MAPEDIT_KEY_ENTER,      MAPEDIT_BIT_ENTER     )){ return; }
     if(processKey(MAPEDIT_KEY_TAB,        MAPEDIT_BIT_TAB       )){ return; }
     if(processKey(MAPEDIT_KEY_LSHIFT,     MAPEDIT_BIT_LSHIFT    )){ return; }
     if(processKey(MAPEDIT_KEY_RSHIFT,     MAPEDIT_BIT_RSHIFT    )){ return; }
