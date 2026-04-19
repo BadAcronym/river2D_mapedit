@@ -5,8 +5,8 @@
 #include "river2D_main.h"
 #include "mapedit_main.h"
 
-global EngineData *global_engine;
-global EditorData *global_editor;
+s_global EngineData *global_engine;
+s_global EditorData *global_editor;
 
 #ifdef ASAN
         #define LIBPATH "./vendor/river2D/bin/asan/"
