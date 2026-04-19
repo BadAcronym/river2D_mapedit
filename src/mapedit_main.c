@@ -249,7 +249,7 @@ void mapedit_init
     engine->controls.lastScrollTime = now;
 
     editor->currentState = MAPEDIT_STATE_MENU;
-    editor->currentFile = cstr_sv("HELLO, WORLD.");
+    editor->filename  = cstr_sv("HELLO, WORLD.");
 }
 
 int32_t mapedit_shutdown
@@ -1148,9 +1148,13 @@ f_internal void checkFilePickerButtons
         return;
     }
 
+    // TESTING: do it this way? and release back to const char *
+    // when I'm done...
+    StringView currentFile = cstr_sv(editor->filename);
+
     if(engine->controls.keymap & MAPEDIT_BIT_BACKSPACE)
     {
-        sv_trim(&editor->currentFile, 1, SV_RIGHT);
+        sv_trim(&editor->filename, 1, SV_RIGHT);
         engine->controls.keymap &= ~MAPEDIT_BIT_BACKSPACE;
     }
 
@@ -1164,11 +1168,14 @@ f_internal void checkFilePickerButtons
             engine->controls.keymap &= ~(MAPEDIT_BIT_A << i);
             if(shift)
             {
-                fprintf(stderr, "%c\n", 0x40 + i);
+                const char *text = sv_add_char(&editor->filename,
+                                               0x40 + i, SV_RIGHT);
+                editor->filename = text;
                 continue;
             }
 
-            fprintf(stderr, "%c\n", 0x61 + i);
+            const char *text = sv_add_char(&editor->filename, 0x61 + i, SV_RIGHT);
+            editor->filename = cstr_sv(text);
         }
     }
 
@@ -1180,13 +1187,13 @@ f_internal void checkFilePickerButtons
 
     if(editor->confirmed)
     {
-        loadProject(engine, editor, &editor->currentFile);
+        loadProject(engine, editor, &editor->filename);
         changeState(editor, MAPEDIT_STATE_EDIT);
         return;
     }
 
     engine->loadText(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE],
-                     &editor->currentFile, MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
+                     &editor->filename, MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
 }
 
 void mapedit_update

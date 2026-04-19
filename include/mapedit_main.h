@@ -177,7 +177,7 @@ typedef struct EditorData
     Action       *actions;
     uint32_t     currentAction;
     StringView   projectName;
-    StringView   currentFile;
+    const char   *filename;
     bool         confirmed;
 }
 EditorData;
