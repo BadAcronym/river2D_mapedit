@@ -1,7 +1,6 @@
 #include "mapedit_main.h"
 #include "imgsurf_main.h"
 
-#define STRING_VIEW_IMPL
 #include "string_view.h"
 
 #include <math.h>
@@ -104,52 +103,53 @@ void mapedit_init
     engine->controls.buttoncodes[MAPEDIT_BUTTON_MIDDLEM] = RIVER2D_MOUSE2;
     engine->controls.buttoncodes[MAPEDIT_BUTTON_RIGHTM]  = RIVER2D_MOUSE3;
 
-    uint8_t *keycodes = engine->controls.keycodes;
-    keycodes[MAPEDIT_KEY_ESCAPE]     = river2D_charToKey(RIVER2D_ASCII_ESCAPE);
-    keycodes[MAPEDIT_KEY_LSHIFT]     = river2D_charToKey(RIVER2D_ASCII_LSHIFT);
-    keycodes[MAPEDIT_KEY_LCTRL]      = river2D_charToKey(RIVER2D_ASCII_LCTRL);
-    keycodes[MAPEDIT_KEY_BACKSPACE]  = river2D_charToKey(RIVER2D_ASCII_BACKSPACE);
-    keycodes[MAPEDIT_KEY_QUIT]       = river2D_charToKey('q');
-    keycodes[MAPEDIT_KEY_SAVE]       = river2D_charToKey('s');
-    keycodes[MAPEDIT_KEY_TILEPICKER] = river2D_charToKey('t');
-    keycodes[MAPEDIT_KEY_INC_SIZE]   = river2D_charToKey('=');
-    keycodes[MAPEDIT_KEY_RED_SIZE]   = river2D_charToKey('-');
-    keycodes[MAPEDIT_KEY_LAYER0]     = river2D_charToKey('0');
-    keycodes[MAPEDIT_KEY_LAYER1]     = river2D_charToKey('1');
-    keycodes[MAPEDIT_KEY_LAYER2]     = river2D_charToKey('2');
-    keycodes[MAPEDIT_KEY_LAYER3]     = river2D_charToKey('3');
-    keycodes[MAPEDIT_KEY_LAYER4]     = river2D_charToKey('4');
-    keycodes[MAPEDIT_KEY_LAYER5]     = river2D_charToKey('5');
-    keycodes[MAPEDIT_KEY_LAYER6]     = river2D_charToKey('6');
-    keycodes[MAPEDIT_KEY_LAYER7]     = river2D_charToKey('7');
-    keycodes[MAPEDIT_KEY_LAYER8]     = river2D_charToKey('8');
-    keycodes[MAPEDIT_KEY_LAYER9]     = river2D_charToKey('9');
-    keycodes[MAPEDIT_KEY_A]          = river2D_charToKey('a');
-    keycodes[MAPEDIT_KEY_B]          = river2D_charToKey('b');
-    keycodes[MAPEDIT_KEY_C]          = river2D_charToKey('c');
-    keycodes[MAPEDIT_KEY_D]          = river2D_charToKey('d');
-    keycodes[MAPEDIT_KEY_E]          = river2D_charToKey('e');
-    keycodes[MAPEDIT_KEY_F]          = river2D_charToKey('f');
-    keycodes[MAPEDIT_KEY_G]          = river2D_charToKey('g');
-    keycodes[MAPEDIT_KEY_H]          = river2D_charToKey('h');
-    keycodes[MAPEDIT_KEY_I]          = river2D_charToKey('i');
-    keycodes[MAPEDIT_KEY_J]          = river2D_charToKey('j');
-    keycodes[MAPEDIT_KEY_K]          = river2D_charToKey('k');
-    keycodes[MAPEDIT_KEY_L]          = river2D_charToKey('l');
-    keycodes[MAPEDIT_KEY_M]          = river2D_charToKey('m');
-    keycodes[MAPEDIT_KEY_N]          = river2D_charToKey('n');
-    keycodes[MAPEDIT_KEY_O]          = river2D_charToKey('o');
-    keycodes[MAPEDIT_KEY_P]          = river2D_charToKey('p');
-    keycodes[MAPEDIT_KEY_Q]          = river2D_charToKey('q');
-    keycodes[MAPEDIT_KEY_R]          = river2D_charToKey('r');
-    keycodes[MAPEDIT_KEY_S]          = river2D_charToKey('s');
-    keycodes[MAPEDIT_KEY_T]          = river2D_charToKey('t');
-    keycodes[MAPEDIT_KEY_U]          = river2D_charToKey('u');
-    keycodes[MAPEDIT_KEY_V]          = river2D_charToKey('v');
-    keycodes[MAPEDIT_KEY_W]          = river2D_charToKey('w');
-    keycodes[MAPEDIT_KEY_X]          = river2D_charToKey('x');
-    keycodes[MAPEDIT_KEY_Y]          = river2D_charToKey('y');
-    keycodes[MAPEDIT_KEY_Z]          = river2D_charToKey('z');
+    engine->controls.keycodes[MAPEDIT_KEY_ESCAPE]     = RIVER2D_ASCII_ESCAPE;
+    engine->controls.keycodes[MAPEDIT_KEY_LSHIFT]     = RIVER2D_ASCII_LSHIFT;
+    engine->controls.keycodes[MAPEDIT_KEY_RSHIFT]     = RIVER2D_ASCII_RSHIFT;
+    engine->controls.keycodes[MAPEDIT_KEY_LCTRL]      = RIVER2D_ASCII_LCTRL;
+    engine->controls.keycodes[MAPEDIT_KEY_RCTRL]      = RIVER2D_ASCII_RCTRL;
+    engine->controls.keycodes[MAPEDIT_KEY_BACKSPACE]  = RIVER2D_ASCII_BACKSPACE;
+    engine->controls.keycodes[MAPEDIT_KEY_QUIT]       = 'q';
+    engine->controls.keycodes[MAPEDIT_KEY_SAVE]       = 's';
+    engine->controls.keycodes[MAPEDIT_KEY_TILEPICKER] = 't';
+    engine->controls.keycodes[MAPEDIT_KEY_INC_SIZE]   = '=';
+    engine->controls.keycodes[MAPEDIT_KEY_RED_SIZE]   = '-';
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER0]     = '0';
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER1]     = '1';
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER2]     = '2';
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER3]     = '3';
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER4]     = '4';
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER5]     = '5';
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER6]     = '6';
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER7]     = '7';
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER8]     = '8';
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER9]     = '9';
+    engine->controls.keycodes[MAPEDIT_KEY_A]          = 'a';
+    engine->controls.keycodes[MAPEDIT_KEY_B]          = 'b';
+    engine->controls.keycodes[MAPEDIT_KEY_C]          = 'c';
+    engine->controls.keycodes[MAPEDIT_KEY_D]          = 'd';
+    engine->controls.keycodes[MAPEDIT_KEY_E]          = 'e';
+    engine->controls.keycodes[MAPEDIT_KEY_F]          = 'f';
+    engine->controls.keycodes[MAPEDIT_KEY_G]          = 'g';
+    engine->controls.keycodes[MAPEDIT_KEY_H]          = 'h';
+    engine->controls.keycodes[MAPEDIT_KEY_I]          = 'i';
+    engine->controls.keycodes[MAPEDIT_KEY_J]          = 'j';
+    engine->controls.keycodes[MAPEDIT_KEY_K]          = 'k';
+    engine->controls.keycodes[MAPEDIT_KEY_L]          = 'l';
+    engine->controls.keycodes[MAPEDIT_KEY_M]          = 'm';
+    engine->controls.keycodes[MAPEDIT_KEY_N]          = 'n';
+    engine->controls.keycodes[MAPEDIT_KEY_O]          = 'o';
+    engine->controls.keycodes[MAPEDIT_KEY_P]          = 'p';
+    engine->controls.keycodes[MAPEDIT_KEY_Q]          = 'q';
+    engine->controls.keycodes[MAPEDIT_KEY_R]          = 'r';
+    engine->controls.keycodes[MAPEDIT_KEY_S]          = 's';
+    engine->controls.keycodes[MAPEDIT_KEY_T]          = 't';
+    engine->controls.keycodes[MAPEDIT_KEY_U]          = 'u';
+    engine->controls.keycodes[MAPEDIT_KEY_V]          = 'v';
+    engine->controls.keycodes[MAPEDIT_KEY_W]          = 'w';
+    engine->controls.keycodes[MAPEDIT_KEY_X]          = 'x';
+    engine->controls.keycodes[MAPEDIT_KEY_Y]          = 'y';
+    engine->controls.keycodes[MAPEDIT_KEY_Z]          = 'z';
 
     StringView title_sv = cstr_sv("RIVER2D MAP EDITOR");
     StringView new_sv   = cstr_sv("NEW PROJECT");
@@ -260,7 +260,7 @@ int32_t mapedit_shutdown
     return 0;
 }
 
-internal void changeState
+f_internal void changeState
 (
     EditorData *editor,
     uint8_t    nextState
@@ -281,7 +281,7 @@ internal void changeState
 // it'd only be in exact runs find another way to do RLE maybe, one that scales
 // well with lots of pairs of 2, 4, short runs that is
 
-internal void saveCurrentProject
+f_internal void saveCurrentProject
 (
     EngineData *engine,
     EditorData *editor
@@ -352,7 +352,7 @@ internal void saveCurrentProject
     editor->lastSaveTime = river2D_queryTime();
 }
 
-internal void drawMainMenu
+f_internal void drawMainMenu
 (
     EngineData *engine,
     EditorData *editor
@@ -389,7 +389,7 @@ internal void drawMainMenu
     }
 }
 
-internal void checkMainMenuButtons
+f_internal void checkMainMenuButtons
 (
     EngineData *engine,
     EditorData *editor
@@ -515,7 +515,7 @@ internal void checkMainMenuButtons
     }
 }
 
-internal void drawEditor
+f_internal void drawEditor
 (
     EngineData *engine,
     EditorData *editor
@@ -597,7 +597,7 @@ internal void drawEditor
     }
 }
 
-internal void incrementAction
+f_internal void incrementAction
 (
     EditorData *editor
 ){
@@ -607,7 +607,7 @@ internal void incrementAction
     }
 }
 
-internal void decrementAction
+f_internal void decrementAction
 (
     EditorData *editor
 ){
@@ -621,7 +621,7 @@ internal void decrementAction
     }
 }
 
-internal void readAction_undo
+f_internal void readAction_undo
 (
     EditorData *editor
 ){
@@ -629,7 +629,7 @@ internal void readAction_undo
     editor->tiles[action.map_index] = action.prev_tile;
 }
 
-internal void readAction_redo
+f_internal void readAction_redo
 (
     EditorData *editor
 ){
@@ -637,7 +637,7 @@ internal void readAction_redo
     editor->tiles[action.map_index] = action.new_tile;
 }
 
-internal void writeAction
+f_internal void writeAction
 (
     EditorData   *editor,
     uint64_t     map_index,
@@ -652,7 +652,7 @@ internal void writeAction
     editor->actions[editor->currentAction].new_tile     = new_tile;
 }
 
-internal void undo
+f_internal void undo
 (
     EditorData *editor
 ){
@@ -701,7 +701,7 @@ internal void undo
     }
 }
 
-internal void redo
+f_internal void redo
 (
     EditorData *editor
 ){
@@ -756,7 +756,7 @@ internal void redo
     }
 }
 
-internal void placeSelectedTiles
+f_internal void placeSelectedTiles
 (
     EditorData *editor,
     uint16_t   tileX,
@@ -808,7 +808,7 @@ internal void placeSelectedTiles
     }
 }
 
-internal void checkEditorButtons
+f_internal void checkEditorButtons
 (
     EngineData *engine,
     EditorData *editor
@@ -1030,7 +1030,7 @@ internal void checkEditorButtons
     }
 }
 
-internal void drawFilePicker
+f_internal void drawFilePicker
 (
     EngineData *engine
 ){
@@ -1048,7 +1048,7 @@ internal void drawFilePicker
                            engine->planes[MAPEDIT_PLANE_CURRENTFILE].height);
 }
 
-internal void loadProject
+f_internal void loadProject
 (
     EngineData *engine,
     EditorData *editor,
@@ -1136,7 +1136,7 @@ internal void loadProject
     fclose(file);
 }
 
-internal void checkFilePickerButtons
+f_internal void checkFilePickerButtons
 (
     EngineData *engine,
     EditorData *editor
@@ -1239,7 +1239,7 @@ void mapedit_updateSelectSize
 #define CONTROL_NOTFOUND 0
 #define CONTROL_FOUND    1
 
-internal uint8_t processButton_function
+f_internal uint8_t processButton_function
 (
     River2D_ControlMap *controls,
     uint64_t           desired,
@@ -1267,7 +1267,7 @@ internal uint8_t processButton_function
 #define processButton(bmacro, bitmacro) \
 processButton_function(controls, bmacro, button, bitmacro, isDown)
 
-internal uint8_t processKey_function
+f_internal uint8_t processKey_function
 (
     River2D_ControlMap *controls,
     uint64_t           desired,
@@ -1326,7 +1326,9 @@ void mapedit_processKeys
 ){
     if(processKey(MAPEDIT_KEY_ESCAPE,     MAPEDIT_BIT_ESCAPE    )){ return; }
     if(processKey(MAPEDIT_KEY_LSHIFT,     MAPEDIT_BIT_LSHIFT    )){ return; }
+    if(processKey(MAPEDIT_KEY_RSHIFT,     MAPEDIT_BIT_RSHIFT    )){ return; }
     if(processKey(MAPEDIT_KEY_LCTRL,      MAPEDIT_BIT_LCTRL     )){ return; }
+    if(processKey(MAPEDIT_KEY_RCTRL,      MAPEDIT_BIT_RCTRL     )){ return; }
     if(processKey(MAPEDIT_KEY_BACKSPACE,  MAPEDIT_BIT_BACKSPACE )){ return; }
     if(processKey(MAPEDIT_KEY_SAVE,       MAPEDIT_BIT_SAVE      )){ return; }
     if(processKey(MAPEDIT_KEY_QUIT,       MAPEDIT_BIT_QUIT      )){ return; }
