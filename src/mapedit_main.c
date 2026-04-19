@@ -98,7 +98,8 @@ void mapedit_init
                         engine->backbuffer.width, engine->backbuffer.height);
 
     // BACKLOG: transfer to mapedit_loadConfig at some point, when keybinds
-    // should be remappable
+    // should be remappable?
+
     engine->controls.buttoncodes[MAPEDIT_BUTTON_LEFTM]   = RIVER2D_MOUSE1;
     engine->controls.buttoncodes[MAPEDIT_BUTTON_MIDDLEM] = RIVER2D_MOUSE2;
     engine->controls.buttoncodes[MAPEDIT_BUTTON_RIGHTM]  = RIVER2D_MOUSE3;
@@ -109,21 +110,16 @@ void mapedit_init
     engine->controls.keycodes[MAPEDIT_KEY_LCTRL]      = RIVER2D_ASCII_LCTRL;
     engine->controls.keycodes[MAPEDIT_KEY_RCTRL]      = RIVER2D_ASCII_RCTRL;
     engine->controls.keycodes[MAPEDIT_KEY_BACKSPACE]  = RIVER2D_ASCII_BACKSPACE;
-    engine->controls.keycodes[MAPEDIT_KEY_QUIT]       = 'q';
-    engine->controls.keycodes[MAPEDIT_KEY_SAVE]       = 's';
-    engine->controls.keycodes[MAPEDIT_KEY_TILEPICKER] = 't';
-    engine->controls.keycodes[MAPEDIT_KEY_INC_SIZE]   = '=';
-    engine->controls.keycodes[MAPEDIT_KEY_RED_SIZE]   = '-';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER0]     = '0';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER1]     = '1';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER2]     = '2';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER3]     = '3';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER4]     = '4';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER5]     = '5';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER6]     = '6';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER7]     = '7';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER8]     = '8';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER9]     = '9';
+    engine->controls.keycodes[MAPEDIT_KEY_0]          = '0';
+    engine->controls.keycodes[MAPEDIT_KEY_1]          = '1';
+    engine->controls.keycodes[MAPEDIT_KEY_2]          = '2';
+    engine->controls.keycodes[MAPEDIT_KEY_3]          = '3';
+    engine->controls.keycodes[MAPEDIT_KEY_4]          = '4';
+    engine->controls.keycodes[MAPEDIT_KEY_5]          = '5';
+    engine->controls.keycodes[MAPEDIT_KEY_6]          = '6';
+    engine->controls.keycodes[MAPEDIT_KEY_7]          = '7';
+    engine->controls.keycodes[MAPEDIT_KEY_8]          = '8';
+    engine->controls.keycodes[MAPEDIT_KEY_9]          = '9';
     engine->controls.keycodes[MAPEDIT_KEY_A]          = 'a';
     engine->controls.keycodes[MAPEDIT_KEY_B]          = 'b';
     engine->controls.keycodes[MAPEDIT_KEY_C]          = 'c';
@@ -150,6 +146,8 @@ void mapedit_init
     engine->controls.keycodes[MAPEDIT_KEY_X]          = 'x';
     engine->controls.keycodes[MAPEDIT_KEY_Y]          = 'y';
     engine->controls.keycodes[MAPEDIT_KEY_Z]          = 'z';
+    engine->controls.keycodes[MAPEDIT_KEY_MINUS]      = '-';
+    engine->controls.keycodes[MAPEDIT_KEY_EQUAL]      = '=';
 
     StringView title_sv = cstr_sv("RIVER2D MAP EDITOR");
     StringView new_sv   = cstr_sv("NEW PROJECT");
@@ -394,10 +392,10 @@ f_internal void checkMainMenuButtons
     EngineData *engine,
     EditorData *editor
 ){
-    if(engine->controls.keymap & MAPEDIT_BIT_QUIT)
-    {
+    if(engine->controls.keymap & MAPEDIT_BIT_LCTRL &&
+       engine->controls.keymap & MAPEDIT_BIT_Q
+    ){
         engine->running = false;
-        engine->controls.keymap &= ~MAPEDIT_BIT_QUIT;
         return;
     }
 
@@ -496,7 +494,6 @@ f_internal void checkMainMenuButtons
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
             saveCurrentProject(engine, editor);
-            engine->controls.keymap    &= ~MAPEDIT_BIT_SAVE;
             engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
         }
     }
@@ -527,7 +524,7 @@ f_internal void drawEditor
 
     for(uint8_t i = 0; i < editor->layers; ++i)
     {
-        if(engine->controls.keymap & (MAPEDIT_BIT_LAYER0 << i))
+        if(engine->controls.keymap & (MAPEDIT_BIT_0 << i))
         {
             editor->currentLayer = i;
 
@@ -819,10 +816,10 @@ f_internal void checkEditorButtons
     // TODO: (mapedit #2): add some descriptions or UI elements to delimit what
     // mode one is in
 
-    if(engine->controls.keymap & MAPEDIT_BIT_TILEPICKER)
+    if(engine->controls.keymap & MAPEDIT_BIT_T)
     {
         editor->editorflags     ^= MAPEDIT_FLAG_BIT_TILEPICKER;
-        engine->controls.keymap &= ~MAPEDIT_BIT_TILEPICKER;
+        engine->controls.keymap &= ~MAPEDIT_BIT_T;
     }
 
     float fX = (float)engine->backbuffer.width;
@@ -914,16 +911,15 @@ f_internal void checkEditorButtons
                 tileY = (uint8_t)(sheetY - editor->selectMult);
             }
 
-            if(engine->controls.keymap & MAPEDIT_BIT_INC_SIZE)
-            {
-                mapedit_updateSelectSize(editor, true);
-                engine->controls.keymap &= ~MAPEDIT_BIT_INC_SIZE;
-            }
-
-            if(engine->controls.keymap & MAPEDIT_BIT_RED_SIZE)
+            if(engine->controls.keymap & MAPEDIT_BIT_MINUS)
             {
                 mapedit_updateSelectSize(editor, false);
-                engine->controls.keymap &= ~MAPEDIT_BIT_RED_SIZE;
+                engine->controls.keymap &= ~MAPEDIT_BIT_MINUS;
+            }
+            if(engine->controls.keymap & MAPEDIT_BIT_EQUAL)
+            {
+                mapedit_updateSelectSize(editor, true);
+                engine->controls.keymap &= ~MAPEDIT_BIT_EQUAL;
             }
 
             engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
@@ -971,10 +967,11 @@ f_internal void checkEditorButtons
         engine->controls.keymap &= ~MAPEDIT_BIT_ESCAPE;
         return;
     }
-    else if(engine->controls.keymap & MAPEDIT_BIT_SAVE)
-    {
+    else if(engine->controls.keymap & MAPEDIT_BIT_LCTRL &&
+            engine->controls.keymap & MAPEDIT_BIT_S
+    ){
         saveCurrentProject(engine, editor);
-        engine->controls.keymap &= ~MAPEDIT_BIT_SAVE;
+        engine->controls.keymap &= ~MAPEDIT_BIT_S;
         return;
     }
 
@@ -1154,10 +1151,6 @@ f_internal void checkFilePickerButtons
         engine->controls.keymap &= ~MAPEDIT_BIT_BACKSPACE;
     }
 
-    // CURRENT: how do we check for the entire keyboard
-
-    // CURRENT: does not respect layout, does it. bollocks.
-    // how can I make keyboard input non-layout dependent???
     for(uint8_t i = 0; i < 26; ++i)
     {
         if(engine->controls.keymap & (MAPEDIT_BIT_A << i))
@@ -1325,29 +1318,22 @@ void mapedit_processKeys
     bool               isDown
 ){
     if(processKey(MAPEDIT_KEY_ESCAPE,     MAPEDIT_BIT_ESCAPE    )){ return; }
+    if(processKey(MAPEDIT_KEY_TAB,        MAPEDIT_BIT_TAB       )){ return; }
     if(processKey(MAPEDIT_KEY_LSHIFT,     MAPEDIT_BIT_LSHIFT    )){ return; }
     if(processKey(MAPEDIT_KEY_RSHIFT,     MAPEDIT_BIT_RSHIFT    )){ return; }
     if(processKey(MAPEDIT_KEY_LCTRL,      MAPEDIT_BIT_LCTRL     )){ return; }
     if(processKey(MAPEDIT_KEY_RCTRL,      MAPEDIT_BIT_RCTRL     )){ return; }
     if(processKey(MAPEDIT_KEY_BACKSPACE,  MAPEDIT_BIT_BACKSPACE )){ return; }
-    if(processKey(MAPEDIT_KEY_SAVE,       MAPEDIT_BIT_SAVE      )){ return; }
-    if(processKey(MAPEDIT_KEY_QUIT,       MAPEDIT_BIT_QUIT      )){ return; }
-    if(processKey(MAPEDIT_KEY_SAVE,       MAPEDIT_BIT_SAVE      )){ return; }
-    if(processKey(MAPEDIT_KEY_TILEPICKER, MAPEDIT_BIT_TILEPICKER)){ return; }
-    if(processKey(MAPEDIT_KEY_INC_SIZE,   MAPEDIT_BIT_INC_SIZE  )){ return; }
-    if(processKey(MAPEDIT_KEY_RED_SIZE,   MAPEDIT_BIT_RED_SIZE  )){ return; }
-    if(processKey(MAPEDIT_KEY_LAYER0,     MAPEDIT_BIT_LAYER0    )){ return; }
-    if(processKey(MAPEDIT_KEY_LAYER1,     MAPEDIT_BIT_LAYER1    )){ return; }
-    if(processKey(MAPEDIT_KEY_LAYER2,     MAPEDIT_BIT_LAYER2    )){ return; }
-    if(processKey(MAPEDIT_KEY_LAYER3,     MAPEDIT_BIT_LAYER3    )){ return; }
-    if(processKey(MAPEDIT_KEY_LAYER4,     MAPEDIT_BIT_LAYER4    )){ return; }
-    if(processKey(MAPEDIT_KEY_LAYER5,     MAPEDIT_BIT_LAYER5    )){ return; }
-    if(processKey(MAPEDIT_KEY_LAYER6,     MAPEDIT_BIT_LAYER6    )){ return; }
-    if(processKey(MAPEDIT_KEY_LAYER7,     MAPEDIT_BIT_LAYER7    )){ return; }
-    if(processKey(MAPEDIT_KEY_LAYER8,     MAPEDIT_BIT_LAYER8    )){ return; }
-    if(processKey(MAPEDIT_KEY_LAYER9,     MAPEDIT_BIT_LAYER9    )){ return; }
-    if(processKey(MAPEDIT_KEY_ZOOMIN,     MAPEDIT_BIT_ZOOMIN    )){ return; }
-    if(processKey(MAPEDIT_KEY_ZOOMOUT,    MAPEDIT_BIT_ZOOMOUT   )){ return; }
+    if(processKey(MAPEDIT_KEY_0,          MAPEDIT_BIT_0         )){ return; }
+    if(processKey(MAPEDIT_KEY_1,          MAPEDIT_BIT_1         )){ return; }
+    if(processKey(MAPEDIT_KEY_2,          MAPEDIT_BIT_2         )){ return; }
+    if(processKey(MAPEDIT_KEY_3,          MAPEDIT_BIT_3         )){ return; }
+    if(processKey(MAPEDIT_KEY_4,          MAPEDIT_BIT_4         )){ return; }
+    if(processKey(MAPEDIT_KEY_5,          MAPEDIT_BIT_5         )){ return; }
+    if(processKey(MAPEDIT_KEY_6,          MAPEDIT_BIT_6         )){ return; }
+    if(processKey(MAPEDIT_KEY_7,          MAPEDIT_BIT_7         )){ return; }
+    if(processKey(MAPEDIT_KEY_8,          MAPEDIT_BIT_8         )){ return; }
+    if(processKey(MAPEDIT_KEY_9,          MAPEDIT_BIT_9         )){ return; }
     if(processKey(MAPEDIT_KEY_A,          MAPEDIT_BIT_A         )){ return; }
     if(processKey(MAPEDIT_KEY_B,          MAPEDIT_BIT_B         )){ return; }
     if(processKey(MAPEDIT_KEY_C,          MAPEDIT_BIT_C         )){ return; }
@@ -1374,6 +1360,8 @@ void mapedit_processKeys
     if(processKey(MAPEDIT_KEY_X,          MAPEDIT_BIT_X         )){ return; }
     if(processKey(MAPEDIT_KEY_Y,          MAPEDIT_BIT_Y         )){ return; }
     if(processKey(MAPEDIT_KEY_Z,          MAPEDIT_BIT_Z         )){ return; }
+    if(processKey(MAPEDIT_KEY_MINUS,      MAPEDIT_BIT_MINUS     )){ return; }
+    if(processKey(MAPEDIT_KEY_EQUAL,      MAPEDIT_BIT_EQUAL     )){ return; }
 
 #ifdef DEBUG
     fprintf(stderr, "key pressed: 0x%" PRIx64 "\n", key);
