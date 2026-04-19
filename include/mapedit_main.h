@@ -71,6 +71,8 @@
 #define MAPEDIT_KEY_X                 40
 #define MAPEDIT_KEY_Y                 41
 #define MAPEDIT_KEY_Z                 42
+#define MAPEDIT_KEY_MINUS             43
+#define MAPEDIT_KEY_EQUAL             44
 
 #define MAPEDIT_BIT_LEFTM             0x000000000001LLU
 #define MAPEDIT_BIT_RIGHTM            0x000000000002LLU
@@ -119,6 +121,8 @@
 #define MAPEDIT_BIT_X                 0x0010000000000LLU
 #define MAPEDIT_BIT_Y                 0x0020000000000LLU
 #define MAPEDIT_BIT_Z                 0x0040000000000LLU
+#define MAPEDIT_BIT_MINUS             0x0080000000000LLU
+#define MAPEDIT_BIT_EQUAL             0x0100000000000LLU
 
 #define MAPEDIT_STATE_NULL            0
 #define MAPEDIT_STATE_MENU            1
