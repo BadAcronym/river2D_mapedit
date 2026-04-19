@@ -276,9 +276,10 @@ internal void changeState
     editor->currentState  = nextState;
 }
 
-// TODO: add RLE? lose 1 bit of the 32 for every tile, just to make some uint32_t's a repeat of the last placed tile
-// see if this is even worth it, it'd only be in exact runs
-// find another way to do RLE maybe, one that scales well with lots of pairs of 2, 4, short runs that is
+// TODO: add RLE? lose 1 bit of the 32 for every tile, just to make some
+// uint32_t's a repeat of the last placed tile see if this is even worth it,
+// it'd only be in exact runs find another way to do RLE maybe, one that scales
+// well with lots of pairs of 2, 4, short runs that is
 
 internal void saveCurrentProject
 (
@@ -329,7 +330,7 @@ internal void saveCurrentProject
     }
     if((elements = fwrite(&editor->layers, 1, 1, file)) != 1)
     {
-        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile."
+        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. "
                 "\033[0m\n");
         return;
     }
@@ -1153,10 +1154,34 @@ internal void checkFilePickerButtons
         engine->controls.keymap &= ~MAPEDIT_BIT_BACKSPACE;
     }
 
-    // CURRENT: each keyboard key adds a new character!
-    // (maybe allocate a super empty string and set the cursor to 0 at first)
+    // CURRENT: how do we check for the entire keyboard
+
+    // CURRENT: does not respect layout, does it. bollocks.
+    // how can I make keyboard input non-layout dependent???
+    for(uint8_t i = 0; i < 26; ++i)
+    {
+        if(engine->controls.keymap & (MAPEDIT_BIT_A << i))
+        {
+            // TESTING: just print for now
+            // FIXME: poll right shift
+            if(engine->controls.keymap & MAPEDIT_BIT_LSHIFT ||
+               engine->controls.keymap & MAPEDIT_BIT_RSHIFT
+            ){
+                fprintf(stderr, "%c\n", 0x40 + i);
+                continue;
+            }
+
+            fprintf(stderr, "%c\n", 0x61 + i);
+        }
+        engine->controls.keymap &= ~(MAPEDIT_BIT_A << i);
+    }
 
     // CURRENT: confirm with enter!
+    // if(engine->controls.keymap & MAPEDIT_BIT_ENTER)
+    // {
+    //     editor->confirmed = true;
+    //     engine->controls.keymap &= ~MAPEDIT_BIT_ENTER;
+    // }
 
     if(editor->confirmed)
     {
