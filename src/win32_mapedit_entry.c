@@ -168,7 +168,7 @@ int CALLBACK WinMain
     engine.windowName     =  "River2D Map Editor";
     engine.instance       =  instance;
 
-    engine.init(&engine, planes);
+    river2D_init(&engine, planes);
     mapedit_init(&engine, &editor);
 
     global_engine = &engine;
@@ -231,10 +231,10 @@ int CALLBACK WinMain
 
         mapedit_update(&engine, &editor);
         engine.context = GetDC(engine.window);
-        engine.bltBuffer(&engine);
+        river2D_bltBuffer(&engine);
         editor.lastPresentTime = now;
         ReleaseDC(engine.window, engine.context);
     }
 
-    return engine.shutdown(&engine);
+    return river2D_shutdown(&engine);
 }
