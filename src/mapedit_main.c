@@ -1054,6 +1054,8 @@ f_internal void loadProject
     EngineData *engine,
     EditorData *editor
 ){
+    const char *filename = puddle_sv_cstr((StringView*)&editor->filename);
+
     if(!editor->filename.data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: failed to find .rte file to load!"
@@ -1063,14 +1065,14 @@ f_internal void loadProject
     }
 
 #ifdef DEBUG
-    fprintf(stderr, "\nloading file: "PRI_SV"\n", ARG_SV(*filename));
+    fprintf(stderr, "\nloading file: "PRI_SV"\n", ARG_SV(editor->filename));
 #endif
 
-    FILE *file = fopen(editor->filename.data, "rb");
+    FILE *file = fopen(filename, "rb");
     if(!file)
     {
         fprintf(stderr, "\033[31;1;7mERROR: could not open file "
-                "named \"%s\".\033[0m\n", editor->filename.data);
+                "named \""PRI_SV"\".\033[0m\n", ARG_SV(editor->filename));
         changeState(editor, MAPEDIT_STATE_MENU);
         return;
     }
@@ -1082,8 +1084,8 @@ f_internal void loadProject
     {
         if(byte != header[i])
         {
-            fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
-                    "\033[0m\n", editor->filename.data);
+            fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: "
+                    PRI_SV"\033[0m\n", ARG_SV(editor->filename));
             return;
         }
     }
@@ -1093,25 +1095,25 @@ f_internal void loadProject
     if((elements = fread(&editor->tilesize, 2, 1, file)) != 1)
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
-                "\033[0m\n", editor->filename.data);
+                "\033[0m\n", filename);
         return;
     }
     if((elements = fread(&editor->mapWidth, 2, 1, file)) != 1)
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
-                "\033[0m\n", editor->filename.data);
+                "\033[0m\n", filename);
         return;
     }
     if((elements = fread(&editor->mapHeight, 2, 1, file)) != 1)
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
-                "\033[0m\n", editor->filename.data);
+                "\033[0m\n", filename);
         return;
     }
     if((elements = fread(&editor->layers, 1, 1, file)) != 1)
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
-                "\033[0m\n", editor->filename.data);
+                "\033[0m\n", filename);
         return;
     }
 
