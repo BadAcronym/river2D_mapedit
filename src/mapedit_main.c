@@ -235,8 +235,6 @@ void mapedit_init
         editor->actions[i].stroke_start.ns = INT64_MIN;
     }
 
-    // TODO: allow changing project name with a menu item or hotkey, pop-up
-    // textbox and user keyboard input
     if(!editor->projectName.data)
     {
         editor->projectName = puddle_cstr_s("unnamed_project");
