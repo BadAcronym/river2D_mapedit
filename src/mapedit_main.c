@@ -288,7 +288,7 @@ f_internal void saveCurrentProject
     EngineData *engine,
     EditorData *editor
 ){
-    engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_ICON_SAVING],
+    river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_ICON_SAVING],
                            &engine->backbuffer, RIVER2D_PICTOP_OVER, 16, 16, 0, 0,
                            engine->planes[MAPEDIT_PLANE_ICON_SAVING].width,
                            engine->planes[MAPEDIT_PLANE_ICON_SAVING].height);
@@ -359,21 +359,21 @@ f_internal void drawMainMenu
     EngineData *engine,
     EditorData *editor
 ){
-    engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_BACKGROUND],
+    river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_BACKGROUND],
                            &engine->backbuffer, RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
                            engine->planes[MAPEDIT_PLANE_BACKGROUND].width,
                            engine->planes[MAPEDIT_PLANE_BACKGROUND].height);
 
     if(!editor->previousState)
     {
-        engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
                                engine->planes[MAPEDIT_PLANE_MAINMENU].width,
                                engine->planes[MAPEDIT_PLANE_MAINMENU].height);
     }
     else
     {
-        engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU],
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
                                engine->planes[MAPEDIT_PLANE_PAUSEMENU].width,
                                engine->planes[MAPEDIT_PLANE_PAUSEMENU].height);
@@ -384,7 +384,7 @@ f_internal void drawMainMenu
     float deltaMS = river2D_deltaTime_now_ms(&editor->lastSaveTime);
     if(deltaMS < 250)
     {
-        engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_ICON_SAVED],
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_ICON_SAVED],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER, 16, 16, 0, 0,
                                engine->planes[MAPEDIT_PLANE_ICON_SAVED].width,
                                engine->planes[MAPEDIT_PLANE_ICON_SAVED].height);
@@ -418,7 +418,7 @@ f_internal void checkMainMenuButtons
         float length = editor->new_b.area.lowRight.x - editor->new_b.area.upLeft.x;
         float fX     = (float)(engine->backbuffer.width);
         float fY     = (float)(engine->backbuffer.height);
-        engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
                                (uint32_t)(editor->new_b.area.upLeft.x * fX),
                                (uint32_t)(editor->new_b.area.upLeft.y * fY + 20),
@@ -449,7 +449,7 @@ f_internal void checkMainMenuButtons
         float length = editor->load_b.area.lowRight.x - editor->load_b.area.upLeft.x;
         float fX     = (float)(engine->backbuffer.width);
         float fY     = (float)(engine->backbuffer.height);
-        engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
                                (uint32_t)(editor->load_b.area.upLeft.x * fX),
                                (uint32_t)(editor->load_b.area.upLeft.y * fY + 20),
@@ -469,7 +469,7 @@ f_internal void checkMainMenuButtons
         float length = editor->quit_b.area.lowRight.x - editor->quit_b.area.upLeft.x;
         float fX     = (float)(engine->backbuffer.width);
         float fY     = (float)(engine->backbuffer.height);
-        engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
                                (uint32_t)(editor->quit_b.area.upLeft.x * fX),
                                (uint32_t)(editor->quit_b.area.upLeft.y * fY + 20),
@@ -489,7 +489,7 @@ f_internal void checkMainMenuButtons
         float length = editor->save_b.area.lowRight.x - editor->save_b.area.upLeft.x;
         float fX     = (float)(engine->backbuffer.width);
         float fY     = (float)(engine->backbuffer.height);
-        engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
                                (uint32_t)(editor->save_b.area.upLeft.x * fX),
                                (uint32_t)(editor->save_b.area.upLeft.y * fY + 20),
@@ -521,7 +521,7 @@ f_internal void drawEditor
     EngineData *engine,
     EditorData *editor
 ){
-    engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_VOID],
+    river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_VOID],
                            &engine->backbuffer, RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
                            engine->planes[MAPEDIT_PLANE_VOID].width,
                            engine->planes[MAPEDIT_PLANE_VOID].height);
@@ -557,7 +557,7 @@ f_internal void drawEditor
                 if(editor->tiles[index].x != UINT16_MAX &&
                    editor->tiles[index].y != UINT16_MAX
                 ){
-                    engine->compositeImage(engine,
+                    river2D_compositeImage(engine,
                                            &engine->planes[MAPEDIT_PLANE_TILESHEET],
                                            &engine->backbuffer, RIVER2D_PICTOP_OVER,
                                            x * editor->tilesize,
@@ -575,10 +575,10 @@ f_internal void drawEditor
 
     StringView layer_sv = puddle_cstr_sv(layerStr);
 
-    engine->loadText(engine, &engine->planes[MAPEDIT_PLANE_CURRENTLAYER], &layer_sv,
+    river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_CURRENTLAYER], &layer_sv,
                      MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
 
-    engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTLAYER],
+    river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTLAYER],
                            &engine->backbuffer, RIVER2D_PICTOP_OVER,
                            (uint32_t)(0.95f * (float)engine->backbuffer.width),
                            (uint32_t)(0.025f * (float)engine->backbuffer.width),
@@ -591,7 +591,7 @@ f_internal void drawEditor
     float deltaMS = river2D_deltaTime_now_ms(&editor->lastSaveTime);
     if(deltaMS < 250)
     {
-        engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_ICON_SAVED],
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_ICON_SAVED],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER, 16, 16, 0, 0,
                                engine->planes[MAPEDIT_PLANE_ICON_SAVED].width,
                                engine->planes[MAPEDIT_PLANE_ICON_SAVED].height);
@@ -837,7 +837,7 @@ f_internal void checkEditorButtons
             editor->editorflags     &= ~MAPEDIT_FLAG_BIT_TILEPICKER;
             return;
         }
-        engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_BACKGROUND],
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_BACKGROUND],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
                                engine->backbuffer.width  / 10,
                                engine->backbuffer.height / 10,
@@ -845,7 +845,7 @@ f_internal void checkEditorButtons
                                (uint32_t)((float)engine->backbuffer.width  / 1.25f),
                                (uint32_t)((float)engine->backbuffer.height / 1.25f));
 
-        engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE],
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
                                engine->planes[MAPEDIT_PLANE_SELECTTILE].width,
                                engine->planes[MAPEDIT_PLANE_SELECTTILE].height);
@@ -856,7 +856,7 @@ f_internal void checkEditorButtons
         // HACK: just load the one file for now and use it here... lmfao
         uint32_t sheet_width  = engine->planes[MAPEDIT_PLANE_TILESHEET].width;
         uint32_t sheet_height = engine->planes[MAPEDIT_PLANE_TILESHEET].height;
-        engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET],
+        river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET],
                                &engine->backbuffer, RIVER2D_PICTOP_OVER,
                                engine->backbuffer.width  / 10 + editor->tilesize,
                                engine->backbuffer.height / 10 + editor->tilesize,
@@ -883,7 +883,7 @@ f_internal void checkEditorButtons
 
             float length = editor->close_b.area.lowRight.x -
                            editor->close_b.area.upLeft.x;
-            engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
+            river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                    &engine->backbuffer, RIVER2D_PICTOP_OVER,
                                    (uint32_t)(editor->close_b.area.upLeft.x * fX),
                                    (uint32_t)(editor->close_b.area.upLeft.y * fY + 20),
@@ -926,7 +926,7 @@ f_internal void checkEditorButtons
                 engine->controls.keymap &= ~MAPEDIT_BIT_EQUAL;
             }
 
-            engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
+            river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                                    &engine->backbuffer, RIVER2D_PICTOP_OVER,
                                    (uint32_t)(fX * (tiles.upLeft.x + 0.0055f) +
                                               tileX * editor->tilesize),
@@ -1007,7 +1007,7 @@ f_internal void checkEditorButtons
         }
     }
 
-    engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET],
+    river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET],
                            &engine->backbuffer, RIVER2D_PICTOP_OVER,
                            tileX * editor->tilesize,
                            tileY * editor->tilesize,
@@ -1035,12 +1035,12 @@ f_internal void drawFilePicker
 (
     EngineData *engine
 ){
-    engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_BACKGROUND],
+    river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_BACKGROUND],
                            &engine->backbuffer, RIVER2D_PICTOP_OVER, 0, 0, 0, 0,
                            engine->planes[MAPEDIT_PLANE_VOID].width,
                            engine->planes[MAPEDIT_PLANE_VOID].height);
 
-    engine->compositeImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE],
+    river2D_compositeImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE],
                            &engine->backbuffer, RIVER2D_PICTOP_OVER,
                            (uint32_t)(0.2f * (float)engine->backbuffer.width),
                            (uint32_t)(0.4f * (float)engine->backbuffer.height),
@@ -1195,7 +1195,7 @@ f_internal void checkFilePickerButtons
         return;
     }
 
-    engine->loadText(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE],
+    river2D_loadText(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE],
                      (StringView*)&editor->filename, MAPEDIT_PLANE_FONT16,
                      16, 1, 0, 0);
 }
