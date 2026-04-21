@@ -176,8 +176,9 @@ typedef struct EditorData
     Tile         *tiles;
     Action       *actions;
     uint32_t     currentAction;
-    StringView   projectName;
-    const char   *filename;
+    String       projectName;
+    String       filename;
+    uint8_t      cursor;
     bool         confirmed;
 }
 EditorData;

@@ -152,12 +152,12 @@ void mapedit_init
     engine->controls.keycodes[MAPEDIT_KEY_MINUS]      = '-';
     engine->controls.keycodes[MAPEDIT_KEY_EQUAL]      = '=';
 
-    StringView title_sv = cstr_sv("RIVER2D MAP EDITOR");
-    StringView new_sv   = cstr_sv("NEW PROJECT");
-    StringView load_sv  = cstr_sv("LOAD PROJECT");
-    StringView save_sv  = cstr_sv("SAVE PROJECT");
-    StringView quit_sv  = cstr_sv("QUIT");
-    StringView close    = cstr_sv("CLOSE");
+    StringView title_sv = puddle_cstr_sv("RIVER2D MAP EDITOR");
+    StringView new_sv   = puddle_cstr_sv("NEW PROJECT");
+    StringView load_sv  = puddle_cstr_sv("LOAD PROJECT");
+    StringView save_sv  = puddle_cstr_sv("SAVE PROJECT");
+    StringView quit_sv  = puddle_cstr_sv("QUIT");
+    StringView close    = puddle_cstr_sv("CLOSE");
 
     // JANKY: I'm loading text by creating a button, then overwriting it. pause/main
     Coordinates point = { .x = 0.5f, .y = 0.2f };
@@ -239,7 +239,7 @@ void mapedit_init
     // textbox and user keyboard input
     if(!editor->projectName.data)
     {
-        editor->projectName = cstr_sv("unnamed_project");
+        editor->projectName = puddle_cstr_s("unnamed_project");
     }
 
     River2D_Time now                = river2D_queryTime();
@@ -249,7 +249,9 @@ void mapedit_init
     engine->controls.lastScrollTime = now;
 
     editor->currentState = MAPEDIT_STATE_MENU;
-    editor->filename  = cstr_sv("HELLO, WORLD.");
+    char *buf = calloc(256, 1);
+    editor->filename.data = buf;
+    editor->filename.size = 256;
 }
 
 int32_t mapedit_shutdown
@@ -258,6 +260,7 @@ int32_t mapedit_shutdown
 ){
     free(editor->tiles);
     free(editor->actions);
+    free((void*)editor->filename.data);
     return 0;
 }
 
@@ -572,7 +575,7 @@ f_internal void drawEditor
     char layerStr[2];
     snprintf(layerStr, 2, "%hhu", editor->currentLayer);
 
-    StringView layer_sv = cstr_sv(layerStr);
+    StringView layer_sv = puddle_cstr_sv(layerStr);
 
     engine->loadText(engine, &engine->planes[MAPEDIT_PLANE_CURRENTLAYER], &layer_sv,
                      MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
@@ -1051,10 +1054,9 @@ f_internal void drawFilePicker
 f_internal void loadProject
 (
     EngineData *engine,
-    EditorData *editor,
-    StringView *filename
+    EditorData *editor
 ){
-    if(!filename)
+    if(!editor->filename.data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: failed to find .rte file to load!"
                 "\033[0m\n");
@@ -1066,11 +1068,11 @@ f_internal void loadProject
     fprintf(stderr, "\nloading file: "PRI_SV"\n", ARG_SV(*filename));
 #endif
 
-    FILE *file = fopen(filename->data, "rb");
+    FILE *file = fopen(editor->filename.data, "rb");
     if(!file)
     {
         fprintf(stderr, "\033[31;1;7mERROR: could not open file "
-                "named \"%s\".\033[0m\n", filename->data);
+                "named \"%s\".\033[0m\n", editor->filename.data);
         changeState(editor, MAPEDIT_STATE_MENU);
         return;
     }
@@ -1083,7 +1085,7 @@ f_internal void loadProject
         if(byte != header[i])
         {
             fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
-                    "\033[0m\n", filename->data);
+                    "\033[0m\n", editor->filename.data);
             return;
         }
     }
@@ -1093,25 +1095,25 @@ f_internal void loadProject
     if((elements = fread(&editor->tilesize, 2, 1, file)) != 1)
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
-                "\033[0m\n", filename->data);
+                "\033[0m\n", editor->filename.data);
         return;
     }
     if((elements = fread(&editor->mapWidth, 2, 1, file)) != 1)
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
-                "\033[0m\n", filename->data);
+                "\033[0m\n", editor->filename.data);
         return;
     }
     if((elements = fread(&editor->mapHeight, 2, 1, file)) != 1)
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
-                "\033[0m\n", filename->data);
+                "\033[0m\n", editor->filename.data);
         return;
     }
     if((elements = fread(&editor->layers, 1, 1, file)) != 1)
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
-                "\033[0m\n", filename->data);
+                "\033[0m\n", editor->filename.data);
         return;
     }
 
@@ -1148,13 +1150,18 @@ f_internal void checkFilePickerButtons
         return;
     }
 
-    // TESTING: do it this way? and release back to const char *
-    // when I'm done...
-    StringView currentFile = cstr_sv(editor->filename);
+    // TODO: allow ctrl+backspace to clear the whole thing
+
+    // TODO: text scaling? wrapping? any thing of this sort?
+
+    // TODO: display an indicator, so as to signify that you're in a file opener
+    // dialog...
+
+    // TODO: use editor->cursor
 
     if(engine->controls.keymap & MAPEDIT_BIT_BACKSPACE)
     {
-        sv_trim(&editor->filename, 1, SV_RIGHT);
+        puddle_sv_trim((StringView*)&editor->filename, 1, SV_RIGHT);
         engine->controls.keymap &= ~MAPEDIT_BIT_BACKSPACE;
     }
 
@@ -1168,14 +1175,12 @@ f_internal void checkFilePickerButtons
             engine->controls.keymap &= ~(MAPEDIT_BIT_A << i);
             if(shift)
             {
-                const char *text = sv_add_char(&editor->filename,
-                                               0x40 + i, SV_RIGHT);
-                editor->filename = text;
+                // sv_add_char(&editor->filename, 0x40 + i, SV_RIGHT);
+                editor->filename.data[editor->cursor] = 0x40 + i;
                 continue;
             }
 
-            const char *text = sv_add_char(&editor->filename, 0x61 + i, SV_RIGHT);
-            editor->filename = cstr_sv(text);
+            // const char *text = sv_add_char(&editor->filename, 0x61 + i, SV_RIGHT);
         }
     }
 
@@ -1187,13 +1192,14 @@ f_internal void checkFilePickerButtons
 
     if(editor->confirmed)
     {
-        loadProject(engine, editor, &editor->filename);
+        loadProject(engine, editor);
         changeState(editor, MAPEDIT_STATE_EDIT);
         return;
     }
 
     engine->loadText(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE],
-                     &editor->filename, MAPEDIT_PLANE_FONT16, 16, 1, 0, 0);
+                     (StringView*)&editor->filename, MAPEDIT_PLANE_FONT16,
+                     16, 1, 0, 0);
 }
 
 void mapedit_update
