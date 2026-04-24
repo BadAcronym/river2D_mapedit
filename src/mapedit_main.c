@@ -237,7 +237,7 @@ void mapedit_init
 
     if(!editor->projectName.data)
     {
-        editor->projectName = puddle_cstr_s("unnamed_project");
+        editor->projectName = puddle_cstr_str("unnamed_project");
     }
 
     River2D_Time now                = river2D_queryTime();
@@ -1054,7 +1054,8 @@ f_internal void loadProject
     EngineData *engine,
     EditorData *editor
 ){
-    const char *filename = puddle_sv_cstr((StringView*)&editor->filename);
+    StringView *name = (StringView*)&editor->filename;
+    const char *filename = puddle_sv_cstr(*name);
 
     if(!editor->filename.data)
     {
