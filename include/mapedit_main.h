@@ -135,10 +135,19 @@
 
 #define MAPEDIT_FLAG_BIT_TILEPICKER   0x01UL
 
+#define MAPEDIT_BIT_ANIMATION  0x01LLU
+#define MAPEDIT_BIT_COLLISION  0x02LLU
+#define MAPEDIT_BIT_ROTATE_90  0x04LLU
+#define MAPEDIT_BIT_ROTATE_180 0x08LLU
+#define MAPEDIT_BIT_ROTATE_270 0x10LLU
+
 typedef struct Tile
 {
     uint16_t x;
     uint16_t y;
+    uint16_t frames;
+    uint16_t currentFrame;
+    uint8_t  flags;
 }
 Tile;
 
