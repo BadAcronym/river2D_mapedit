@@ -841,7 +841,9 @@ f_internal void placeSelectedTiles
                 continue;
             }
 
-            Tile new_tile = {editor->selectedX + x, editor->selectedY + y};
+            Tile new_tile = {0};
+            new_tile.x = editor->selectedX + x;
+            new_tile.y = editor->selectedY + y;
 
             writeAction(editor, index, new_tile);
             incrementAction(editor);
@@ -1178,10 +1180,12 @@ f_internal void loadProject
         return;
     }
 
-    uint64_t tilecount = editor->layers * editor->mapWidth * editor->mapHeight;
+    uint64_t maxtile = editor->layers * editor->mapWidth * editor->mapHeight *
+                       sizeof(Tile);
 
-    for(uint32_t i = 0; i < tilecount * 4 && ((byte = fgetc(file)) != EOF); ++i)
+    for(uint64_t i = 0; i < maxtile && ((byte = fgetc(file)) != EOF); ++i)
     {
+        // TESTING: should still be fine to read back a map, we'll see
         ((uint8_t*)editor->tiles)[i] = (uint8_t)byte;
     }
 
