@@ -1185,7 +1185,6 @@ f_internal void loadProject
 
     for(uint64_t i = 0; i < maxtile && ((byte = fgetc(file)) != EOF); ++i)
     {
-        // TESTING: should still be fine to read back a map, we'll see
         ((uint8_t*)editor->tiles)[i] = (uint8_t)byte;
     }
 
