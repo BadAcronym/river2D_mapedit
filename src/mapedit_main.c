@@ -513,9 +513,11 @@ f_internal void checkMainMenuButtons
         float fX     = (float)(engine->backbuffer.width);
         float fY     = (float)(engine->backbuffer.height);
 
+        comp.src        = &engine->planes[MAPEDIT_PLANE_HIGHLIGHT];
         comp.offsetDstX = (uint32_t)(editor->save_b.area.upLeft.x * fX);
         comp.offsetDstY = (uint32_t)(editor->save_b.area.upLeft.y * fY + 20);
         comp.cropWidth  = (uint32_t)(length * fX);
+        comp.cropHeight = 5;
 
         river2D_compositeImage(engine, &comp);
 
