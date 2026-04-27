@@ -5,6 +5,8 @@ build/
 bin/
 obj/
 
+assets/custom/
+
 compile_commands*
 compile_flags*
 *.raddbg
