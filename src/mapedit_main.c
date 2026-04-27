@@ -195,23 +195,24 @@ void mapedit_init
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE], &close,
                          MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->close_b);
 
-    // URGENT: refactor, load from project settings?
-    // probably only on startup, save finalized tilesheet in project and read it back...
-    // I don't want to have to remember weird tile paths that were segregated, but
-    // rather just one big project file
-    river2D_loadImage_file(engine, puddle_cstr_sv("assets/tiles/tilesheet.qoi"),
-                           &engine->planes[MAPEDIT_PLANE_TILESHEET],
-                           RIVER2D_CHANNELS_BGRA, 8);
+    // URGENT: refactor, load from project settings.
+    StringView dir = puddle_cstr_sv("assets/custom/");
+    StringView ls  = river2D_listFiles(dir);
+
+    // TESTING: DEBUG
+    fprintf(stderr, "the path string is: "PRI_SV"\n", ARG_SV(ls));
+
+    for(uint16_t i = 0; i < dir.size; ++i)
+    {
+        // river2D_loadImage_file(engine, tmp, &engine->planes[MAPEDIT_PLANE_TILESHEET],
+        //                        RIVER2D_CHANNELS_BGRA, 8);
+    }
 
     // BACKLOG: allow decreasing/increasing this minimum tilesize, as well as limiting
     // selectmult?
     editor->tilesize   = 8;
     editor->selectMult = 1;
 
-    // allow 10 layers by default, any other layer you'd have to add to the UI selector
-    // PERF: start with 1 layer, only poll and draw that layer, until
-    // there's any data written to the other layers 🤔 means to keep track of
-    // what layer has had data written to it, and only go through those??
     editor->layers       = 10;
     editor->currentLayer = 1;
 
@@ -223,8 +224,7 @@ void mapedit_init
     editor->tiles = malloc(tilecount * sizeof(Tile));
     for(uint32_t i = 0; i < tilecount; ++i)
     {
-        editor->tiles[i].x = UINT16_MAX;
-        editor->tiles[i].y = UINT16_MAX;
+        editor->tiles[i].flags |= MAPEDIT_BIT_INVALID;
     }
 
     editor->actions = malloc(MAPEDIT_MAX_ACTIONS * sizeof(Action));
@@ -301,13 +301,13 @@ f_internal void saveCurrentProject
     engine->bltBuffer(engine);
 
     char *filename_cstr = malloc(256);
-    sprintf(filename_cstr, "%s.rte", editor->projectName.data);
+    sprintf(filename_cstr, PRI_SV".rte", ARG_SV(editor->projectName));
 
     FILE *file = fopen(filename_cstr, "wb");
     if(!file)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: could not open file for saving: "
-                "%s.\033[0m\n", editor->projectName.data);
+                PRI_SV".\033[0m\n", ARG_SV(editor->projectName));
         free(filename_cstr);
         return;
     }
@@ -451,8 +451,7 @@ f_internal void checkMainMenuButtons
                                      editor->mapHeight * editor->mapWidth;
                 for(uint32_t i = 0; i < tilecount; ++i)
                 {
-                    editor->tiles[i].x = UINT16_MAX;
-                    editor->tiles[i].y = UINT16_MAX;
+                    editor->tiles[i].flags |= MAPEDIT_BIT_INVALID;
                 }
             }
 
@@ -583,9 +582,8 @@ f_internal void drawEditor
             {
                 uint64_t index = z * editor->mapWidth * editor->mapHeight +
                                  y * editor->mapWidth + x;
-                if(editor->tiles[index].x != UINT16_MAX &&
-                   editor->tiles[index].y != UINT16_MAX
-                ){
+                if(!(editor->tiles[index].flags & MAPEDIT_BIT_INVALID))
+                {
                     comp.src        = &engine->planes[MAPEDIT_PLANE_TILESHEET];
                     comp.offsetSrcX = editor->tiles[index].x * editor->tilesize;
                     comp.offsetSrcY = editor->tiles[index].y * editor->tilesize;
