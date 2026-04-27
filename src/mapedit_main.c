@@ -196,6 +196,9 @@ void mapedit_init
                          MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->close_b);
 
     // URGENT: refactor, load from project settings?
+    // probably only on startup, save finalized tilesheet in project and read it back...
+    // I don't want to have to remember weird tile paths that were segregated, but
+    // rather just one big project file
     river2D_loadImage_file(engine, puddle_cstr_sv("assets/tiles/tilesheet.qoi"),
                            &engine->planes[MAPEDIT_PLANE_TILESHEET],
                            RIVER2D_CHANNELS_BGRA, 8);
