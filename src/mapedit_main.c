@@ -201,12 +201,22 @@ void mapedit_init
 
     // TESTING: DEBUG
     fprintf(stderr, "the path string is: "PRI_SV"\n", ARG_SV(ls));
+    fprintf(stderr, "length: %zu\n", ls.size);
 
+    StringView file = {0};
+
+    // PERF: stop trying to find unfindable indices, I need some type of early return,
+    // knowing when exactly none of these calls is gonna return anything anymore.
+    // maybe return exactly sv when the index surpasses the amount of ';'s present, or
+    // better yet, when the index would surpass the amount of non-null items present
     for(uint16_t i = 0; i < dir.size; ++i)
     {
+        StringView file = sv_find_by_delim(ls, ';', i);
         // river2D_loadImage_file(engine, tmp, &engine->planes[MAPEDIT_PLANE_TILESHEET],
         //                        RIVER2D_CHANNELS_BGRA, 8);
     }
+
+    free((void*)ls.data);
 
     // BACKLOG: allow decreasing/increasing this minimum tilesize, as well as limiting
     // selectmult?
