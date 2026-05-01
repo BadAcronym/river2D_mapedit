@@ -203,17 +203,36 @@ void mapedit_init
     fprintf(stderr, "the path string is: "PRI_SV"\n", ARG_SV(ls));
     fprintf(stderr, "length: %zu\n", ls.size);
 
-    StringView file = {0};
-
     // PERF: stop trying to find unfindable indices, I need some type of early return,
     // knowing when exactly none of these calls is gonna return anything anymore.
     // maybe return exactly sv when the index surpasses the amount of ';'s present, or
     // better yet, when the index would surpass the amount of non-null items present
     for(uint16_t i = 0; i < dir.size; ++i)
     {
-        StringView file = sv_find_by_delim(ls, ';', i);
-        // river2D_loadImage_file(engine, tmp, &engine->planes[MAPEDIT_PLANE_TILESHEET],
-        //                        RIVER2D_CHANNELS_BGRA, 8);
+        StringView folder = cstr_sv("assets/custom/");
+        StringView file   = sv_find_by_delim(ls, ';', i);
+
+        if(!file.data)
+        {
+            break;
+        }
+
+        StringView expanded = cstr_sv(sv_concat(folder, file));
+
+        if(!sv_find(cstr_sv(".qoi"), expanded))
+        {
+            continue;
+        }
+
+        fprintf(stderr, "concatenating '"PRI_SV"' to tilesheet image.\n",
+                ARG_SV(expanded));
+
+        // CURRENT: store in tmp image, then append image
+        river2D_loadImage_file(engine, expanded,
+                               &engine->planes[MAPEDIT_PLANE_TILESHEET],
+                               RIVER2D_CHANNELS_BGRA, 8);
+
+        free((void*)expanded.data);
     }
 
     free((void*)ls.data);
