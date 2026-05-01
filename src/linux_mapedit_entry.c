@@ -18,7 +18,7 @@ int main
     EngineData    engine = {0};
     River2D_Image planes[RIVER2D_MAX_PLANES] = {0};
 
-    StringView libpath = puddle_cstr_sv(LIBPATH);
+    StringView libpath = cstr_sv(LIBPATH);
     river2D_resolveRenderer(&engine, libpath, RIVER2D_RENDERER_SOFTWARE);
 
     river2D_loadConfig(&engine.config);

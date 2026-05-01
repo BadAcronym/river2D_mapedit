@@ -17,7 +17,7 @@ void mapedit_init
     EngineData *engine,
     EditorData *editor
 ){
-    river2D_loadImage_file(engine, puddle_cstr_sv("assets/background.qoi"),
+    river2D_loadImage_file(engine, cstr_sv("assets/background.qoi"),
                            &engine->planes[MAPEDIT_PLANE_BACKGROUND],
                            RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_BACKGROUND].data)
@@ -26,7 +26,7 @@ void mapedit_init
                 "\n\033[31;1;7mERROR: Unable to load background image!\033[0m\n");
     }
 
-    river2D_loadImage_file(engine, puddle_cstr_sv("assets/black.qoi"),
+    river2D_loadImage_file(engine, cstr_sv("assets/black.qoi"),
                            &engine->planes[MAPEDIT_PLANE_VOID],
                            RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_VOID].data)
@@ -34,7 +34,7 @@ void mapedit_init
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load black image!\033[0m\n");
     }
 
-    river2D_loadImage_file(engine, puddle_cstr_sv("assets/highlight.qoi"),
+    river2D_loadImage_file(engine, cstr_sv("assets/highlight.qoi"),
                            &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                            RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_HIGHLIGHT].data)
@@ -43,14 +43,14 @@ void mapedit_init
                 "\n\033[31;1;7mERROR: Unable to load highlight image!\033[0m\n");
     }
 
-    river2D_loadImage_file(engine, puddle_cstr_sv("assets/saving.qoi"),
+    river2D_loadImage_file(engine, cstr_sv("assets/saving.qoi"),
                            &engine->planes[MAPEDIT_PLANE_ICON_SAVING],
                            RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_ICON_SAVING].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load saving icon!\033[0m\n");
     }
-    river2D_loadImage_file(engine, puddle_cstr_sv("assets/saved.qoi"),
+    river2D_loadImage_file(engine, cstr_sv("assets/saved.qoi"),
                            &engine->planes[MAPEDIT_PLANE_ICON_SAVED],
                            RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_ICON_SAVED].data)
@@ -58,21 +58,21 @@ void mapedit_init
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load saved icon!\033[0m\n");
     }
 
-    river2D_loadImage_file(engine, puddle_cstr_sv("assets/cursor_default.qoi"),
+    river2D_loadImage_file(engine, cstr_sv("assets/cursor_default.qoi"),
                            &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT],
                            RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load default cursor!\033[0m\n");
     }
-    river2D_loadImage_file(engine, puddle_cstr_sv("assets/cursor_hover.qoi"),
+    river2D_loadImage_file(engine, cstr_sv("assets/cursor_hover.qoi"),
                            &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER],
                            RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_CURSOR_HOVER].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load hover cursor!\033[0m\n");
     }
-    river2D_loadImage_file(engine, puddle_cstr_sv("assets/cursor_place.qoi"),
+    river2D_loadImage_file(engine, cstr_sv("assets/cursor_place.qoi"),
                            &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE],
                            RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_CURSOR_PLACE].data)
@@ -80,7 +80,7 @@ void mapedit_init
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load place cursor!\033[0m\n");
     }
 
-    river2D_loadImage_file(engine, puddle_cstr_sv("assets/font_default_16.qoi"),
+    river2D_loadImage_file(engine, cstr_sv("assets/font_default_16.qoi"),
                            &engine->planes[MAPEDIT_PLANE_FONT16],
                            RIVER2D_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_FONT16].data)
@@ -152,12 +152,12 @@ void mapedit_init
     engine->controls.keycodes[MAPEDIT_KEY_MINUS]      = '-';
     engine->controls.keycodes[MAPEDIT_KEY_EQUAL]      = '=';
 
-    StringView title_sv = puddle_cstr_sv("RIVER2D MAP EDITOR");
-    StringView new_sv   = puddle_cstr_sv("NEW PROJECT");
-    StringView load_sv  = puddle_cstr_sv("LOAD PROJECT");
-    StringView save_sv  = puddle_cstr_sv("SAVE PROJECT");
-    StringView quit_sv  = puddle_cstr_sv("QUIT");
-    StringView close    = puddle_cstr_sv("CLOSE");
+    StringView title_sv = cstr_sv("RIVER2D MAP EDITOR");
+    StringView new_sv   = cstr_sv("NEW PROJECT");
+    StringView load_sv  = cstr_sv("LOAD PROJECT");
+    StringView save_sv  = cstr_sv("SAVE PROJECT");
+    StringView quit_sv  = cstr_sv("QUIT");
+    StringView close    = cstr_sv("CLOSE");
 
     // JANKY: I'm loading text by creating a button, then overwriting it. pause/main
     Coordinates point = { .x = 0.5f, .y = 0.2f };
@@ -196,7 +196,7 @@ void mapedit_init
                          MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->close_b);
 
     // URGENT: refactor, load from project settings.
-    StringView dir = puddle_cstr_sv("assets/custom/");
+    StringView dir = cstr_sv("assets/custom/");
     StringView ls  = river2D_listFiles(dir);
 
     // TESTING: DEBUG
@@ -246,7 +246,7 @@ void mapedit_init
 
     if(!editor->projectName.data)
     {
-        editor->projectName = puddle_cstr_str("unnamed_project");
+        editor->projectName = cstr_str("unnamed_project");
     }
 
     River2D_Time now                = river2D_queryTime();
@@ -611,7 +611,7 @@ f_internal void drawEditor
     char layerStr[2];
     snprintf(layerStr, 2, "%hhu", editor->currentLayer);
 
-    StringView layer_sv = puddle_cstr_sv(layerStr);
+    StringView layer_sv = cstr_sv(layerStr);
 
     rvLoadTextSettings set = {0};
     set.sv       = &layer_sv;
@@ -1124,7 +1124,7 @@ f_internal void loadProject
     EditorData *editor
 ){
     StringView *name = (StringView*)&editor->filename;
-    const char *filename = puddle_sv_cstr(*name);
+    const char *filename = sv_cstr(*name);
 
     if(!editor->filename.data)
     {
@@ -1205,7 +1205,7 @@ f_internal void loadProject
             IMGSURF_FILE_QOI, &engine->planes[MAPEDIT_PLANE_TILESHEET].width,
             &engine->planes[MAPEDIT_PLANE_TILESHEET].height, IMGSURF_CHANNELS_BGRA, 8);
 
-    engine->planes[MAPEDIT_PLANE_TILESHEET].path = puddle_cstr_sv("loadProject");
+    engine->planes[MAPEDIT_PLANE_TILESHEET].path = cstr_sv("loadProject");
 
     fclose(file);
 }
@@ -1233,7 +1233,7 @@ f_internal void checkFilePickerButtons
 
     if(engine->controls.keymap & MAPEDIT_BIT_BACKSPACE)
     {
-        puddle_sv_trim((StringView*)&editor->filename, 1, SV_RIGHT);
+        sv_trim((StringView*)&editor->filename, 1, SV_RIGHT);
         engine->controls.keymap &= ~MAPEDIT_BIT_BACKSPACE;
     }
 
