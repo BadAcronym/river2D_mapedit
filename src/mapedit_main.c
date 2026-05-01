@@ -227,10 +227,13 @@ void mapedit_init
         fprintf(stderr, "concatenating '"PRI_SV"' to tilesheet image.\n",
                 ARG_SV(expanded));
 
+        River2D_Image tmp;
+
         // CURRENT: store in tmp image, then append image
-        river2D_loadImage_file(engine, expanded,
-                               &engine->planes[MAPEDIT_PLANE_TILESHEET],
-                               RIVER2D_CHANNELS_BGRA, 8);
+        river2D_loadImage_file(engine, expanded, &tmp, RIVER2D_CHANNELS_BGRA, 8);
+
+        river2D_appendImage(engine, &tmp, &engine->planes[MAPEDIT_PLANE_TILESHEET],
+                            RIVER2D_VERTICAL);
 
         free((void*)expanded.data);
     }
