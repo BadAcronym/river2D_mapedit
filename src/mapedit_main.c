@@ -1,4 +1,5 @@
 #include "mapedit_main.h"
+
 #include "imgsurf_main.h"
 
 #include "string_view.h"
@@ -190,6 +191,9 @@ void mapedit_init
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], &quit_sv,
                          MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->quit_b);
 
+    // TODO: allow choosing if text is centered, or aligned to the left. this button is
+    // off because of how different the size scaling is between 640x360 and 1280x720.
+    // we do actually want left and right-aligned text as a possibility.
     point.x = 0.175f;
     point.y = 0.86f;
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE], &close,
@@ -199,20 +203,18 @@ void mapedit_init
     StringView dir = cstr_sv("assets/custom/");
     StringView ls  = river2D_listFiles(dir);
 
-    // TESTING: DEBUG
-    fprintf(stderr, "the path string is: "PRI_SV"\n", ARG_SV(ls));
-    fprintf(stderr, "length: %zu\n", ls.size);
+    fprintf(stderr, "the path string is: \n"PRI_SV, ARG_SV(ls));
 
     // PERF: stop trying to find unfindable indices, I need some type of early return,
     // knowing when exactly none of these calls is gonna return anything anymore.
     // maybe return exactly sv when the index surpasses the amount of ';'s present, or
     // better yet, when the index would surpass the amount of non-null items present
+    StringView folder = cstr_sv("assets/custom/");
+
     for(uint16_t i = 0; i < dir.size; ++i)
     {
-        StringView folder = cstr_sv("assets/custom/");
-        StringView file   = sv_find_by_delim(ls, ';', i);
-
-        if(!file.data)
+        StringView file = sv_find_by_delim(ls, ';', i);
+        if(!file.data || !file.size)
         {
             break;
         }
@@ -221,6 +223,7 @@ void mapedit_init
 
         if(!sv_find(cstr_sv(".qoi"), expanded))
         {
+            free((void*)expanded.data);
             continue;
         }
 
@@ -229,20 +232,20 @@ void mapedit_init
 
         River2D_Image tmp;
 
-        // CURRENT: store in tmp image, then append image
         river2D_loadImage_file(engine, expanded, &tmp, RIVER2D_CHANNELS_BGRA, 8);
 
         river2D_appendImage(engine, &tmp, &engine->planes[MAPEDIT_PLANE_TILESHEET],
                             RIVER2D_VERTICAL);
+
+        river2D_destroyImage(&tmp);
 
         free((void*)expanded.data);
     }
 
     free((void*)ls.data);
 
-    // BACKLOG: allow decreasing/increasing this minimum tilesize, as well as limiting
-    // selectmult?
-    editor->tilesize   = 8;
+    // TODO: allow decreasing/increasing this minimum tilesize
+    editor->tilesize   = 32;
     editor->selectMult = 1;
 
     editor->layers       = 10;
