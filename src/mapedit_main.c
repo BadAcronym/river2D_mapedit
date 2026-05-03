@@ -896,6 +896,18 @@ f_internal void checkEditorButtons
         uint32_t sheet_width  = engine->planes[MAPEDIT_PLANE_TILESHEET].width;
         uint32_t sheet_height = engine->planes[MAPEDIT_PLANE_TILESHEET].height;
 
+        float max_w = (float)engine->backbuffer.width  * 0.8f - 2 * editor->tilesize;
+        float max_h = (float)engine->backbuffer.height * 0.8f - 2 * editor->tilesize;
+
+        if((float)sheet_width > max_w)
+        {
+            sheet_width = (uint32_t)max_w;
+        }
+        if((float)sheet_height > max_h)
+        {
+            sheet_height = (uint32_t)max_h;
+        }
+
         comp.src        = &engine->planes[MAPEDIT_PLANE_TILESHEET];
         comp.offsetDstX = engine->backbuffer.width  / 10 + editor->tilesize;
         comp.offsetDstY = engine->backbuffer.height / 10 + editor->tilesize;
