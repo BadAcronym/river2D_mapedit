@@ -1,0 +1,6 @@
+#!/bin/bash
+
+./clean
+./run debug --compile-only
+
+gf2 ./bin/debug/mapedit
