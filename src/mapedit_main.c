@@ -569,15 +569,7 @@ f_internal void drawEditor
         if(engine->controls.keymap & (MAPEDIT_BIT_0 << i))
         {
             editor->currentLayer = i;
-
-            if(engine->controls.keymap & MAPEDIT_BIT_LSHIFT)
-            {
-                editor->isolate = true;
-            }
-            else
-            {
-                editor->isolate = false;
-            }
+            editor->isolate      = engine->controls.keymap & MAPEDIT_BIT_LSHIFT;
         }
     }
 
