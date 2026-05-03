@@ -221,9 +221,6 @@ void mapedit_init
             continue;
         }
 
-        fprintf(stderr, "concatenating '"PRI_SV"' to tilesheet image.\n",
-                ARG_SV(expanded));
-
         River2D_Image tmp;
 
         river2D_loadImage_file(engine, expanded, &tmp, RIVER2D_CHANNELS_BGRA, 8);
