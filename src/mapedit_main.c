@@ -203,12 +203,6 @@ void mapedit_init
     StringView dir = cstr_sv("assets/custom/");
     StringView ls  = river2D_listFiles(dir);
 
-    fprintf(stderr, "the path string is: "PRI_SV"\n", ARG_SV(ls));
-
-    // PERF: stop trying to find unfindable indices, I need some type of early return,
-    // knowing when exactly none of these calls is gonna return anything anymore.
-    // maybe return exactly sv when the index surpasses the amount of ';'s present, or
-    // better yet, when the index would surpass the amount of non-null items present
     StringView folder = cstr_sv("assets/custom/");
 
     for(uint16_t i = 0; i < dir.size; ++i)
@@ -952,12 +946,6 @@ f_internal void checkEditorButtons
         tiles.upLeft.y   = 0.095f + (float)((float)editor->tilesize / fY);
         tiles.lowRight.x = tiles.upLeft.x + (float)sheet_width / fX;
         tiles.lowRight.y = tiles.upLeft.y + (float)sheet_height / fY;
-
-        // TODO: load all files inside the specified folder, separate the
-        // spreadsheets visually but have them be one image
-
-        // TODO: river2D_appendImage (either by x or y) would be super handy to
-        // have in general
 
         // TODO: scrollwheel changes size, 2x2 smallest, 96x96 biggest? only
         // limitation is the highlighting, lol
