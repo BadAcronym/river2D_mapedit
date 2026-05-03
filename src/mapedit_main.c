@@ -10,9 +10,6 @@
 #include <stdlib.h>
 #include <memory.h>
 
-// BACKLOG: write logging function (or library, lmfao) that writes to file, as
-// well as stderr copy some river3D code for that?
-
 void mapedit_init
 (
     EngineData *engine,
@@ -98,9 +95,6 @@ void mapedit_init
     river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE],
                         engine->backbuffer.width, engine->backbuffer.height);
 
-    // BACKLOG: transfer to mapedit_loadConfig at some point, when keybinds
-    // should be remappable?
-
     engine->controls.buttoncodes[MAPEDIT_BUTTON_LEFTM]   = RIVER2D_MOUSE1;
     engine->controls.buttoncodes[MAPEDIT_BUTTON_MIDDLEM] = RIVER2D_MOUSE2;
     engine->controls.buttoncodes[MAPEDIT_BUTTON_RIGHTM]  = RIVER2D_MOUSE3;
@@ -160,7 +154,8 @@ void mapedit_init
     StringView quit_sv  = cstr_sv("QUIT");
     StringView close    = cstr_sv("CLOSE");
 
-    // JANKY: I'm loading text by creating a button, then overwriting it. pause/main
+    // I'm loading text by creating a button, then overwriting it. pause/main
+    // janky, but I don't mind it.
     Coordinates point = { .x = 0.5f, .y = 0.2f };
 
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU], &title_sv,
@@ -191,15 +186,11 @@ void mapedit_init
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], &quit_sv,
                          MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->quit_b);
 
-    // TODO: allow choosing if text is centered, or aligned to the left. this button is
-    // off because of how different the size scaling is between 640x360 and 1280x720.
-    // we do actually want left and right-aligned text as a possibility.
     point.x = 0.175f;
     point.y = 0.86f;
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE], &close,
                          MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->close_b);
 
-    // URGENT: refactor, load from project settings.
     StringView dir = cstr_sv("assets/custom/");
     StringView ls  = river2D_listFiles(dir);
 
@@ -235,7 +226,6 @@ void mapedit_init
 
     free((void*)ls.data);
 
-    // TODO: allow decreasing/increasing this minimum tilesize
     editor->tilesize   = 32;
     editor->selectMult = 1;
 
@@ -246,7 +236,6 @@ void mapedit_init
     editor->mapHeight = engine->config.canvas_height / editor->tilesize;
 
     uint64_t tilecount = editor->layers * editor->mapWidth * editor->mapHeight;
-    // TODO: resize this when user decides to expand canvas, set map_width & _height
     editor->tiles = malloc(tilecount * sizeof(Tile));
     for(uint32_t i = 0; i < tilecount; ++i)
     {
@@ -303,24 +292,19 @@ f_internal void changeState
     editor->currentState  = nextState;
 }
 
-// TODO: add RLE? lose 1 bit of the 32 for every tile, just to make some
-// uint32_t's a repeat of the last placed tile see if this is even worth it,
-// it'd only be in exact runs find another way to do RLE maybe, one that scales
-// well with lots of pairs of 2, 4, short runs that is
-
 f_internal void saveCurrentProject
 (
     EngineData *engine,
     EditorData *editor
 ){
     rvCompositeSettings comp = {0};
-    comp.src        = &engine->planes[MAPEDIT_PLANE_ICON_SAVING];
-    comp.dst        = &engine->backbuffer;
-    comp.pictop     = RIVER2D_PICTOP_OVER;
-    comp.cropWidth  = engine->planes[MAPEDIT_PLANE_ICON_SAVING].width;
-    comp.cropHeight = engine->planes[MAPEDIT_PLANE_ICON_SAVING].height;
-    comp.offsetDstX = 16;
-    comp.offsetDstY = 16;
+    comp.src                 = &engine->planes[MAPEDIT_PLANE_ICON_SAVING];
+    comp.dst                 = &engine->backbuffer;
+    comp.pictop              = RIVER2D_PICTOP_OVER;
+    comp.cropWidth           = engine->planes[MAPEDIT_PLANE_ICON_SAVING].width;
+    comp.cropHeight          = engine->planes[MAPEDIT_PLANE_ICON_SAVING].height;
+    comp.offsetDstX          = 16;
+    comp.offsetDstY          = 16;
 
     river2D_compositeImage(engine, &comp);
 
@@ -879,12 +863,6 @@ f_internal void checkEditorButtons
     EngineData *engine,
     EditorData *editor
 ){
-    // TODO: (mapedit #6): make backbuffer moveable,
-    // move grid along with it (so it might be offset)
-
-    // TODO: (mapedit #2): add some descriptions or UI elements to delimit what
-    // mode one is in
-
     rvCompositeSettings comp = {0};
     comp.dst    = &engine->backbuffer;
     comp.pictop = RIVER2D_PICTOP_OVER;
@@ -923,10 +901,6 @@ f_internal void checkEditorButtons
 
         river2D_compositeImage(engine, &comp);
 
-        // TODO: load each and every file that is in assets/tiles, then display
-        // their thumbnails 🤔
-
-        // HACK: just load the one file for now and use it here... lmfao
         uint32_t sheet_width  = engine->planes[MAPEDIT_PLANE_TILESHEET].width;
         uint32_t sheet_height = engine->planes[MAPEDIT_PLANE_TILESHEET].height;
 
@@ -943,9 +917,6 @@ f_internal void checkEditorButtons
         tiles.upLeft.y   = 0.095f + (float)((float)editor->tilesize / fY);
         tiles.lowRight.x = tiles.upLeft.x + (float)sheet_width / fX;
         tiles.lowRight.y = tiles.upLeft.y + (float)sheet_height / fY;
-
-        // TODO: scrollwheel changes size, 2x2 smallest, 96x96 biggest? only
-        // limitation is the highlighting, lol
 
         if(river2D_insideRect(&engine->controls.pointer, &editor->close_b.area))
         {
@@ -1051,16 +1022,6 @@ f_internal void checkEditorButtons
         engine->controls.keymap &= ~MAPEDIT_BIT_S;
         return;
     }
-
-    // TODO: allow resizing the view to zoom in or out freely into the backbuffer.
-    // TODO: allow scrolling and panning the view, as well as expanding the tilemap
-
-    // BACKLOG: allow resizing the backbuffer itself to be smaller or bigger.
-    // always keep a copy of the largest backbuffer in memory, so data is not lost when
-    // sizing down, then back up?
-
-    // TODO: wheel or menu of recently used tiles and a hotbar with specific
-    // ones, somewhere.
 
     uint16_t tileX = (uint16_t)(engine->controls.pointer.x * fX  / editor->tilesize);
     uint16_t tileY = (uint16_t)(engine->controls.pointer.y * fY / editor->tilesize);
@@ -1210,7 +1171,6 @@ f_internal void loadProject
         river2D_destroyImage(&engine->planes[MAPEDIT_PLANE_TILESHEET]);
     }
 
-    // NOTE: might not be BGRA
     engine->planes[MAPEDIT_PLANE_TILESHEET].data = imgsurf_load_ptr(file,
             IMGSURF_FILE_QOI, &engine->planes[MAPEDIT_PLANE_TILESHEET].width,
             &engine->planes[MAPEDIT_PLANE_TILESHEET].height, IMGSURF_CHANNELS_BGRA, 8);
@@ -1231,15 +1191,6 @@ f_internal void checkFilePickerButtons
         engine->controls.keymap &= ~MAPEDIT_BIT_ESCAPE;
         return;
     }
-
-    // TODO: allow ctrl+backspace to clear the whole thing
-
-    // TODO: text scaling? wrapping? any thing of this sort?
-
-    // TODO: display an indicator, so as to signify that you're in a file opener
-    // dialog...
-
-    // TODO: use editor->cursor
 
     if(engine->controls.keymap & MAPEDIT_BIT_BACKSPACE)
     {

@@ -9,8 +9,6 @@ a preview (outdated for this release, this was 0.0.1):
 since I am currently working on a fairly small game (16x16 tiles on a 360p base canvas),
 the abilities of the editor reflect that right now. but, you can:
 
-<!-- TODO: obv refactor this whole thing w/ new capabilities and new preview -->
-
 - open the editor and start placing tiles!
 - to load tiles, you must place your tilesheet in `assets/tiles/tilesheet.qoi`.
 - saving and loading projects is possible. `mapedit` will load whatever `.rte` file you

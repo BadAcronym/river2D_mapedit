@@ -174,10 +174,6 @@ int CALLBACK WinMain
     global_engine = &engine;
     global_editor = &editor;
 
-    // TODO: figure out the mapping window msgs
-
-    // TODO: try to abstract this into river2D_openwindow without passing instance and shi, just what's already declared in the header
-
     WNDCLASSA wc     = {0};
     LPCSTR className = "MapeditClass";
 
@@ -226,7 +222,6 @@ int CALLBACK WinMain
         {
             // struct timespec duration = {0, ns_threshold - deltaNS};
             // nanosleep(&duration, NULL);
-            // TODO: nanosleep on windows, or 1ms precision
         }
 
         mapedit_update(&engine, &editor);
