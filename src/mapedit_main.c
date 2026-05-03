@@ -203,7 +203,7 @@ void mapedit_init
     StringView dir = cstr_sv("assets/custom/");
     StringView ls  = river2D_listFiles(dir);
 
-    fprintf(stderr, "the path string is: \n"PRI_SV, ARG_SV(ls));
+    fprintf(stderr, "the path string is: "PRI_SV"\n", ARG_SV(ls));
 
     // PERF: stop trying to find unfindable indices, I need some type of early return,
     // knowing when exactly none of these calls is gonna return anything anymore.
