@@ -119,12 +119,12 @@ LRESULT CALLBACK win32WindowCallback
             int32_t scrollAmount = GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
             if(scrollAmount > 0)
             {
-                mapedit_updateSelectSize(global_editor, true);
+                mapedit_scroll(global_editor, false);
                 break;
             }
             else if(scrollAmount < 0)
             {
-                mapedit_updateSelectSize(global_editor, false);
+                mapedit_scroll(global_editor, true);
                 break;
             }
             break;

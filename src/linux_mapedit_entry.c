@@ -60,26 +60,30 @@ int main
                 {
                     if(event.xbutton.button == RIVER2D_MOUSE4)
                     {
-                        mapedit_updateSelectSize(&editor, true);
+                        mapedit_scroll(&editor, false);
                         break;
                     }
                     else if(event.xbutton.button == RIVER2D_MOUSE5)
                     {
-                        mapedit_updateSelectSize(&editor, false);
+                        mapedit_scroll(&editor, true);
                         break;
                     }
 
-                    mapedit_processButtons(&editor, &engine.controls, event.xbutton.button, true);
+                    mapedit_processButtons(&editor, &engine.controls,
+                                           event.xbutton.button, true);
                     break;
                 }
                 case ButtonRelease:
                 {
-                    mapedit_processButtons(&editor, &engine.controls, event.xbutton.button, false);
+                    mapedit_processButtons(&editor, &engine.controls,
+                                           event.xbutton.button, false);
                     break;
                 }
                 case MotionNotify:
                 {
-                    mapedit_processPointer(&engine, (uint32_t)event.xmotion.x, (uint32_t)event.xmotion.y);
+                    mapedit_processPointer(&engine,
+                                           (uint32_t)event.xmotion.x,
+                                           (uint32_t)event.xmotion.y);
                     break;
                 }
                 case ClientMessage:
@@ -95,8 +99,9 @@ int main
                     resizeWidth  = (uint32_t)event.xconfigure.width;
                     resizeHeight = (uint32_t)event.xconfigure.height;
 
-                    if(resizeWidth != engine.config.window_width || resizeHeight != engine.config.window_height)
-                    {
+                    if(resizeWidth != engine.config.window_width ||
+                       resizeHeight != engine.config.window_height
+                    ){
                         engine.config.window_width  = resizeWidth;
                         engine.config.window_height = resizeHeight;
                     }
@@ -120,7 +125,8 @@ int main
             uint16_t desiredFPS = 144;
 
             River2D_Time now          = river2D_queryTime();
-            int64_t      deltaNS      = river2D_deltaTime_ns(&editor.lastPresentTime, &now);
+            int64_t      deltaNS      = river2D_deltaTime_ns(&editor.lastPresentTime,
+                                                             &now);
             double       ns_threshold = 1e9f / (double)(desiredFPS);
 
             if(deltaNS < (int64_t)ns_threshold)

@@ -909,6 +909,8 @@ f_internal void checkEditorButtons
         }
 
         comp.src        = &engine->planes[MAPEDIT_PLANE_TILESHEET];
+        comp.offsetSrcX = 0;
+        comp.offsetSrcY = editor->viewScroll * editor->tilesize;
         comp.offsetDstX = engine->backbuffer.width  / 10 + editor->tilesize;
         comp.offsetDstY = engine->backbuffer.height / 10 + editor->tilesize;
         comp.cropWidth  = sheet_width;
@@ -930,6 +932,8 @@ f_internal void checkEditorButtons
                            editor->close_b.area.upLeft.x;
 
             comp.src        = &engine->planes[MAPEDIT_PLANE_HIGHLIGHT];
+            comp.offsetSrcX = 0;
+            comp.offsetSrcY = 0;
             comp.offsetDstX = (uint32_t)(editor->close_b.area.upLeft.x * fX);
             comp.offsetDstY = (uint32_t)(editor->close_b.area.upLeft.y * fY + 20);
             comp.cropWidth  = (uint32_t)(length * fX);
@@ -949,9 +953,9 @@ f_internal void checkEditorButtons
 
             float    deltaX = engine->controls.pointer.x - tiles.upLeft.x;
             float    deltaY = engine->controls.pointer.y - tiles.upLeft.y;
-            uint8_t  tileX  = (uint8_t)(deltaX * fX  / editor->tilesize);
+            uint8_t  tileX  = (uint8_t)(deltaX * fX / editor->tilesize);
             uint8_t  tileY  = (uint8_t)(deltaY * fY / editor->tilesize);
-            uint16_t sheetX = (uint16_t)(sheet_width / editor->tilesize);
+            uint16_t sheetX = (uint16_t)(sheet_width  / editor->tilesize);
             uint16_t sheetY = (uint16_t)(sheet_height / editor->tilesize);
 
             if(tileX + editor->selectMult > sheetX)
@@ -987,7 +991,7 @@ f_internal void checkEditorButtons
             if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
             {
                 editor->selectedX           = tileX;
-                editor->selectedY           = tileY;
+                editor->selectedY           = tileY + editor->viewScroll;
                 editor->editorflags        &= ~MAPEDIT_FLAG_BIT_TILEPICKER;
                 engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
             }
@@ -1268,6 +1272,26 @@ void mapedit_update
     {
         fprintf(stderr, "\033[31;1;7mERROR: invalid state: %u, previous: %u\033[0m\n",
                 editor->currentState, editor->previousState);
+    }
+}
+
+void mapedit_scroll
+(
+    EditorData *editor,
+    bool       down
+){
+    if(editor->currentState != MAPEDIT_STATE_EDIT)
+    {
+        return;
+    }
+
+    if(down)
+    {
+        ++editor->viewScroll;
+    }
+    else if(editor->viewScroll)
+    {
+        --editor->viewScroll;
     }
 }
 

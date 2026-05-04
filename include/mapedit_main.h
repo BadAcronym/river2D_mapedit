@@ -185,6 +185,7 @@ typedef struct EditorData
     uint32_t     currentAction;
     String       projectName;
     String       filename;
+    uint8_t      viewScroll;
     uint8_t      cursor;
     bool         confirmed;
 }
@@ -205,6 +206,12 @@ extern void mapedit_update
 (
     EngineData *engine,
     EditorData *editor
+);
+
+extern void mapedit_scroll
+(
+    EditorData *editor,
+    bool       increase
 );
 
 extern void mapedit_updateSelectSize
