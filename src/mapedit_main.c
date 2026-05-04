@@ -1216,15 +1216,15 @@ f_internal void checkFilePickerButtons
             engine->controls.keymap &= ~(MAPEDIT_BIT_A << i);
             if(shift)
             {
-                // sv_add_char(&editor->filename, 0x40 + i, SV_RIGHT);
                 editor->filename.data[editor->cursor] = 0x40 + i;
                 continue;
             }
 
-            // const char *text = sv_add_char(&editor->filename, 0x61 + i, SV_RIGHT);
+            editor->filename.data[editor->cursor] = 0x61 + i;
         }
     }
 
+    // FIXME: why does right shift confirm?????
     if(engine->controls.keymap & MAPEDIT_BIT_ENTER)
     {
         editor->confirmed = true;
