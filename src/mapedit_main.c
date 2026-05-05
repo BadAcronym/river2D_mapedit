@@ -1216,7 +1216,7 @@ f_internal void checkFilePickerButtons
             engine->controls.keymap &= ~(MAPEDIT_BIT_A << i);
             if(shift)
             {
-                editor->filename.data[editor->cursor] = 0x40 + i;
+                editor->filename.data[editor->cursor] = 0x41 + i;
                 continue;
             }
 
@@ -1224,7 +1224,13 @@ f_internal void checkFilePickerButtons
         }
     }
 
-    // FIXME: why does right shift confirm?????
+    // TODO: handle:
+    // periods,
+    // slashes,
+    // dashes,
+    // underscores,
+    // brackets
+
     if(engine->controls.keymap & MAPEDIT_BIT_ENTER)
     {
         editor->confirmed = true;
@@ -1395,9 +1401,14 @@ void mapedit_processButtons
 void mapedit_processKeys
 (
     River2D_ControlMap *controls,
-    uint64_t           key,
+    uint8_t            key,
     bool               isDown
 ){
+    if(!key)
+    {
+        return;
+    }
+
     if(processKey(MAPEDIT_KEY_ESCAPE,     MAPEDIT_BIT_ESCAPE    )){ return; }
     if(processKey(MAPEDIT_KEY_ENTER,      MAPEDIT_BIT_ENTER     )){ return; }
     if(processKey(MAPEDIT_KEY_TAB,        MAPEDIT_BIT_TAB       )){ return; }
