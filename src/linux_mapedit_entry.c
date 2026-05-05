@@ -46,14 +46,16 @@ int main
             {
                 case KeyPress:
                 {
-                    uint8_t ascii = xkeyToAscii(&engine, &event);
-                    mapedit_processKeys(&engine.controls, ascii, true);
+                    AsciiKey ascii = xkeyToAscii(&engine, &event);
+                    mapedit_processKeys(&engine.controls, ascii.shifted, true);
+                    mapedit_processKeys(&engine.controls, ascii.unshifted, true);
                     break;
                 }
                 case KeyRelease:
                 {
-                    uint8_t ascii = xkeyToAscii(&engine, &event);
-                    mapedit_processKeys(&engine.controls, ascii, false);
+                    AsciiKey ascii = xkeyToAscii(&engine, &event);
+                    mapedit_processKeys(&engine.controls, ascii.shifted, false);
+                    mapedit_processKeys(&engine.controls, ascii.unshifted, false);
                     break;
                 }
                 case ButtonPress:

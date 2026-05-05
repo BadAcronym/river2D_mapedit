@@ -231,7 +231,7 @@ extern void mapedit_processButtons
 extern void mapedit_processKeys
 (
     River2D_ControlMap *controls,
-    uint64_t           key,
+    uint8_t            key,
     bool               isDown
 );
 
