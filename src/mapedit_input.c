@@ -1,5 +1,7 @@
 #include "mapedit_main.h"
 
+#include <inttypes.h>
+
 #define CONTROL_NOTFOUND 0
 #define CONTROL_FOUND    1
 
@@ -141,7 +143,7 @@ void mapedit_processKeys
     if(processKey(MAPEDIT_KEY_EQUAL,      MAPEDIT_BIT_EQUAL     )){ return; }
 
 #ifdef DEBUG
-    fprintf(stderr, "key pressed: 0x%" PRIx64 "\n", key);
+    fprintf(stderr, "key pressed: %x\n", key);
 #endif
 }
 

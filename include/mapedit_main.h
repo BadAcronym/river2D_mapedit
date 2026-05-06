@@ -255,6 +255,12 @@ extern void mapedit_changeState
     uint8_t    nextState
 );
 
+extern void mapedit_saveProject
+(
+    EngineData *engine,
+    EditorData *editor
+);
+
 extern void mapedit_loadProject
 (
     EngineData *engine,
@@ -268,5 +274,40 @@ extern void mapedit_undo
 
 extern void mapedit_redo
 (
+    EditorData *editor
+);
+
+extern void mapedit_drawMainMenu
+(
+    EngineData *engine,
+    EditorData *editor
+);
+
+extern void mapedit_pollMainMenu
+(
+    EngineData *engine,
+    EditorData *editor
+);
+
+extern void mapedit_drawEditor
+(
+    EngineData *engine,
+    EditorData *editor
+);
+
+extern void mapedit_pollEditor
+(
+    EngineData *engine,
+    EditorData *editor
+);
+
+extern void mapedit_drawFilePicker
+(
+    EngineData *engine
+);
+
+extern void mapedit_pollFilePicker
+(
+    EngineData *engine,
     EditorData *editor
 );

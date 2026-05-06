@@ -1,6 +1,83 @@
 #include "mapedit_main.h"
 #include "imgsurf_main.h"
 
+void mapedit_saveProject
+(
+    EngineData *engine,
+    EditorData *editor
+){
+    rvCompositeSettings comp = {0};
+    comp.src                 = &engine->planes[MAPEDIT_PLANE_ICON_SAVING];
+    comp.dst                 = &engine->backbuffer;
+    comp.pictop              = RIVER2D_PICTOP_OVER;
+    comp.cropWidth           = engine->planes[MAPEDIT_PLANE_ICON_SAVING].width;
+    comp.cropHeight          = engine->planes[MAPEDIT_PLANE_ICON_SAVING].height;
+    comp.offsetDstX          = 16;
+    comp.offsetDstY          = 16;
+
+    river2D_compositeImage(engine, &comp);
+
+    engine->bltBuffer(engine);
+
+    char *filename_cstr = malloc(256);
+    sprintf(filename_cstr, PRI_SV".rte", ARG_SV(editor->projectName));
+
+    FILE *file = fopen(filename_cstr, "wb");
+    if(!file)
+    {
+        fprintf(stderr, "\n\033[31;1;7mERROR: could not open file for saving: "
+                PRI_SV".\033[0m\n", ARG_SV(editor->projectName));
+        free(filename_cstr);
+        return;
+    }
+
+    const char header[9] = "r2Dtiles";
+    fwrite(header, sizeof(header) - 1, 1, file);
+
+    size_t elements = 0;
+
+    if((elements = fwrite(&editor->tilesize, 2, 1, file)) != 1)
+    {
+        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. "
+                "fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
+        return;
+    }
+    if((elements = fwrite(&editor->mapWidth, 2, 1, file)) != 1)
+    {
+        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. "
+                "fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
+        return;
+    }
+    if((elements = fwrite(&editor->mapHeight, 2, 1, file)) != 1)
+    {
+        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. "
+                "fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
+        return;
+    }
+    if((elements = fwrite(&editor->layers, 1, 1, file)) != 1)
+    {
+        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. "
+                "\033[0m\n");
+        return;
+    }
+
+    uint64_t tilecount = editor->layers * editor->mapHeight * editor->mapWidth;
+    fwrite(editor->tiles, sizeof(Tile), tilecount, file);
+
+    imgsurf_write_ptr(file, engine->planes[MAPEDIT_PLANE_TILESHEET].data,
+                      IMGSURF_FILE_QOI,
+                      engine->planes[MAPEDIT_PLANE_TILESHEET].width,
+                      engine->planes[MAPEDIT_PLANE_TILESHEET].height,
+                      IMGSURF_CHANNELS_BGRA, 8);
+
+    fclose(file);
+
+    free(filename_cstr);
+    fprintf(stdout, "Project saved successfully.\n");
+
+    editor->lastSaveTime = river2D_queryTime();
+}
+
 void mapedit_loadProject
 (
     EngineData *engine,
