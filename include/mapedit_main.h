@@ -241,3 +241,32 @@ extern void mapedit_processPointer
     uint32_t   x,
     uint32_t   y
 );
+
+extern void mapedit_placeSelectedTiles
+(
+    EditorData *editor,
+    uint16_t   tileX,
+    uint16_t   tileY
+);
+
+extern void mapedit_changeState
+(
+    EditorData *editor,
+    uint8_t    nextState
+);
+
+extern void mapedit_loadProject
+(
+    EngineData *engine,
+    EditorData *editor
+);
+
+extern void mapedit_undo
+(
+    EditorData *editor
+);
+
+extern void mapedit_redo
+(
+    EditorData *editor
+);
