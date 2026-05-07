@@ -102,8 +102,6 @@ void mapedit_init
     engine->controls.keycodes[MAPEDIT_KEY_ENTER]        = RIVER2D_ASCII_ENTER;
     engine->controls.keycodes[MAPEDIT_KEY_BACKSPACE]    = RIVER2D_ASCII_BACKSPACE;
     engine->controls.keycodes[MAPEDIT_KEY_DELETE]       = RIVER2D_ASCII_DELETE;
-    engine->controls.keycodes[MAPEDIT_KEY_SPACE]        = RIVER2D_ASCII_SPACE;
-
     engine->controls.keycodes[MAPEDIT_KEY_MENU]         = RIVER2D_ASCII_ESCAPE;
     engine->controls.keycodes[MAPEDIT_KEY_HOTBAR]       = RIVER2D_ASCII_TAB;
     engine->controls.keycodes[MAPEDIT_KEY_UNDO]         = 'z';
@@ -118,6 +116,13 @@ void mapedit_init
     engine->controls.keycodes[MAPEDIT_KEY_LAYER7]       = '7';
     engine->controls.keycodes[MAPEDIT_KEY_LAYER8]       = '8';
     engine->controls.keycodes[MAPEDIT_KEY_LAYER9]       = '9';
+    engine->controls.keycodes[MAPEDIT_KEY_REDO]         = 'y';
+    engine->controls.keycodes[MAPEDIT_KEY_UNDO]         = 'z';
+    engine->controls.keycodes[MAPEDIT_KEY_DECREASE]     = '-';
+    engine->controls.keycodes[MAPEDIT_KEY_INCREASE]     = '=';
+    engine->controls.keycodes[MAPEDIT_KEY_SAVE]         = 's';
+    engine->controls.keycodes[MAPEDIT_KEY_QUIT]         = 'q';
+    engine->controls.keycodes[MAPEDIT_KEY_TILEPICKER]   = 't';
 
     StringView title_sv = cstr_sv("RIVER2D MAP EDITOR");
     StringView new_sv   = cstr_sv("NEW PROJECT");

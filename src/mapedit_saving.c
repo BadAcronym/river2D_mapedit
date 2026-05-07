@@ -147,10 +147,10 @@ void mapedit_loadProject
         return;
     }
 
-    uint64_t maxtile = editor->layers * editor->mapWidth * editor->mapHeight *
-                       sizeof(Tile);
+    uint64_t maxtilebyte = editor->layers * editor->mapWidth * editor->mapHeight *
+                           sizeof(Tile);
 
-    for(uint64_t i = 0; i < maxtile && ((byte = fgetc(file)) != EOF); ++i)
+    for(uint64_t i = 0; i < maxtilebyte && ((byte = fgetc(file)) != EOF); ++i)
     {
         ((uint8_t*)editor->tiles)[i] = (uint8_t)byte;
     }

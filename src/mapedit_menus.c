@@ -54,17 +54,17 @@ void mapedit_pollMainMenu
     comp.pictop = RIVER2D_PICTOP_OVER;
 
     if(engine->controls.keymap & MAPEDIT_BIT_LCTRL &&
-       engine->controls.keymap & MAPEDIT_BIT_Q
+       engine->controls.keymap & MAPEDIT_BIT_QUIT
     ){
         engine->running = false;
         return;
     }
 
-    if(engine->controls.keymap &  MAPEDIT_BIT_ESCAPE &&
+    if(engine->controls.keymap &  MAPEDIT_BIT_MENU &&
        editor->previousState   != MAPEDIT_STATE_NULL
     ){
         mapedit_changeState(editor, editor->previousState);
-        engine->controls.keymap &= ~MAPEDIT_BIT_ESCAPE;
+        engine->controls.keymap &= ~MAPEDIT_BIT_MENU;
         return;
     }
 
@@ -197,7 +197,7 @@ void mapedit_drawEditor
 
     for(uint8_t i = 0; i < editor->layers; ++i)
     {
-        if(engine->controls.keymap & (MAPEDIT_BIT_0 << i))
+        if(engine->controls.keymap & (MAPEDIT_BIT_LAYER0 << i))
         {
             editor->currentLayer = i;
             editor->isolate      = engine->controls.keymap & MAPEDIT_BIT_LSHIFT;
@@ -277,10 +277,10 @@ void mapedit_pollEditor
     comp.dst    = &engine->backbuffer;
     comp.pictop = RIVER2D_PICTOP_OVER;
 
-    if(engine->controls.keymap & MAPEDIT_BIT_T)
+    if(engine->controls.keymap & MAPEDIT_BIT_TILEPICKER)
     {
         editor->editorflags     ^= MAPEDIT_FLAG_BIT_TILEPICKER;
-        engine->controls.keymap &= ~MAPEDIT_BIT_T;
+        engine->controls.keymap &= ~MAPEDIT_BIT_TILEPICKER;
     }
 
     float fX = (float)engine->backbuffer.width;
@@ -288,9 +288,9 @@ void mapedit_pollEditor
 
     if(editor->editorflags & MAPEDIT_FLAG_BIT_TILEPICKER)
     {
-        if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
+        if(engine->controls.keymap & MAPEDIT_BIT_MENU)
         {
-            engine->controls.keymap &= ~MAPEDIT_BIT_ESCAPE;
+            engine->controls.keymap &= ~MAPEDIT_BIT_MENU;
             editor->editorflags     &= ~MAPEDIT_FLAG_BIT_TILEPICKER;
             return;
         }
@@ -385,15 +385,15 @@ void mapedit_pollEditor
                 tileY = (uint8_t)(sheetY - editor->selectMult);
             }
 
-            if(engine->controls.keymap & MAPEDIT_BIT_MINUS)
+            if(engine->controls.keymap & MAPEDIT_BIT_DECREASE)
             {
                 mapedit_updateSelectSize(editor, false);
-                engine->controls.keymap &= ~MAPEDIT_BIT_MINUS;
+                engine->controls.keymap &= ~MAPEDIT_BIT_DECREASE;
             }
-            if(engine->controls.keymap & MAPEDIT_BIT_EQUAL)
+            if(engine->controls.keymap & MAPEDIT_BIT_INCREASE)
             {
                 mapedit_updateSelectSize(editor, true);
-                engine->controls.keymap &= ~MAPEDIT_BIT_EQUAL;
+                engine->controls.keymap &= ~MAPEDIT_BIT_INCREASE;
             }
 
             comp.src        = &engine->planes[MAPEDIT_PLANE_HIGHLIGHT];
@@ -421,31 +421,31 @@ void mapedit_pollEditor
 
         return;
     }
-    else if(engine->controls.keymap & MAPEDIT_BIT_Z &&
+    else if(engine->controls.keymap & MAPEDIT_BIT_UNDO &&
             engine->controls.keymap & MAPEDIT_BIT_LCTRL
     ){
         mapedit_undo(editor);
-        engine->controls.keymap &= ~MAPEDIT_BIT_Z;
+        engine->controls.keymap &= ~MAPEDIT_BIT_UNDO;
         return;
     }
-    else if(engine->controls.keymap & MAPEDIT_BIT_Y &&
+    else if(engine->controls.keymap & MAPEDIT_BIT_REDO &&
             engine->controls.keymap & MAPEDIT_BIT_LCTRL
     ){
         mapedit_redo(editor);
-        engine->controls.keymap &= ~MAPEDIT_BIT_Y;
+        engine->controls.keymap &= ~MAPEDIT_BIT_REDO;
         return;
     }
-    else if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
+    else if(engine->controls.keymap & MAPEDIT_BIT_MENU)
     {
         mapedit_changeState(editor, MAPEDIT_STATE_MENU);
-        engine->controls.keymap &= ~MAPEDIT_BIT_ESCAPE;
+        engine->controls.keymap &= ~MAPEDIT_BIT_MENU;
         return;
     }
     else if(engine->controls.keymap & MAPEDIT_BIT_LCTRL &&
-            engine->controls.keymap & MAPEDIT_BIT_S
+            engine->controls.keymap & MAPEDIT_BIT_SAVE
     ){
         mapedit_saveProject(engine, editor);
-        engine->controls.keymap &= ~MAPEDIT_BIT_S;
+        engine->controls.keymap &= ~MAPEDIT_BIT_SAVE;
         return;
     }
 
@@ -544,83 +544,28 @@ void mapedit_pollFilePicker
     EngineData *engine,
     EditorData *editor
 ){
-    if(engine->controls.keymap & MAPEDIT_BIT_ESCAPE)
+    if(engine->controls.keymap & MAPEDIT_BIT_MENU)
     {
         mapedit_changeState(editor, MAPEDIT_STATE_MENU);
-        engine->controls.keymap &= ~MAPEDIT_BIT_ESCAPE;
+        engine->controls.keymap &= ~MAPEDIT_BIT_MENU;
         return;
     }
 
+    if(engine->controls.ascii)
+    {
+        editor->filename.data[editor->cursor] = engine->controls.ascii;
+        engine->controls.ascii = 0x00;
+
+        increaseCursor(editor);
+    }
+
     if(engine->controls.keymap & MAPEDIT_BIT_BACKSPACE)
     {
-        sv_trim((StringView*)&editor->filename, 1, SV_RIGHT);
+        decreaseCursor(editor);
+
+        editor->filename.data[editor->cursor] = '\0';
         engine->controls.keymap &= ~MAPEDIT_BIT_BACKSPACE;
     }
-
-    bool shift = (engine->controls.keymap & MAPEDIT_BIT_LSHIFT) ||
-                 (engine->controls.keymap & MAPEDIT_BIT_RSHIFT);
-
-    for(uint8_t i = 0; i < 26; ++i)
-    {
-        if(engine->controls.keymap & (MAPEDIT_BIT_A << i))
-        {
-            engine->controls.keymap &= ~(MAPEDIT_BIT_A << i);
-            if(shift)
-            {
-                editor->filename.data[editor->cursor] = 0x41 + i;
-                increaseCursor(editor);
-                continue;
-            }
-
-            editor->filename.data[editor->cursor] = 0x61 + i;
-            increaseCursor(editor);
-        }
-    }
-
-    if(engine->controls.keymap & MAPEDIT_BIT_BACKSPACE)
-    {
-        editor->filename.data[editor->cursor] = '\0';
-        decreaseCursor(editor);
-    }
-
-    if(engine->controls.keymap & MAPEDIT_BIT_SPACE)
-    {
-        editor->filename.data[editor->cursor] = ' ';
-        increaseCursor(editor);
-    }
-
-    if(engine->controls.keymap_special & MAPEDIT_BIT_AMPERSAND)
-    {
-        editor->filename.data[editor->cursor] = '&';
-        increaseCursor(editor);
-    }
-
-    // TODO: handle:
-    // ampersand &
-    // apostrophe '
-    // asciicircum ^
-    // asterisk *
-    // at @
-    // backslash \
-    // bar |
-    // braces {}
-    // brackets []
-    // colon :
-    // comma ,
-    // dollar $
-    // equals =
-    // exclam !
-    // greater >
-    // lesser <
-    // minus -
-    // number #
-    // parentheses ()
-    // percent %
-    // period .
-    // question ?
-    // semicolon ;
-    // slash /
-    // underscore _
 
     if(engine->controls.keymap & MAPEDIT_BIT_ENTER)
     {
