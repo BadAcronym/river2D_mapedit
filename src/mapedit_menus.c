@@ -515,6 +515,30 @@ void mapedit_drawFilePicker
     river2D_compositeImage(engine, &comp);
 }
 
+f_internal void decreaseCursor
+(
+    EditorData *editor
+){
+    if(editor->cursor == 0)
+    {
+        return;
+    }
+
+    --editor->cursor;
+}
+
+f_internal void increaseCursor
+(
+    EditorData *editor
+){
+    if(editor->cursor == 255)
+    {
+        return;
+    }
+
+    ++editor->cursor;
+}
+
 void mapedit_pollFilePicker
 (
     EngineData *engine,
@@ -544,19 +568,59 @@ void mapedit_pollFilePicker
             if(shift)
             {
                 editor->filename.data[editor->cursor] = 0x41 + i;
+                increaseCursor(editor);
                 continue;
             }
 
             editor->filename.data[editor->cursor] = 0x61 + i;
+            increaseCursor(editor);
         }
     }
 
+    if(engine->controls.keymap & MAPEDIT_BIT_BACKSPACE)
+    {
+        editor->filename.data[editor->cursor] = '\0';
+        decreaseCursor(editor);
+    }
+
+    if(engine->controls.keymap & MAPEDIT_BIT_SPACE)
+    {
+        editor->filename.data[editor->cursor] = ' ';
+        increaseCursor(editor);
+    }
+
+    if(engine->controls.keymap_special & MAPEDIT_BIT_AMPERSAND)
+    {
+        editor->filename.data[editor->cursor] = '&';
+        increaseCursor(editor);
+    }
+
     // TODO: handle:
-    // periods,
-    // slashes,
-    // dashes,
-    // underscores,
-    // brackets
+    // ampersand &
+    // apostrophe '
+    // asciicircum ^
+    // asterisk *
+    // at @
+    // backslash \
+    // bar |
+    // braces {}
+    // brackets []
+    // colon :
+    // comma ,
+    // dollar $
+    // equals =
+    // exclam !
+    // greater >
+    // lesser <
+    // minus -
+    // number #
+    // parentheses ()
+    // percent %
+    // period .
+    // question ?
+    // semicolon ;
+    // slash /
+    // underscore _
 
     if(engine->controls.keymap & MAPEDIT_BIT_ENTER)
     {
