@@ -226,9 +226,9 @@ void mapedit_init
         editor->actions[i].stroke_start.ns = INT64_MIN;
     }
 
-    if(!editor->filename.data)
+    if(!editor->inputBuffer.data)
     {
-        editor->filename = cstr_str("unnamed_project");
+        editor->inputBuffer = cstr_str("unnamed_project");
     }
 
     River2D_Time now                = river2D_queryTime();
@@ -239,8 +239,8 @@ void mapedit_init
 
     editor->currentState = MAPEDIT_STATE_MENU;
     char *buf = calloc(256, 1);
-    editor->filename.data = buf;
-    editor->filename.size = 256;
+    editor->inputBuffer.data = buf;
+    editor->inputBuffer.size = 256;
 }
 
 int32_t mapedit_shutdown
@@ -249,7 +249,7 @@ int32_t mapedit_shutdown
 ){
     free(editor->tiles);
     free(editor->actions);
-    free((void*)editor->filename.data);
+    free((void*)editor->inputBuffer.data);
     return 0;
 }
 

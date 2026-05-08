@@ -560,7 +560,7 @@ f_internal void pollInput
 
     if(engine->controls.ascii)
     {
-        editor->filename.data[editor->cursor] = engine->controls.ascii;
+        editor->inputBuffer.data[editor->cursor] = engine->controls.ascii;
         engine->controls.ascii = 0x00;
 
         increaseCursor(editor);
@@ -570,7 +570,7 @@ f_internal void pollInput
     {
         decreaseCursor(editor);
 
-        editor->filename.data[editor->cursor] = '\0';
+        editor->inputBuffer.data[editor->cursor] = '\0';
         engine->controls.keymap &= ~MAPEDIT_BIT_BACKSPACE;
     }
 
@@ -588,7 +588,7 @@ f_internal void drawTextBuffer
 ){
     rvLoadTextSettings set = {0};
     set.image    = &engine->planes[MAPEDIT_PLANE_CURRENTFILE];
-    set.sv       = (StringView*)&editor->filename;
+    set.sv       = (StringView*)&editor->inputBuffer;
     set.font     = MAPEDIT_PLANE_FONT16,
     set.charsize = 16;
     set.spacing  = 1;

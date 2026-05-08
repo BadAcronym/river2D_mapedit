@@ -142,7 +142,8 @@ typedef struct EditorData
     Tile         *tiles;
     Action       *actions;
     uint32_t     currentAction;
-    String       filename;
+    String       inputBuffer;
+    StringView   filename;
     uint8_t      viewScroll;
     uint8_t      cursor;
     bool         confirmed;
