@@ -226,9 +226,9 @@ void mapedit_init
         editor->actions[i].stroke_start.ns = INT64_MIN;
     }
 
-    if(!editor->projectName.data)
+    if(!editor->filename.data)
     {
-        editor->projectName = cstr_str("unnamed_project");
+        editor->filename = cstr_str("unnamed_project");
     }
 
     River2D_Time now                = river2D_queryTime();
@@ -287,7 +287,12 @@ void mapedit_update
     else if(editor->currentState == MAPEDIT_STATE_LOAD)
     {
         mapedit_drawFilePicker(engine);
-        mapedit_pollFilePicker(engine, editor);
+        mapedit_pollLoadFile(engine, editor);
+    }
+    else if(editor->currentState == MAPEDIT_STATE_SAVEAS)
+    {
+        mapedit_drawFilePicker(engine);
+        mapedit_pollSaveFile(engine, editor);
     }
     else
     {

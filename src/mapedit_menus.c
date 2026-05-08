@@ -441,6 +441,13 @@ void mapedit_pollEditor
         engine->controls.keymap &= ~MAPEDIT_BIT_MENU;
         return;
     }
+    else if((engine->controls.keymap & MAPEDIT_BIT_LSHIFT  ||
+             engine->controls.keymap & MAPEDIT_BIT_RSHIFT) &&
+             engine->controls.keymap & MAPEDIT_BIT_LCTRL   &&
+             engine->controls.keymap & MAPEDIT_BIT_SAVE
+    ){
+        mapedit_changeState(editor, MAPEDIT_STATE_SAVEAS);
+    }
     else if(engine->controls.keymap & MAPEDIT_BIT_LCTRL &&
             engine->controls.keymap & MAPEDIT_BIT_SAVE
     ){
@@ -539,7 +546,7 @@ f_internal void increaseCursor
     ++editor->cursor;
 }
 
-void mapedit_pollFilePicker
+f_internal void pollInput
 (
     EngineData *engine,
     EditorData *editor
@@ -572,14 +579,13 @@ void mapedit_pollFilePicker
         editor->confirmed = true;
         engine->controls.keymap &= ~MAPEDIT_BIT_ENTER;
     }
+}
 
-    if(editor->confirmed)
-    {
-        mapedit_loadProject(engine, editor);
-        mapedit_changeState(editor, MAPEDIT_STATE_EDIT);
-        return;
-    }
-
+f_internal void drawTextBuffer
+(
+    EngineData *engine,
+    EditorData *editor
+){
     rvLoadTextSettings set = {0};
     set.image    = &engine->planes[MAPEDIT_PLANE_CURRENTFILE];
     set.sv       = (StringView*)&editor->filename;
@@ -588,4 +594,40 @@ void mapedit_pollFilePicker
     set.spacing  = 1;
 
     river2D_loadText(engine, &set);
+}
+
+void mapedit_pollLoadFile
+(
+    EngineData *engine,
+    EditorData *editor
+){
+    pollInput(engine, editor);
+
+    if(editor->confirmed)
+    {
+        mapedit_loadProject(engine, editor);
+        mapedit_changeState(editor, MAPEDIT_STATE_EDIT);
+        editor->confirmed = false;
+        return;
+    }
+
+    drawTextBuffer(engine, editor);
+}
+
+void mapedit_pollSaveFile
+(
+    EngineData *engine,
+    EditorData *editor
+){
+    pollInput(engine, editor);
+
+    if(editor->confirmed)
+    {
+        mapedit_saveProject(engine, editor);
+        mapedit_changeState(editor, MAPEDIT_STATE_EDIT);
+        editor->confirmed = false;
+        return;
+    }
+
+    drawTextBuffer(engine, editor);
 }

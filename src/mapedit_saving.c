@@ -19,15 +19,31 @@ void mapedit_saveProject
 
     engine->bltBuffer(engine);
 
-    char *filename_cstr = malloc(256);
-    sprintf(filename_cstr, PRI_SV".rte", ARG_SV(editor->projectName));
+    StringView sv_filename = str_sv_cpy(editor->filename);
+
+    StringView  ext = cstr_sv(".rte");
+    const char* pos = sv_filename.data + sv_filename.size - 4;
+
+    if(sv_find(ext, sv_filename) != pos)
+    {
+        // TESTING: DEBUG
+        fprintf(stderr, "pos: %p\n", pos);
+        fprintf(stderr, "found: %p\n", sv_find(ext, sv_filename));
+        fprintf(stderr, "attaching "PRI_SV" to "PRI_SV".\n",
+                ARG_SV(ext), ARG_SV(sv_filename));
+        StringView final = cstr_sv(sv_concat(sv_filename, ext));
+        fprintf(stderr, "after: "PRI_SV"\n", ARG_SV(final));
+    }
+
+    // TESTING:
+    const char *filename_cstr = "";
 
     FILE *file = fopen(filename_cstr, "wb");
     if(!file)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: could not open file for saving: "
-                PRI_SV".\033[0m\n", ARG_SV(editor->projectName));
-        free(filename_cstr);
+                PRI_SV".\033[0m\n", ARG_SV(editor->filename));
+        free((void*)sv_filename.data);
         return;
     }
 
@@ -72,7 +88,7 @@ void mapedit_saveProject
 
     fclose(file);
 
-    free(filename_cstr);
+    free((void*)filename_cstr);
     fprintf(stdout, "Project saved successfully.\n");
 
     editor->lastSaveTime = river2D_queryTime();
@@ -84,7 +100,19 @@ void mapedit_loadProject
     EditorData *editor
 ){
     StringView *name = (StringView*)&editor->filename;
-    const char *filename = sv_cstr(*name);
+
+    const char *filename_cstr;
+    StringView ext = cstr_sv(".rte");
+    char*      pos = editor->filename.data + editor->filename.size - 4;
+
+    if(sv_find(ext, *((StringView*)&editor->filename)) != pos)
+    {
+        filename_cstr = sv_concat(*((StringView*)(&editor->filename)), ext);
+    }
+    else
+    {
+        filename_cstr = sv_cstr(*((StringView*)(&editor->filename)));
+    }
 
     if(!editor->filename.data)
     {
@@ -98,7 +126,7 @@ void mapedit_loadProject
     fprintf(stderr, "\nloading file: "PRI_SV"\n", ARG_SV(editor->filename));
 #endif
 
-    FILE *file = fopen(filename, "rb");
+    FILE *file = fopen(filename_cstr, "rb");
     if(!file)
     {
         fprintf(stderr, "\033[31;1;7mERROR: could not open file "
@@ -125,25 +153,25 @@ void mapedit_loadProject
     if((elements = fread(&editor->tilesize, 2, 1, file)) != 1)
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
-                "\033[0m\n", filename);
+                "\033[0m\n", filename_cstr);
         return;
     }
     if((elements = fread(&editor->mapWidth, 2, 1, file)) != 1)
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
-                "\033[0m\n", filename);
+                "\033[0m\n", filename_cstr);
         return;
     }
     if((elements = fread(&editor->mapHeight, 2, 1, file)) != 1)
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
-                "\033[0m\n", filename);
+                "\033[0m\n", filename_cstr);
         return;
     }
     if((elements = fread(&editor->layers, 1, 1, file)) != 1)
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
-                "\033[0m\n", filename);
+                "\033[0m\n", filename_cstr);
         return;
     }
 
@@ -165,6 +193,8 @@ void mapedit_loadProject
             &engine->planes[MAPEDIT_PLANE_TILESHEET].height, IMGSURF_CHANNELS_BGRA, 8);
 
     engine->planes[MAPEDIT_PLANE_TILESHEET].path = cstr_sv("loadProject");
+
+    free((void*)filename_cstr);
 
     fclose(file);
 }

@@ -90,6 +90,7 @@
 #define MAPEDIT_STATE_MENU            1
 #define MAPEDIT_STATE_EDIT            2
 #define MAPEDIT_STATE_LOAD            3
+#define MAPEDIT_STATE_SAVEAS          4
 
 #define MAPEDIT_FLAG_BIT_TILEPICKER   0x01UL
 
@@ -141,7 +142,6 @@ typedef struct EditorData
     Tile         *tiles;
     Action       *actions;
     uint32_t     currentAction;
-    String       projectName;
     String       filename;
     uint8_t      viewScroll;
     uint8_t      cursor;
@@ -264,7 +264,13 @@ extern void mapedit_drawFilePicker
     EngineData *engine
 );
 
-extern void mapedit_pollFilePicker
+extern void mapedit_pollLoadFile
+(
+    EngineData *engine,
+    EditorData *editor
+);
+
+extern void mapedit_pollSaveFile
 (
     EngineData *engine,
     EditorData *editor
