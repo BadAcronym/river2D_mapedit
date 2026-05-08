@@ -514,7 +514,7 @@ void mapedit_drawFilePicker
     river2D_compositeImage(engine, &comp);
 
     comp.src = &engine->planes[MAPEDIT_PLANE_CURRENTFILE];
-    comp.offsetDstX = (uint32_t)(0.2f * (float)engine->backbuffer.width);
+    comp.offsetDstX = (uint32_t)(0.025f * (float)engine->backbuffer.width);
     comp.offsetDstY = (uint32_t)(0.4f * (float)engine->backbuffer.height);
     comp.cropWidth  = engine->planes[MAPEDIT_PLANE_CURRENTFILE].width;
     comp.cropHeight = engine->planes[MAPEDIT_PLANE_CURRENTFILE].height;
