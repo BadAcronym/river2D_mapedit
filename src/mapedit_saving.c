@@ -197,6 +197,13 @@ void mapedit_loadProject
     river2D_loadImage_ptr(engine, file, &engine->planes[MAPEDIT_PLANE_TILESHEET],
                           RIVER2D_CHANNELS_BGRA, 8);
 
+    if(!engine->planes[MAPEDIT_PLANE_TILESHEET].data)
+    {
+        fprintf(stderr, "\033[31;1;7mERROR: failed to load tilesheet into ptr."
+                "\033[0m\n");
+        return;
+    }
+
     engine->planes[MAPEDIT_PLANE_TILESHEET].path = cstr_sv("loadProject");
 
     free((void*)sv_cstr(editor->filename));
