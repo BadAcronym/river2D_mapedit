@@ -315,7 +315,7 @@ void mapedit_pollEditor
         uint32_t sheet_height = engine->planes[MAPEDIT_PLANE_TILESHEET].height;
 
         float max_w = (float)engine->backbuffer.width  * 0.8f - 2 * editor->tilesize;
-        float max_h = (float)engine->backbuffer.height * 0.8f - 2 * editor->tilesize;
+        float max_h = (float)engine->backbuffer.height * 0.8f - 3 * editor->tilesize;
 
         if((float)sheet_width > max_w)
         {
