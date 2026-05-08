@@ -118,6 +118,7 @@ void mapedit_pollMainMenu
 
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
+            engine->controls.ascii = 0x00;
             mapedit_changeState(editor, MAPEDIT_STATE_LOAD);
             engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
         }
@@ -446,6 +447,7 @@ void mapedit_pollEditor
              engine->controls.keymap & MAPEDIT_BIT_LCTRL   &&
              engine->controls.keymap & MAPEDIT_BIT_SAVE
     ){
+        engine->controls.ascii = 0x00;
         mapedit_changeState(editor, MAPEDIT_STATE_SAVEAS);
     }
     else if(engine->controls.keymap & MAPEDIT_BIT_LCTRL &&
