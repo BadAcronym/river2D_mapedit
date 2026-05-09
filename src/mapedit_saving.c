@@ -194,14 +194,8 @@ void mapedit_loadProject
         river2D_destroyImage(&engine->planes[MAPEDIT_PLANE_TILESHEET]);
     }
 
-    engine->planes[MAPEDIT_PLANE_TILESHEET].data =
-        imgsurf_load_ptr(file, IMGSURF_FILE_QOI,
-                         &engine->planes[MAPEDIT_PLANE_TILESHEET].width,
-                         &engine->planes[MAPEDIT_PLANE_TILESHEET].height,
-                         IMGSURF_CHANNELS_BGRA, 8);
-
-    // river2D_loadImage_ptr(engine, file, &engine->planes[MAPEDIT_PLANE_TILESHEET],
-    //                       RIVER2D_CHANNELS_BGRA, 8);
+    river2D_loadImage_ptr(engine, file, &engine->planes[MAPEDIT_PLANE_TILESHEET],
+                          RIVER2D_CHANNELS_BGRA, 8);
 
     if(!engine->planes[MAPEDIT_PLANE_TILESHEET].data)
     {
