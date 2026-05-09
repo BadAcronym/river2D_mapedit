@@ -99,7 +99,7 @@ int main
                     resizeWidth  = (uint32_t)event.xconfigure.width;
                     resizeHeight = (uint32_t)event.xconfigure.height;
 
-                    if(resizeWidth != engine.config.window_width ||
+                    if(resizeWidth  != engine.config.window_width  ||
                        resizeHeight != engine.config.window_height
                     ){
                         engine.config.window_width  = resizeWidth;
