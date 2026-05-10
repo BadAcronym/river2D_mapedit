@@ -86,6 +86,8 @@ void mapedit_saveProject
     uint64_t tilecount = editor->layers * editor->mapHeight * editor->mapWidth;
     fwrite(editor->tiles, sizeof(Tile), tilecount, file);
 
+    river2D_syncImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET], false);
+
     imgsurf_write_ptr(file, engine->planes[MAPEDIT_PLANE_TILESHEET].data,
                       IMGSURF_FILE_QOI,
                       engine->planes[MAPEDIT_PLANE_TILESHEET].width,
