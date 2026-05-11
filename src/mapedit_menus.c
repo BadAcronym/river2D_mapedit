@@ -44,6 +44,55 @@ void mapedit_drawMainMenu
     }
 }
 
+// WIP: arrow keys
+f_internal void nextButton
+(
+    EditorData *editor,
+    bool       upward
+){
+}
+
+f_internal void pollHovers
+(
+    EngineData *engine,
+    EditorData *editor
+){
+    if(river2D_insideRect(&engine->controls.pointer, &editor->new_b.area))
+    {
+        editor->new_b.status |= RIVER2D_BIT_HOVER;
+        return;
+    }
+    editor->new_b.status &= ~RIVER2D_BIT_HOVER;
+
+    if(river2D_insideRect(&engine->controls.pointer, &editor->load_b.area))
+    {
+        editor->load_b.status |= RIVER2D_BIT_HOVER;
+        return;
+    }
+    editor->load_b.status &= ~RIVER2D_BIT_HOVER;
+
+    if(river2D_insideRect(&engine->controls.pointer, &editor->quit_b.area))
+    {
+        editor->quit_b.status |= RIVER2D_BIT_HOVER;
+        return;
+    }
+    editor->quit_b.status &= ~RIVER2D_BIT_HOVER;
+
+    if(river2D_insideRect(&engine->controls.pointer, &editor->save_b.area))
+    {
+        editor->save_b.status |= RIVER2D_BIT_HOVER;
+        return;
+    }
+    editor->save_b.status &= ~RIVER2D_BIT_HOVER;
+
+    if(river2D_insideRect(&engine->controls.pointer, &editor->saveas_b.area))
+    {
+        editor->saveas_b.status |= RIVER2D_BIT_HOVER;
+        return;
+    }
+    editor->saveas_b.status &= ~RIVER2D_BIT_HOVER;
+}
+
 void mapedit_pollMainMenu
 (
     EngineData *engine,
@@ -60,15 +109,25 @@ void mapedit_pollMainMenu
         return;
     }
 
-    if(engine->controls.keymap &  MAPEDIT_BIT_MENU &&
-       editor->previousState   != MAPEDIT_STATE_NULL
-    ){
+    if(editor->previousState && engine->controls.keymap & MAPEDIT_BIT_MENU)
+    {
         mapedit_changeState(editor, editor->previousState);
         engine->controls.keymap &= ~MAPEDIT_BIT_MENU;
         return;
     }
 
-    if(river2D_insideRect(&engine->controls.pointer, &editor->new_b.area))
+    if(engine->controls.keymap & MAPEDIT_BIT_UP)
+    {
+        nextButton(editor, true);
+    }
+    else if(engine->controls.keymap & MAPEDIT_BIT_DOWN)
+    {
+        nextButton(editor, false);
+    }
+
+    pollHovers(engine, editor);
+
+    if(editor->new_b.status & RIVER2D_BIT_HOVER)
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
@@ -86,7 +145,7 @@ void mapedit_pollMainMenu
 
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
-            if(editor->previousState != MAPEDIT_STATE_NULL && editor->tiles)
+            if(editor->previousState && editor->tiles)
             {
                 uint64_t tilecount = editor->layers *
                                      editor->mapHeight * editor->mapWidth;
@@ -100,7 +159,7 @@ void mapedit_pollMainMenu
             engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
         }
     }
-    else if(river2D_insideRect(&engine->controls.pointer, &editor->load_b.area))
+    else if(editor->load_b.status & RIVER2D_BIT_HOVER)
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
@@ -123,7 +182,7 @@ void mapedit_pollMainMenu
             engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
         }
     }
-    else if(river2D_insideRect(&engine->controls.pointer, &editor->quit_b.area))
+    else if(editor->quit_b.status & RIVER2D_BIT_HOVER)
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
@@ -144,9 +203,8 @@ void mapedit_pollMainMenu
             engine->running = false;
         }
     }
-    else if(editor->previousState &&
-            river2D_insideRect(&engine->controls.pointer, &editor->save_b.area)
-    ){
+    else if(editor->previousState && editor->save_b.status & RIVER2D_BIT_HOVER)
+    {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
         float length = editor->save_b.area.lowRight.x - editor->save_b.area.upLeft.x;
@@ -167,9 +225,8 @@ void mapedit_pollMainMenu
             engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
         }
     }
-    else if(editor->previousState &&
-            river2D_insideRect(&engine->controls.pointer, &editor->saveas_b.area)
-    ){
+    else if(editor->previousState && editor->saveas_b.status & RIVER2D_BIT_HOVER)
+    {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
 
         float length = editor->saveas_b.area.lowRight.x - editor->saveas_b.area.upLeft.x;
