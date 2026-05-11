@@ -123,6 +123,10 @@ void mapedit_init
     engine->controls.keycodes[MAPEDIT_KEY_SAVE]         = 's';
     engine->controls.keycodes[MAPEDIT_KEY_QUIT]         = 'q';
     engine->controls.keycodes[MAPEDIT_KEY_TILEPICKER]   = 't';
+    engine->controls.keycodes[MAPEDIT_KEY_UP]           = RIVER2D_ASCII_UP;
+    engine->controls.keycodes[MAPEDIT_KEY_DOWN]         = RIVER2D_ASCII_DOWN;
+    engine->controls.keycodes[MAPEDIT_KEY_LEFT]         = RIVER2D_ASCII_LEFT;
+    engine->controls.keycodes[MAPEDIT_KEY_RIGHT]        = RIVER2D_ASCII_RIGHT;
 
     StringView title_sv  = cstr_sv("RIVER2D MAP EDITOR");
     StringView new_sv    = cstr_sv("NEW PROJECT");

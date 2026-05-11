@@ -54,6 +54,10 @@
 #define MAPEDIT_KEY_SAVE              23
 #define MAPEDIT_KEY_QUIT              24
 #define MAPEDIT_KEY_TILEPICKER        25
+#define MAPEDIT_KEY_UP                26
+#define MAPEDIT_KEY_DOWN              27
+#define MAPEDIT_KEY_LEFT              28
+#define MAPEDIT_KEY_RIGHT             29
 
 #define MAPEDIT_BIT_LEFTM             0x000000000001LLU
 #define MAPEDIT_BIT_RIGHTM            0x000000000002LLU
@@ -85,6 +89,10 @@
 #define MAPEDIT_BIT_SAVE              0x0000000000800000LLU
 #define MAPEDIT_BIT_QUIT              0x0000000001000000LLU
 #define MAPEDIT_BIT_TILEPICKER        0x0000000002000000LLU
+#define MAPEDIT_BIT_UP                0x0000000004000000LLU
+#define MAPEDIT_BIT_DOWN              0x0000000008000000LLU
+#define MAPEDIT_BIT_LEFT              0x0000000010000000LLU
+#define MAPEDIT_BIT_RIGHT             0x0000000020000000LLU
 
 #define MAPEDIT_STATE_NULL            0
 #define MAPEDIT_STATE_MENU            1
@@ -191,7 +199,7 @@ extern void mapedit_processButtons
 extern void mapedit_processKeys
 (
     River2D_ControlMap *controls,
-    AsciiKey           key,
+    uint8_t            key,
     bool               isDown
 );
 

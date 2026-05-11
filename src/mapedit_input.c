@@ -34,21 +34,18 @@ f_internal void processKey_function
 (
     River2D_ControlMap *controls,
     uint8_t            desired,
-    AsciiKey           key,
+    uint8_t            key,
     uint64_t           bit,
     bool               isDown
 ){
-    if(isDown &&
-       (key.shifted   == controls->keycodes[desired] ||
-        key.unshifted == controls->keycodes[desired])
-    ){
+    if(isDown && key == controls->keycodes[desired])
+    {
         controls->keymap |= bit;
         return;
     }
 
-    if(key.shifted   == controls->keycodes[desired] ||
-            key.unshifted == controls->keycodes[desired]
-    ){
+    if(key == controls->keycodes[desired])
+    {
         controls->keymap &= ~bit;
     }
 }
@@ -83,12 +80,12 @@ void mapedit_processButtons
 void mapedit_processKeys
 (
     River2D_ControlMap *controls,
-    AsciiKey           key,
+    uint8_t            key,
     bool               isDown
 ){
     if(isDown)
     {
-        controls->ascii = (char)key.shifted;
+        controls->ascii = (char)key;
         if(controls->ascii < 0x20 || controls->ascii > 0x7E)
         {
             controls->ascii = 0x00;
@@ -121,6 +118,10 @@ void mapedit_processKeys
     processKey(MAPEDIT_KEY_SAVE,       MAPEDIT_BIT_SAVE      );
     processKey(MAPEDIT_KEY_QUIT,       MAPEDIT_BIT_QUIT      );
     processKey(MAPEDIT_KEY_TILEPICKER, MAPEDIT_BIT_TILEPICKER);
+    processKey(MAPEDIT_KEY_UP,         MAPEDIT_BIT_UP);
+    processKey(MAPEDIT_KEY_DOWN,       MAPEDIT_BIT_DOWN);
+    processKey(MAPEDIT_KEY_LEFT,       MAPEDIT_BIT_LEFT);
+    processKey(MAPEDIT_KEY_RIGHT,      MAPEDIT_BIT_RIGHT);
 
 #ifdef DEBUG
     fprintf(stderr, "key pressed: %x\n", key);
