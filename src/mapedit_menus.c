@@ -167,6 +167,29 @@ void mapedit_pollMainMenu
             engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
         }
     }
+    else if(editor->previousState &&
+            river2D_insideRect(&engine->controls.pointer, &editor->saveas_b.area)
+    ){
+        river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+
+        float length = editor->saveas_b.area.lowRight.x - editor->saveas_b.area.upLeft.x;
+        float fX     = (float)(engine->backbuffer.width);
+        float fY     = (float)(engine->backbuffer.height);
+
+        comp.src        = &engine->planes[MAPEDIT_PLANE_HIGHLIGHT];
+        comp.offsetDstX = (uint32_t)(editor->saveas_b.area.upLeft.x * fX);
+        comp.offsetDstY = (uint32_t)(editor->saveas_b.area.upLeft.y * fY + 20);
+        comp.cropWidth  = (uint32_t)(length * fX);
+        comp.cropHeight = 5;
+
+        river2D_compositeImage(engine, &comp);
+
+        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
+        {
+            mapedit_changeState(editor, MAPEDIT_STATE_SAVEAS);
+            engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
+        }
+    }
     else
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);

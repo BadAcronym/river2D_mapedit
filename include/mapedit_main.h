@@ -137,6 +137,7 @@ typedef struct EditorData
     Button       new_b;
     Button       load_b;
     Button       save_b;
+    Button       saveas_b;
     Button       quit_b;
     Button       close_b;
     Tile         *tiles;

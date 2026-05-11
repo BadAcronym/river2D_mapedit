@@ -124,12 +124,13 @@ void mapedit_init
     engine->controls.keycodes[MAPEDIT_KEY_QUIT]         = 'q';
     engine->controls.keycodes[MAPEDIT_KEY_TILEPICKER]   = 't';
 
-    StringView title_sv = cstr_sv("RIVER2D MAP EDITOR");
-    StringView new_sv   = cstr_sv("NEW PROJECT");
-    StringView load_sv  = cstr_sv("LOAD PROJECT");
-    StringView save_sv  = cstr_sv("SAVE PROJECT");
-    StringView quit_sv  = cstr_sv("QUIT");
-    StringView close    = cstr_sv("CLOSE");
+    StringView title_sv  = cstr_sv("RIVER2D MAP EDITOR");
+    StringView new_sv    = cstr_sv("NEW PROJECT");
+    StringView load_sv   = cstr_sv("LOAD PROJECT");
+    StringView save_sv   = cstr_sv("SAVE PROJECT");
+    StringView saveas_sv = cstr_sv("SAVE AS");
+    StringView quit_sv   = cstr_sv("QUIT");
+    StringView close     = cstr_sv("CLOSE");
 
     // I'm loading text by creating a button, then overwriting it. pause/main
     // janky, but I don't mind it.
@@ -147,15 +148,19 @@ void mapedit_init
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], &new_sv,
                          MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->new_b);
 
-    point.y = 0.5f;
+    point.y = 0.48f;
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU], &load_sv,
                          MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->load_b);
 
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], &load_sv,
                          MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->load_b);
-    point.y = 0.6f;
+    point.y = 0.56f;
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], &save_sv,
                          MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->save_b);
+    point.y = 0.64f;
+    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], &saveas_sv,
+                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->saveas_b);
+
     point.y = 0.8f;
     river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU], &quit_sv,
                          MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->quit_b);
