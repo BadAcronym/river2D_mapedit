@@ -148,6 +148,7 @@ typedef struct EditorData
     Button       saveas_b;
     Button       quit_b;
     Button       close_b;
+    uint8_t      i_button;
     Tile         *tiles;
     Action       *actions;
     uint32_t     currentAction;
