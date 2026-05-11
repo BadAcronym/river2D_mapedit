@@ -44,7 +44,6 @@ void mapedit_drawMainMenu
     }
 }
 
-// WIP: arrow keys
 f_internal void nextButton
 (
     EditorData *editor,
@@ -746,6 +745,8 @@ f_internal void pollInput
     EngineData *engine,
     EditorData *editor
 ){
+    editor->inputBuffer.data[editor->cursor] = RIVER2D_ASCII_CURSOR;
+
     if(engine->controls.keymap & MAPEDIT_BIT_MENU)
     {
         mapedit_changeState(editor, MAPEDIT_STATE_MENU);
@@ -763,14 +764,17 @@ f_internal void pollInput
 
     if(engine->controls.keymap & MAPEDIT_BIT_BACKSPACE)
     {
+        editor->inputBuffer.data[editor->cursor] = '\0';
+
         decreaseCursor(editor);
 
-        editor->inputBuffer.data[editor->cursor] = '\0';
         engine->controls.keymap &= ~MAPEDIT_BIT_BACKSPACE;
     }
 
     if(engine->controls.keymap & MAPEDIT_BIT_ENTER)
     {
+        editor->inputBuffer.data[editor->cursor] = '\0';
+
         editor->confirmed = true;
         engine->controls.keymap &= ~MAPEDIT_BIT_ENTER;
     }
