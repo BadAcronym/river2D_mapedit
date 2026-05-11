@@ -50,6 +50,94 @@ f_internal void nextButton
     EditorData *editor,
     bool       upward
 ){
+    if(!upward)
+    {
+        goto down;
+    }
+
+    if(editor->i_button == 0)
+    {
+        editor->quit_b.status |= RIVER2D_BIT_HOVER;
+    }
+    else if(editor->i_button == 2)
+    {
+        editor->load_b.status &= ~RIVER2D_BIT_HOVER;
+        editor->new_b.status  |= RIVER2D_BIT_HOVER;
+        --editor->i_button;
+    }
+    else if(editor->i_button == 3)
+    {
+        editor->save_b.status &= ~RIVER2D_BIT_HOVER;
+        editor->load_b.status |= RIVER2D_BIT_HOVER;
+        --editor->i_button;
+    }
+    else if(editor->i_button == 4)
+    {
+        editor->saveas_b.status &= ~RIVER2D_BIT_HOVER;
+        editor->save_b.status   |= RIVER2D_BIT_HOVER;
+        --editor->i_button;
+    }
+    else if(editor->previousState && editor->i_button == 5)
+    {
+        editor->quit_b.status   &= ~RIVER2D_BIT_HOVER;
+        editor->saveas_b.status |= RIVER2D_BIT_HOVER;
+        --editor->i_button;
+    }
+    else if(editor->i_button == 5)
+    {
+        editor->quit_b.status &= ~RIVER2D_BIT_HOVER;
+        editor->save_b.status |= RIVER2D_BIT_HOVER;
+        editor->i_button = 3;
+    }
+
+    return;
+
+down:
+    if(editor->i_button == 5)
+    {
+        return;
+    }
+    else if(editor->i_button == 0)
+    {
+        editor->new_b.status |= RIVER2D_BIT_HOVER;
+        ++editor->i_button;
+    }
+    else if(editor->i_button == 1)
+    {
+        editor->new_b.status  &= ~RIVER2D_BIT_HOVER;
+        editor->load_b.status |= RIVER2D_BIT_HOVER;
+        ++editor->i_button;
+    }
+    else if(editor->previousState && editor->i_button == 2)
+    {
+        editor->load_b.status &= ~RIVER2D_BIT_HOVER;
+        editor->save_b.status |= RIVER2D_BIT_HOVER;
+        ++editor->i_button;
+    }
+    else if(editor->i_button == 2)
+    {
+        editor->load_b.status &= ~RIVER2D_BIT_HOVER;
+        editor->quit_b.status |= RIVER2D_BIT_HOVER;
+        ++editor->i_button;
+    }
+    else if(editor->previousState && editor->i_button == 3)
+    {
+        editor->save_b.status   &= ~RIVER2D_BIT_HOVER;
+        editor->saveas_b.status |= RIVER2D_BIT_HOVER;
+        ++editor->i_button;
+    }
+    else if(editor->i_button == 3)
+    {
+        editor->save_b.status &= ~RIVER2D_BIT_HOVER;
+        editor->quit_b.status |= RIVER2D_BIT_HOVER;
+        editor->i_button = 5;
+    }
+    else if(editor->i_button == 4)
+    {
+        editor->saveas_b.status &= ~RIVER2D_BIT_HOVER;
+        editor->quit_b.status   |= RIVER2D_BIT_HOVER;
+        ++editor->i_button;
+    }
 }
 
 f_internal void pollHovers
@@ -59,38 +147,54 @@ f_internal void pollHovers
 ){
     if(river2D_insideRect(&engine->controls.pointer, &editor->new_b.area))
     {
-        editor->new_b.status |= RIVER2D_BIT_HOVER;
+        editor->new_b.status    |= RIVER2D_BIT_HOVER;
+        editor->load_b.status   &= ~RIVER2D_BIT_HOVER;
+        editor->save_b.status   &= ~RIVER2D_BIT_HOVER;
+        editor->saveas_b.status &= ~RIVER2D_BIT_HOVER;
+        editor->quit_b.status   &= ~RIVER2D_BIT_HOVER;
+        editor->i_button = 1;
         return;
     }
-    editor->new_b.status &= ~RIVER2D_BIT_HOVER;
-
-    if(river2D_insideRect(&engine->controls.pointer, &editor->load_b.area))
+    else if(river2D_insideRect(&engine->controls.pointer, &editor->load_b.area))
     {
-        editor->load_b.status |= RIVER2D_BIT_HOVER;
+        editor->new_b.status    &= ~RIVER2D_BIT_HOVER;
+        editor->load_b.status   |= RIVER2D_BIT_HOVER;
+        editor->save_b.status   &= ~RIVER2D_BIT_HOVER;
+        editor->saveas_b.status &= ~RIVER2D_BIT_HOVER;
+        editor->quit_b.status   &= ~RIVER2D_BIT_HOVER;
+        editor->i_button = 2;
         return;
     }
-    editor->load_b.status &= ~RIVER2D_BIT_HOVER;
-
-    if(river2D_insideRect(&engine->controls.pointer, &editor->quit_b.area))
+    else if(river2D_insideRect(&engine->controls.pointer, &editor->save_b.area))
     {
-        editor->quit_b.status |= RIVER2D_BIT_HOVER;
+        editor->new_b.status    &= ~RIVER2D_BIT_HOVER;
+        editor->load_b.status   &= ~RIVER2D_BIT_HOVER;
+        editor->save_b.status   |= RIVER2D_BIT_HOVER;
+        editor->saveas_b.status &= ~RIVER2D_BIT_HOVER;
+        editor->quit_b.status   &= ~RIVER2D_BIT_HOVER;
+        editor->i_button = 3;
         return;
     }
-    editor->quit_b.status &= ~RIVER2D_BIT_HOVER;
-
-    if(river2D_insideRect(&engine->controls.pointer, &editor->save_b.area))
+    else if(river2D_insideRect(&engine->controls.pointer, &editor->saveas_b.area))
     {
-        editor->save_b.status |= RIVER2D_BIT_HOVER;
-        return;
-    }
-    editor->save_b.status &= ~RIVER2D_BIT_HOVER;
-
-    if(river2D_insideRect(&engine->controls.pointer, &editor->saveas_b.area))
-    {
+        editor->new_b.status    &= ~RIVER2D_BIT_HOVER;
+        editor->load_b.status   &= ~RIVER2D_BIT_HOVER;
+        editor->save_b.status   &= ~RIVER2D_BIT_HOVER;
         editor->saveas_b.status |= RIVER2D_BIT_HOVER;
+        editor->quit_b.status   &= ~RIVER2D_BIT_HOVER;
+        editor->i_button = 4;
         return;
     }
-    editor->saveas_b.status &= ~RIVER2D_BIT_HOVER;
+    else if(river2D_insideRect(&engine->controls.pointer, &editor->quit_b.area))
+    {
+        editor->new_b.status    &= ~RIVER2D_BIT_HOVER;
+        editor->load_b.status   &= ~RIVER2D_BIT_HOVER;
+        editor->save_b.status   &= ~RIVER2D_BIT_HOVER;
+        editor->saveas_b.status &= ~RIVER2D_BIT_HOVER;
+        editor->quit_b.status   |= RIVER2D_BIT_HOVER;
+        editor->i_button = 5;
+        return;
+    }
 }
 
 void mapedit_pollMainMenu
@@ -116,16 +220,18 @@ void mapedit_pollMainMenu
         return;
     }
 
+    pollHovers(engine, editor);
+
     if(engine->controls.keymap & MAPEDIT_BIT_UP)
     {
         nextButton(editor, true);
+        engine->controls.keymap &= ~MAPEDIT_BIT_UP;
     }
     else if(engine->controls.keymap & MAPEDIT_BIT_DOWN)
     {
         nextButton(editor, false);
+        engine->controls.keymap &= ~MAPEDIT_BIT_DOWN;
     }
-
-    pollHovers(engine, editor);
 
     if(editor->new_b.status & RIVER2D_BIT_HOVER)
     {
@@ -143,8 +249,9 @@ void mapedit_pollMainMenu
 
         river2D_compositeImage(engine, &comp);
 
-        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
-        {
+        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM ||
+           engine->controls.keymap    & MAPEDIT_BIT_ENTER
+        ){
             if(editor->previousState && editor->tiles)
             {
                 uint64_t tilecount = editor->layers *
@@ -175,11 +282,13 @@ void mapedit_pollMainMenu
 
         river2D_compositeImage(engine, &comp);
 
-        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
-        {
+        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM ||
+           engine->controls.keymap    & MAPEDIT_BIT_ENTER
+        ){
             engine->controls.ascii = 0x00;
-            mapedit_changeState(editor, MAPEDIT_STATE_LOAD);
             engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
+            engine->controls.keymap    &= ~MAPEDIT_BIT_ENTER;
+            mapedit_changeState(editor, MAPEDIT_STATE_LOAD);
         }
     }
     else if(editor->quit_b.status & RIVER2D_BIT_HOVER)
@@ -198,8 +307,9 @@ void mapedit_pollMainMenu
 
         river2D_compositeImage(engine, &comp);
 
-        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
-        {
+        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM ||
+           engine->controls.keymap    & MAPEDIT_BIT_ENTER
+        ){
             engine->running = false;
         }
     }
@@ -219,10 +329,12 @@ void mapedit_pollMainMenu
 
         river2D_compositeImage(engine, &comp);
 
-        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
-        {
-            mapedit_saveProject(engine, editor);
+        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM ||
+           engine->controls.keymap    & MAPEDIT_BIT_ENTER
+        ){
             engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
+            engine->controls.keymap    &= ~MAPEDIT_BIT_ENTER;
+            mapedit_saveProject(engine, editor);
         }
     }
     else if(editor->previousState && editor->saveas_b.status & RIVER2D_BIT_HOVER)
@@ -243,11 +355,12 @@ void mapedit_pollMainMenu
 
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
-            mapedit_changeState(editor, MAPEDIT_STATE_SAVEAS);
             engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
+            engine->controls.keymap    &= ~MAPEDIT_BIT_ENTER;
+            mapedit_changeState(editor, MAPEDIT_STATE_SAVEAS);
         }
     }
-    else
+    else if(!editor->i_button)
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
 
