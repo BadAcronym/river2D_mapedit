@@ -110,9 +110,10 @@ typedef struct Tile
 {
     uint16_t x;
     uint16_t y;
-    uint16_t frames;
-    uint8_t  flags;
     uint8_t  fps;
+    uint8_t  flags;
+    int8_t   adv_x;
+    int8_t   adv_y;
 }
 Tile;
 
