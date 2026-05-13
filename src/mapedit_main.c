@@ -201,20 +201,17 @@ void mapedit_init
         River2D_Image tmp;
 
         river2D_loadImage_file(engine, expanded, &tmp, RIVER2D_CHANNELS_BGRA, 8);
-
         river2D_appendImage(engine, &tmp, &engine->planes[MAPEDIT_PLANE_TILESHEET],
                             RIVER2D_VERTICAL);
 
         river2D_destroyImage(&tmp);
-
         free((void*)expanded.data);
     }
 
     free((void*)ls.data);
 
-    editor->tilesize   = 32;
-    editor->selectMult = 1;
-
+    editor->tilesize     = 32;
+    editor->selectMult   = 1;
     editor->layers       = 10;
     editor->currentLayer = 1;
 
