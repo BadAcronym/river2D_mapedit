@@ -134,48 +134,67 @@ void mapedit_init
     StringView save_sv   = cstr_sv("SAVE PROJECT");
     StringView saveas_sv = cstr_sv("SAVE AS");
     StringView quit_sv   = cstr_sv("QUIT");
-    StringView close     = cstr_sv("CLOSE");
+    StringView close_sv  = cstr_sv("CLOSE");
 
-    // I'm loading text by creating a button, then overwriting it. pause/main
-    // janky, but I don't mind it.
-    Coordinates point = { .x = 0.5f, .y = 0.2f };
+    // JANKY: I'm loading text by creating a button, then overwriting it, like for the
+    // title.
 
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU], &title_sv,
-                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->new_b);
+    ButtonSettings set = {0};
+    set.img      = &engine->planes[MAPEDIT_PLANE_MAINMENU];
+    set.name     = &title_sv;
+    set.font     = MAPEDIT_PLANE_FONT16;
+    set.charsize = 16;
+    set.spacing  = 1;
+    set.point.x  = 0.5f;
+    set.point.y  = 0.2f;
+    set.button   = &editor->new_b;
+    river2D_createButton(engine, &set);
 
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], &title_sv,
-                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->new_b);
-    point.y = 0.4f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU], &new_sv,
-                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->new_b);
+    set.img = &engine->planes[MAPEDIT_PLANE_PAUSEMENU];
+    river2D_createButton(engine, &set);
 
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], &new_sv,
-                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->new_b);
+    set.img     = &engine->planes[MAPEDIT_PLANE_MAINMENU];
+    set.name    = &new_sv;
+    set.point.y = 0.4f;
+    river2D_createButton(engine, &set);
 
-    point.y = 0.48f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU], &load_sv,
-                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->load_b);
+    set.img = &engine->planes[MAPEDIT_PLANE_PAUSEMENU];
+    river2D_createButton(engine, &set);
 
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], &load_sv,
-                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->load_b);
-    point.y = 0.56f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], &save_sv,
-                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->save_b);
-    point.y = 0.64f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], &saveas_sv,
-                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->saveas_b);
+    set.img     = &engine->planes[MAPEDIT_PLANE_MAINMENU];
+    set.name    = &load_sv;
+    set.point.y = 0.48f;
+    set.button  = &editor->load_b;
+    river2D_createButton(engine, &set);
 
-    point.y = 0.8f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU], &quit_sv,
-                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->quit_b);
+    set.img = &engine->planes[MAPEDIT_PLANE_PAUSEMENU];
+    river2D_createButton(engine, &set);
 
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU], &quit_sv,
-                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->quit_b);
+    set.name    = &save_sv;
+    set.point.y = 0.56f;
+    set.button  = &editor->save_b;
+    river2D_createButton(engine, &set);
 
-    point.x = 0.175f;
-    point.y = 0.86f;
-    river2D_createButton(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE], &close,
-                         MAPEDIT_PLANE_FONT16, 16, 1, point, &editor->close_b);
+    set.name    = &saveas_sv;
+    set.point.y = 0.64f;
+    set.button  = &editor->saveas_b;
+    river2D_createButton(engine, &set);
+
+    set.img     = &engine->planes[MAPEDIT_PLANE_MAINMENU];
+    set.name    = &quit_sv;
+    set.point.y = 0.8f;
+    set.button  = &editor->quit_b;
+    river2D_createButton(engine, &set);
+
+    set.img = &engine->planes[MAPEDIT_PLANE_PAUSEMENU];
+    river2D_createButton(engine, &set);
+
+    set.name    = &close_sv;
+    set.img     = &engine->planes[MAPEDIT_PLANE_SELECTTILE];
+    set.point.x = 0.175f;
+    set.point.y = 0.86f;
+    set.button  = &editor->close_b;
+    river2D_createButton(engine, &set);
 
     StringView dir = cstr_sv("assets/custom/");
     StringView ls  = river2D_listFiles(dir);
