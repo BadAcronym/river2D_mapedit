@@ -532,6 +532,26 @@ f_internal void drawTilePicker
     river2D_compositeImage(engine, &comp);
 }
 
+f_internal void drawContextMenu
+(
+    EngineData *engine,
+    EditorData *editor
+){
+    rvCompositeSettings comp = {0};
+    comp.src        = &engine->planes[MAPEDIT_PLANE_VOID];
+    comp.offsetDstX = 0;
+    comp.offsetDstY = 0;
+
+    river2D_compositeImage(engine, &comp);
+}
+
+f_internal void pollContextMenu
+(
+    EngineData *engine,
+    EditorData *editor
+){
+}
+
 f_internal void pollTilePicker
 (
     EngineData *engine,
@@ -561,7 +581,8 @@ f_internal void pollTilePicker
 
     if(editor->flags & MAPEDIT_FLAG_CONTEXTMENU)
     {
-        // TODO: draw context menu
+        drawContextMenu(engine, editor);
+        pollContextMenu(engine, editor);
     }
 
     if(river2D_insideRect(&engine->controls.pointer, &editor->close_b.area))
@@ -645,26 +666,6 @@ f_internal void pollTilePicker
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
     }
-}
-
-f_internal void drawContextMenu
-(
-    EngineData *engine,
-    EditorData *editor
-){
-    rvCompositeSettings comp = {0};
-    comp.src        = &engine->planes[MAPEDIT_PLANE_VOID];
-    comp.offsetDstX = 0;
-    comp.offsetDstY = 0;
-
-    river2D_compositeImage(engine, &comp);
-}
-
-f_internal void pollContextMenu
-(
-    EngineData *engine,
-    EditorData *editor
-){
 }
 
 void mapedit_pollEditor
