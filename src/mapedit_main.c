@@ -128,6 +128,11 @@ void mapedit_init
     engine->controls.keycodes[MAPEDIT_KEY_LEFT]         = RIVER2D_ASCII_LEFT;
     engine->controls.keycodes[MAPEDIT_KEY_RIGHT]        = RIVER2D_ASCII_RIGHT;
 
+    editor->tilesize     = 32;
+    editor->selectMult   = 1;
+    editor->layers       = 10;
+    editor->currentLayer = 1;
+
     StringView title_sv  = cstr_sv("RIVER2D MAP EDITOR");
     StringView new_sv    = cstr_sv("NEW PROJECT");
     StringView load_sv   = cstr_sv("LOAD PROJECT");
@@ -189,11 +194,14 @@ void mapedit_init
     set.img = &engine->planes[MAPEDIT_PLANE_PAUSEMENU];
     river2D_createButton(engine, &set);
 
-    set.name    = &close_sv;
-    set.img     = &engine->planes[MAPEDIT_PLANE_SELECTTILE];
-    set.point.x = 0.175f;
-    set.point.y = 0.86f;
-    set.button  = &editor->close_b;
+    float bufHeight = (float)engine->backbuffer.height;
+
+    set.name      = &close_sv;
+    set.img       = &engine->planes[MAPEDIT_PLANE_SELECTTILE];
+    set.point.x   = 0.1f + set.charsize / (bufHeight * 2);
+    set.point.y   = 0.9f - set.charsize / bufHeight;
+    set.button    = &editor->close_b;
+    set.alignment = RIVER2D_ALIGN_BOTTOMLEFT;
     river2D_createButton(engine, &set);
 
     StringView dir = cstr_sv("assets/custom/");
@@ -228,11 +236,6 @@ void mapedit_init
     }
 
     free((void*)ls.data);
-
-    editor->tilesize     = 32;
-    editor->selectMult   = 1;
-    editor->layers       = 10;
-    editor->currentLayer = 1;
 
     editor->mapWidth  = engine->config.canvas_width  / editor->tilesize;
     editor->mapHeight = engine->config.canvas_height / editor->tilesize;
