@@ -293,6 +293,11 @@ void mapedit_changeState
         return;
     }
 
+    if(nextState == MAPEDIT_STATE_MENU)
+    {
+        editor->i_button = 0;
+    }
+
     editor->previousState = editor->currentState;
     editor->currentState  = nextState;
 }
