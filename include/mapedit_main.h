@@ -100,11 +100,12 @@
 #define MAPEDIT_STATE_LOAD            3
 #define MAPEDIT_STATE_SAVEAS          4
 
-#define MAPEDIT_FLAG_BIT_TILEPICKER   0x01UL
+#define MAPEDIT_FLAG_TILEPICKER  0x01
+#define MAPEDIT_FLAG_CONTEXTMENU 0x02
 
-#define MAPEDIT_BIT_INVALID   0x01
-#define MAPEDIT_BIT_ANIMATED  0x02
-#define MAPEDIT_BIT_COLLISION 0x04
+#define MAPEDIT_BIT_INVALID     0x01
+#define MAPEDIT_BIT_ANIMATED    0x02
+#define MAPEDIT_BIT_COLLISION   0x04
 
 typedef struct Tile
 {
@@ -142,7 +143,7 @@ typedef struct EditorData
     uint8_t      selectMult;
     uint32_t     mapWidth;
     uint32_t     mapHeight;
-    uint64_t     editorflags;
+    uint8_t      flags;
     Button       new_b;
     Button       load_b;
     Button       save_b;
