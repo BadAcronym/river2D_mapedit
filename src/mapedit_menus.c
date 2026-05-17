@@ -151,7 +151,6 @@ f_internal void pollHovers
         editor->save_b.status   &= ~RIVER2D_BIT_HOVER;
         editor->saveas_b.status &= ~RIVER2D_BIT_HOVER;
         editor->quit_b.status   &= ~RIVER2D_BIT_HOVER;
-        editor->i_button = 1;
         return;
     }
     else if(river2D_insideRect(&engine->controls.pointer, &editor->load_b.area))
@@ -161,7 +160,6 @@ f_internal void pollHovers
         editor->save_b.status   &= ~RIVER2D_BIT_HOVER;
         editor->saveas_b.status &= ~RIVER2D_BIT_HOVER;
         editor->quit_b.status   &= ~RIVER2D_BIT_HOVER;
-        editor->i_button = 2;
         return;
     }
     else if(river2D_insideRect(&engine->controls.pointer, &editor->save_b.area))
@@ -171,7 +169,6 @@ f_internal void pollHovers
         editor->save_b.status   |= RIVER2D_BIT_HOVER;
         editor->saveas_b.status &= ~RIVER2D_BIT_HOVER;
         editor->quit_b.status   &= ~RIVER2D_BIT_HOVER;
-        editor->i_button = 3;
         return;
     }
     else if(river2D_insideRect(&engine->controls.pointer, &editor->saveas_b.area))
@@ -181,7 +178,6 @@ f_internal void pollHovers
         editor->save_b.status   &= ~RIVER2D_BIT_HOVER;
         editor->saveas_b.status |= RIVER2D_BIT_HOVER;
         editor->quit_b.status   &= ~RIVER2D_BIT_HOVER;
-        editor->i_button = 4;
         return;
     }
     else if(river2D_insideRect(&engine->controls.pointer, &editor->quit_b.area))
@@ -191,8 +187,15 @@ f_internal void pollHovers
         editor->save_b.status   &= ~RIVER2D_BIT_HOVER;
         editor->saveas_b.status &= ~RIVER2D_BIT_HOVER;
         editor->quit_b.status   |= RIVER2D_BIT_HOVER;
-        editor->i_button = 5;
         return;
+    }
+    else if(!editor->i_button)
+    {
+        editor->new_b.status    &= ~RIVER2D_BIT_HOVER;
+        editor->load_b.status   &= ~RIVER2D_BIT_HOVER;
+        editor->save_b.status   &= ~RIVER2D_BIT_HOVER;
+        editor->saveas_b.status &= ~RIVER2D_BIT_HOVER;
+        editor->quit_b.status   &= ~RIVER2D_BIT_HOVER;
     }
 }
 
