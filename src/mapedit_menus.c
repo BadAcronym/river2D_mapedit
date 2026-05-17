@@ -462,6 +462,209 @@ void mapedit_drawEditor
 
         river2D_compositeImage(engine, &comp);
     }
+
+    float fX       = (float)(engine->backbuffer.width);
+    float fY       = (float)(engine->backbuffer.height);
+    uint16_t tileX = (uint16_t)(engine->controls.pointer.x * fX  / editor->tilesize);
+    uint16_t tileY = (uint16_t)(engine->controls.pointer.y * fY / editor->tilesize);
+
+    uint8_t modX = tileX % editor->selectMult;
+    uint8_t modY = tileY % editor->selectMult;
+
+    if(engine->controls.keymap & MAPEDIT_BIT_LSHIFT)
+    {
+        if(modX)
+        {
+            tileX -= modX;
+        }
+        if(modY)
+        {
+            tileY -= modY;
+        }
+    }
+
+    comp.src        = &engine->planes[MAPEDIT_PLANE_TILESHEET];
+    comp.dst        = &engine->backbuffer;
+    comp.offsetSrcX = editor->selectedX * editor->tilesize;
+    comp.offsetSrcY = editor->selectedY * editor->tilesize;
+    comp.offsetDstX = tileX * editor->tilesize;
+    comp.offsetDstY = tileY * editor->tilesize;
+    comp.cropWidth  = editor->tilesize  * editor->selectMult;
+    comp.cropHeight = editor->tilesize  * editor->selectMult;
+
+    river2D_compositeImage(engine, &comp);
+}
+
+f_internal void drawTilePicker
+(
+    EngineData *engine,
+    EditorData *editor,
+    uint32_t   sheet_width,
+    uint32_t   sheet_height
+){
+    rvCompositeSettings comp = {0};
+    comp.dst        = &engine->backbuffer;
+    comp.pictop     = RIVER2D_PICTOP_OVER;
+    comp.src        = &engine->planes[MAPEDIT_PLANE_BACKGROUND];
+    comp.offsetDstX = engine->backbuffer.width  / 10;
+    comp.offsetDstY = engine->backbuffer.height / 10;
+    comp.cropWidth  = (uint32_t)((float)engine->backbuffer.width  / 1.25f);
+    comp.cropHeight = (uint32_t)((float)engine->backbuffer.height / 1.25f);
+
+    river2D_compositeImage(engine, &comp);
+
+    comp.src        = &engine->planes[MAPEDIT_PLANE_SELECTTILE];
+    comp.offsetDstX = 0;
+    comp.offsetDstY = 0;
+    comp.cropWidth  = engine->planes[MAPEDIT_PLANE_SELECTTILE].width;
+    comp.cropHeight = engine->planes[MAPEDIT_PLANE_SELECTTILE].height;
+
+    river2D_compositeImage(engine, &comp);
+
+    comp.src        = &engine->planes[MAPEDIT_PLANE_TILESHEET];
+    comp.offsetSrcX = 0;
+    comp.offsetSrcY = editor->viewScroll * editor->tilesize;
+    comp.offsetDstX = engine->backbuffer.width  / 10 + editor->tilesize;
+    comp.offsetDstY = engine->backbuffer.height / 10 + editor->tilesize;
+    comp.cropWidth  = sheet_width;
+    comp.cropHeight = sheet_height;
+
+    river2D_compositeImage(engine, &comp);
+}
+
+f_internal void pollTilePicker
+(
+    EngineData *engine,
+    EditorData *editor,
+    uint32_t   sheet_width,
+    uint32_t   sheet_height
+){
+    float fX = (float)(engine->backbuffer.width);
+    float fY = (float)(engine->backbuffer.height);
+
+    Rect tiles = {0};
+    tiles.upLeft.x   = 0.095f + (float)((float)editor->tilesize / fX);
+    tiles.upLeft.y   = 0.095f + (float)((float)editor->tilesize / fY);
+    tiles.lowRight.x = tiles.upLeft.x + (float)sheet_width / fX;
+    tiles.lowRight.y = tiles.upLeft.y + (float)sheet_height / fY;
+
+    rvCompositeSettings comp = {0};
+    comp.dst        = &engine->backbuffer;
+    comp.pictop     = RIVER2D_PICTOP_OVER;
+
+    if(engine->controls.keymap & MAPEDIT_BIT_MENU)
+    {
+        engine->controls.keymap &= ~MAPEDIT_BIT_MENU;
+        editor->flags           &= ~MAPEDIT_FLAG_TILEPICKER;
+        return;
+    }
+
+    if(editor->flags & MAPEDIT_FLAG_CONTEXTMENU)
+    {
+        // TODO: draw context menu
+    }
+
+    if(river2D_insideRect(&engine->controls.pointer, &editor->close_b.area))
+    {
+        river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+
+        float length = editor->close_b.area.lowRight.x -
+                       editor->close_b.area.upLeft.x;
+
+        comp.src        = &engine->planes[MAPEDIT_PLANE_HIGHLIGHT];
+        comp.offsetSrcX = 0;
+        comp.offsetSrcY = 0;
+        comp.offsetDstX = (uint32_t)(editor->close_b.area.upLeft.x * fX);
+        comp.offsetDstY = (uint32_t)(editor->close_b.area.upLeft.y * fY + 20);
+        comp.cropWidth  = (uint32_t)(length * fX);
+        comp.cropHeight = 5;
+
+        river2D_compositeImage(engine, &comp);
+
+        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
+        {
+            editor->flags              &= ~MAPEDIT_FLAG_TILEPICKER;
+            engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
+        }
+    }
+    else if(river2D_insideRect(&engine->controls.pointer, &tiles))
+    {
+        river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_NULL]);
+
+        float    deltaX = engine->controls.pointer.x - tiles.upLeft.x;
+        float    deltaY = engine->controls.pointer.y - tiles.upLeft.y;
+        uint8_t  tileX  = (uint8_t)(deltaX * fX / editor->tilesize);
+        uint8_t  tileY  = (uint8_t)(deltaY * fY / editor->tilesize);
+        uint16_t sheetX = (uint16_t)(sheet_width  / editor->tilesize);
+        uint16_t sheetY = (uint16_t)(sheet_height / editor->tilesize);
+
+        if(tileX + editor->selectMult > sheetX)
+        {
+            tileX = (uint8_t)(sheetX - editor->selectMult);
+        }
+        if(tileY + editor->selectMult > sheetY)
+        {
+            tileY = (uint8_t)(sheetY - editor->selectMult);
+        }
+
+        if(engine->controls.keymap & MAPEDIT_BIT_DECREASE)
+        {
+            mapedit_updateSelectSize(editor, false);
+            engine->controls.keymap &= ~MAPEDIT_BIT_DECREASE;
+        }
+        if(engine->controls.keymap & MAPEDIT_BIT_INCREASE)
+        {
+            mapedit_updateSelectSize(editor, true);
+            engine->controls.keymap &= ~MAPEDIT_BIT_INCREASE;
+        }
+
+        comp.src        = &engine->planes[MAPEDIT_PLANE_HIGHLIGHT];
+        comp.offsetDstX = (uint32_t)(fX * (tiles.upLeft.x + 0.0055f) +
+                                          tileX * editor->tilesize);
+        comp.offsetDstY = (uint32_t)(fY * (tiles.upLeft.y + 0.006f) +
+                                          tileY * editor->tilesize);
+        comp.cropWidth  = editor->tilesize * editor->selectMult;
+        comp.cropHeight = editor->tilesize * editor->selectMult;
+
+        river2D_compositeImage(engine, &comp);
+
+        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
+        {
+            editor->selectedX           = tileX;
+            editor->selectedY           = tileY + editor->viewScroll;
+            editor->flags              &= ~MAPEDIT_FLAG_TILEPICKER;
+            engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
+        }
+        else if(engine->controls.buttonmap & MAPEDIT_BIT_RIGHTM)
+        {
+
+            engine->controls.buttonmap &= ~MAPEDIT_BIT_RIGHTM;
+        }
+    }
+    else
+    {
+        river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
+    }
+}
+
+f_internal void drawContextMenu
+(
+    EngineData *engine,
+    EditorData *editor
+){
+    rvCompositeSettings comp = {0};
+    comp.src        = &engine->planes[MAPEDIT_PLANE_VOID];
+    comp.offsetDstX = 0;
+    comp.offsetDstY = 0;
+
+    river2D_compositeImage(engine, &comp);
+}
+
+f_internal void pollContextMenu
+(
+    EngineData *engine,
+    EditorData *editor
+){
 }
 
 void mapedit_pollEditor
@@ -475,150 +678,36 @@ void mapedit_pollEditor
 
     if(engine->controls.keymap & MAPEDIT_BIT_TILEPICKER)
     {
-        editor->editorflags     ^= MAPEDIT_FLAG_BIT_TILEPICKER;
+        editor->flags           ^= MAPEDIT_FLAG_TILEPICKER;
         engine->controls.keymap &= ~MAPEDIT_BIT_TILEPICKER;
     }
 
     float fX = (float)engine->backbuffer.width;
     float fY = (float)engine->backbuffer.height;
 
-    if(editor->editorflags & MAPEDIT_FLAG_BIT_TILEPICKER)
+    uint32_t sheet_width  = engine->planes[MAPEDIT_PLANE_TILESHEET].width;
+    uint32_t sheet_height = engine->planes[MAPEDIT_PLANE_TILESHEET].height;
+
+    float max_w = (float)engine->backbuffer.width  * 0.8f - 2 * editor->tilesize;
+    float max_h = (float)engine->backbuffer.height * 0.8f - 3 * editor->tilesize;
+
+    if((float)sheet_width > max_w)
     {
-        if(engine->controls.keymap & MAPEDIT_BIT_MENU)
-        {
-            engine->controls.keymap &= ~MAPEDIT_BIT_MENU;
-            editor->editorflags     &= ~MAPEDIT_FLAG_BIT_TILEPICKER;
-            return;
-        }
-
-        comp.src        = &engine->planes[MAPEDIT_PLANE_BACKGROUND];
-        comp.offsetDstX = engine->backbuffer.width  / 10;
-        comp.offsetDstY = engine->backbuffer.height / 10;
-        comp.cropWidth  = (uint32_t)((float)engine->backbuffer.width  / 1.25f);
-        comp.cropHeight = (uint32_t)((float)engine->backbuffer.height / 1.25f);
-
-        river2D_compositeImage(engine, &comp);
-
-        comp.src        = &engine->planes[MAPEDIT_PLANE_SELECTTILE];
-        comp.offsetDstX = 0;
-        comp.offsetDstY = 0;
-        comp.cropWidth  = engine->planes[MAPEDIT_PLANE_SELECTTILE].width;
-        comp.cropHeight = engine->planes[MAPEDIT_PLANE_SELECTTILE].height;
-
-        river2D_compositeImage(engine, &comp);
-
-        uint32_t sheet_width  = engine->planes[MAPEDIT_PLANE_TILESHEET].width;
-        uint32_t sheet_height = engine->planes[MAPEDIT_PLANE_TILESHEET].height;
-
-        float max_w = (float)engine->backbuffer.width  * 0.8f - 2 * editor->tilesize;
-        float max_h = (float)engine->backbuffer.height * 0.8f - 3 * editor->tilesize;
-
-        if((float)sheet_width > max_w)
-        {
-            sheet_width = (uint32_t)max_w;
-        }
-        if((float)sheet_height > max_h)
-        {
-            sheet_height = (uint32_t)max_h;
-        }
-
-        comp.src        = &engine->planes[MAPEDIT_PLANE_TILESHEET];
-        comp.offsetSrcX = 0;
-        comp.offsetSrcY = editor->viewScroll * editor->tilesize;
-        comp.offsetDstX = engine->backbuffer.width  / 10 + editor->tilesize;
-        comp.offsetDstY = engine->backbuffer.height / 10 + editor->tilesize;
-        comp.cropWidth  = sheet_width;
-        comp.cropHeight = sheet_height;
-
-        river2D_compositeImage(engine, &comp);
-
-        Rect tiles = {0};
-        tiles.upLeft.x   = 0.095f + (float)((float)editor->tilesize / fX);
-        tiles.upLeft.y   = 0.095f + (float)((float)editor->tilesize / fY);
-        tiles.lowRight.x = tiles.upLeft.x + (float)sheet_width / fX;
-        tiles.lowRight.y = tiles.upLeft.y + (float)sheet_height / fY;
-
-        if(river2D_insideRect(&engine->controls.pointer, &editor->close_b.area))
-        {
-            river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
-
-            float length = editor->close_b.area.lowRight.x -
-                           editor->close_b.area.upLeft.x;
-
-            comp.src        = &engine->planes[MAPEDIT_PLANE_HIGHLIGHT];
-            comp.offsetSrcX = 0;
-            comp.offsetSrcY = 0;
-            comp.offsetDstX = (uint32_t)(editor->close_b.area.upLeft.x * fX);
-            comp.offsetDstY = (uint32_t)(editor->close_b.area.upLeft.y * fY + 20);
-            comp.cropWidth  = (uint32_t)(length * fX);
-            comp.cropHeight = 5;
-
-            river2D_compositeImage(engine, &comp);
-
-            if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
-            {
-                editor->editorflags        &= ~MAPEDIT_FLAG_BIT_TILEPICKER;
-                engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
-            }
-        }
-        else if(river2D_insideRect(&engine->controls.pointer, &tiles))
-        {
-            river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_NULL]);
-
-            float    deltaX = engine->controls.pointer.x - tiles.upLeft.x;
-            float    deltaY = engine->controls.pointer.y - tiles.upLeft.y;
-            uint8_t  tileX  = (uint8_t)(deltaX * fX / editor->tilesize);
-            uint8_t  tileY  = (uint8_t)(deltaY * fY / editor->tilesize);
-            uint16_t sheetX = (uint16_t)(sheet_width  / editor->tilesize);
-            uint16_t sheetY = (uint16_t)(sheet_height / editor->tilesize);
-
-            if(tileX + editor->selectMult > sheetX)
-            {
-                tileX = (uint8_t)(sheetX - editor->selectMult);
-            }
-            if(tileY + editor->selectMult > sheetY)
-            {
-                tileY = (uint8_t)(sheetY - editor->selectMult);
-            }
-
-            if(engine->controls.keymap & MAPEDIT_BIT_DECREASE)
-            {
-                mapedit_updateSelectSize(editor, false);
-                engine->controls.keymap &= ~MAPEDIT_BIT_DECREASE;
-            }
-            if(engine->controls.keymap & MAPEDIT_BIT_INCREASE)
-            {
-                mapedit_updateSelectSize(editor, true);
-                engine->controls.keymap &= ~MAPEDIT_BIT_INCREASE;
-            }
-
-            comp.src        = &engine->planes[MAPEDIT_PLANE_HIGHLIGHT];
-            comp.offsetDstX = (uint32_t)(fX * (tiles.upLeft.x + 0.0055f) +
-                                              tileX * editor->tilesize);
-            comp.offsetDstY = (uint32_t)(fY * (tiles.upLeft.y + 0.006f) +
-                                              tileY * editor->tilesize);
-            comp.cropWidth  = editor->tilesize * editor->selectMult;
-            comp.cropHeight = editor->tilesize * editor->selectMult;
-
-            river2D_compositeImage(engine, &comp);
-
-            if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
-            {
-                editor->selectedX           = tileX;
-                editor->selectedY           = tileY + editor->viewScroll;
-                editor->editorflags        &= ~MAPEDIT_FLAG_BIT_TILEPICKER;
-                engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
-            }
-        }
-        else
-        {
-            river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
-        }
-
-        return;
+        sheet_width = (uint32_t)max_w;
     }
-    else if(engine->controls.keymap & MAPEDIT_BIT_UNDO &&
-            engine->controls.keymap & MAPEDIT_BIT_LCTRL
+    if((float)sheet_height > max_h)
+    {
+        sheet_height = (uint32_t)max_h;
+    }
+
+    if(editor->flags & MAPEDIT_FLAG_TILEPICKER)
+    {
+        drawTilePicker(engine, editor, sheet_width, sheet_height);
+        pollTilePicker(engine, editor, sheet_width, sheet_height);
+    }
+
+    if(engine->controls.keymap & MAPEDIT_BIT_UNDO &&
+       engine->controls.keymap & MAPEDIT_BIT_LCTRL
     ){
         mapedit_undo(editor);
         engine->controls.keymap &= ~MAPEDIT_BIT_UNDO;
@@ -655,32 +744,6 @@ void mapedit_pollEditor
 
     uint16_t tileX = (uint16_t)(engine->controls.pointer.x * fX  / editor->tilesize);
     uint16_t tileY = (uint16_t)(engine->controls.pointer.y * fY / editor->tilesize);
-
-    uint8_t modX = tileX % editor->selectMult;
-    uint8_t modY = tileY % editor->selectMult;
-
-    if(engine->controls.keymap & MAPEDIT_BIT_LSHIFT)
-    {
-        if(modX)
-        {
-            tileX -= modX;
-        }
-        if(modY)
-        {
-            tileY -= modY;
-        }
-    }
-
-    comp.src        = &engine->planes[MAPEDIT_PLANE_TILESHEET];
-    comp.dst        = &engine->backbuffer;
-    comp.offsetSrcX = editor->selectedX * editor->tilesize;
-    comp.offsetSrcY = editor->selectedY * editor->tilesize;
-    comp.offsetDstX = tileX * editor->tilesize;
-    comp.offsetDstY = tileY * editor->tilesize;
-    comp.cropWidth  = editor->tilesize  * editor->selectMult;
-    comp.cropHeight = editor->tilesize  * editor->selectMult;
-
-    river2D_compositeImage(engine, &comp);
 
     //if(river2D_insideRect(&engine->controls.pointer, &editor->button))
     // {
