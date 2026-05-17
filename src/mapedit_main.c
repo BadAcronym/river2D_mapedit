@@ -144,7 +144,7 @@ void mapedit_init
     // JANKY: I'm loading text by creating a button, then overwriting it, like for the
     // title.
 
-    ButtonSettings set = {0};
+    rvButtonSettings set = {0};
     set.img      = &engine->planes[MAPEDIT_PLANE_MAINMENU];
     set.name     = &title_sv;
     set.font     = MAPEDIT_PLANE_FONT16;
