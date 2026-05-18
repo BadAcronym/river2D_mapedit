@@ -122,7 +122,7 @@ int main
 
         if(mapped)
         {
-            uint16_t desiredFPS   = 144;
+            uint16_t desiredFPS   = 10000;
             double   ns_threshold = 1e9f / (double)(desiredFPS);
 
             River2D_Time now     = river2D_queryTime();
