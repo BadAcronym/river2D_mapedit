@@ -1,5 +1,35 @@
 #include "mapedit_main.h"
 
+f_internal void updateFPS
+(
+    EngineData *engine,
+    EditorData *editor
+){
+    uint64_t deltaNS = river2D_deltaTime_now_ns(&editor->lastFPSTime);
+    if(deltaNS < 320000000UL)
+    {
+        return;
+    }
+
+    float lastFPS = (float)editor->runningFrames * 1e9f / (float)deltaNS;
+
+    char fpsStr[14];
+    snprintf(fpsStr, 14, "FPS: %.1f", lastFPS);
+    StringView fps_sv = cstr_sv(fpsStr);
+
+    rvLoadTextSettings textSet = {0};
+    textSet.image    = &engine->planes[MAPEDIT_PLANE_FPS];
+    textSet.sv       = &fps_sv;
+    textSet.font     = MAPEDIT_PLANE_FONT16;
+    textSet.charsize = 16;
+    textSet.spacing  = 1;
+
+    river2D_loadText(engine, &textSet);
+
+    editor->lastFPSTime   = river2D_queryTime();
+    editor->runningFrames = 0;
+}
+
 void mapedit_drawMainMenu
 (
     EngineData *engine,
@@ -582,6 +612,23 @@ void mapedit_drawEditor
     if(editor->flags & MAPEDIT_FLAG_TILEPICKER)
     {
         drawTilePicker(engine, editor, sheet_width, sheet_height);
+    }
+
+    // TESTING: always show FPS
+    // if(engine->config.choices & MAPEDIT_CHOICE_SHOW_FPS_BIT)
+    if(1)
+    {
+        updateFPS(engine, editor);
+
+        comp.src        = &engine->planes[MAPEDIT_PLANE_FPS];
+        comp.cropWidth  = engine->planes[MAPEDIT_PLANE_FPS].width;
+        comp.cropHeight = engine->planes[MAPEDIT_PLANE_FPS].height;
+        comp.offsetSrcX = 0;
+        comp.offsetSrcY = 0;
+        comp.offsetDstX = 0;
+        comp.offsetDstY = 0;
+
+        river2D_compositeImage(engine, &comp);
     }
 }
 

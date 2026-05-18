@@ -23,6 +23,7 @@
 #define MAPEDIT_PLANE_TILESHEET       15
 #define MAPEDIT_PLANE_CURRENTLAYER    16
 #define MAPEDIT_PLANE_CURRENTFILE     17
+#define MAPEDIT_PLANE_FPS             18
 
 #define MAPEDIT_BUTTON_LEFTM          0
 #define MAPEDIT_BUTTON_RIGHTM         1
@@ -129,6 +130,9 @@ Action;
 
 typedef struct EditorData
 {
+    uint16_t     runningFrames;
+    River2D_Time lastFPSTime;
+    River2D_Time lastUpdateTime;
     River2D_Time lastPresentTime;
     River2D_Time lastSaveTime;
     River2D_Time lastActionStart;

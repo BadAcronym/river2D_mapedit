@@ -91,6 +91,22 @@ void mapedit_init
     river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE],
                         engine->backbuffer.width, engine->backbuffer.height);
 
+    // TESTING: always show FPS
+    // if(engine->config.choices & MAPEDIT_CHOICE_SHOW_FPS_BIT)
+    if(1)
+    {
+        StringView initial = cstr_sv("FPS: ????");
+
+        rvLoadTextSettings textSet = {0};
+        textSet.image    = &engine->planes[MAPEDIT_PLANE_FPS];
+        textSet.sv       = &initial;
+        textSet.font     = MAPEDIT_PLANE_FONT16;
+        textSet.charsize = 16;
+        textSet.spacing  = 1;
+
+        river2D_loadText(engine, &textSet);
+    }
+
     engine->controls.buttoncodes[MAPEDIT_BUTTON_LEFTM]   = RIVER2D_MOUSE1;
     engine->controls.buttoncodes[MAPEDIT_BUTTON_MIDDLEM] = RIVER2D_MOUSE2;
     engine->controls.buttoncodes[MAPEDIT_BUTTON_RIGHTM]  = RIVER2D_MOUSE3;
@@ -332,4 +348,6 @@ void mapedit_update
         fprintf(stderr, "\033[31;1;7mERROR: invalid state: %u, previous: %u\033[0m\n",
                 editor->currentState, editor->previousState);
     }
+
+    ++editor->runningFrames;
 }
