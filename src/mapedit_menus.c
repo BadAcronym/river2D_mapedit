@@ -544,8 +544,8 @@ void mapedit_drawEditor
         river2D_compositeImage(engine, &comp);
     }
 
-    float fX       = (float)(engine->backbuffer.width);
-    float fY       = (float)(engine->backbuffer.height);
+    float    fX    = (float)(engine->backbuffer.width);
+    float    fY    = (float)(engine->backbuffer.height);
     uint16_t tileX = (uint16_t)(engine->controls.pointer.x * fX  / editor->tilesize);
     uint16_t tileY = (uint16_t)(engine->controls.pointer.y * fY / editor->tilesize);
 
@@ -609,8 +609,8 @@ f_internal void pollTilePicker
     tiles.lowRight.y = tiles.upLeft.y + (float)sheet_height / fY;
 
     rvCompositeSettings comp = {0};
-    comp.dst        = &engine->backbuffer;
-    comp.pictop     = RIVER2D_PICTOP_OVER;
+    comp.dst    = &engine->backbuffer;
+    comp.pictop = RIVER2D_PICTOP_OVER;
 
     if(engine->controls.keymap & MAPEDIT_BIT_MENU)
     {
@@ -646,10 +646,10 @@ f_internal void pollTilePicker
     {
         river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_NULL]);
 
-        float    deltaX = engine->controls.pointer.x - tiles.upLeft.x;
-        float    deltaY = engine->controls.pointer.y - tiles.upLeft.y;
-        uint8_t  tileX  = (uint8_t)(deltaX * fX / editor->tilesize);
-        uint8_t  tileY  = (uint8_t)(deltaY * fY / editor->tilesize);
+        float   deltaX = engine->controls.pointer.x - tiles.upLeft.x;
+        float   deltaY = engine->controls.pointer.y - tiles.upLeft.y;
+        uint8_t tileX  = (uint8_t)(deltaX * fX / editor->tilesize);
+        uint8_t tileY  = (uint8_t)(deltaY * fY / editor->tilesize);
 
         if(engine->controls.buttonmap & MAPEDIT_BIT_RIGHTM)
         {
