@@ -614,7 +614,7 @@ void mapedit_drawEditor
         drawTilePicker(engine, editor, sheet_width, sheet_height);
     }
 
-    // TESTING: always show FPS
+    // always show FPS for now
     // if(engine->config.choices & MAPEDIT_CHOICE_SHOW_FPS_BIT)
     if(1)
     {

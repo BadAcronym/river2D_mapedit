@@ -91,7 +91,7 @@ void mapedit_init
     river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE],
                         engine->backbuffer.width, engine->backbuffer.height);
 
-    // TESTING: always show FPS
+    // always show FPS for now
     // if(engine->config.choices & MAPEDIT_CHOICE_SHOW_FPS_BIT)
     if(1)
     {
