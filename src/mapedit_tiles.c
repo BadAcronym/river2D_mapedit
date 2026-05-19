@@ -95,16 +95,76 @@ void mapedit_placeSelectedTiles
                 break;
             }
 
-            if(editor->tiles[index].x == editor->selectedX + x &&
-               editor->tiles[index].y == editor->selectedY + y
-            ){
-                continue;
-            }
-
             Tile new_tile = {0};
             new_tile.x = editor->selectedX + x;
             new_tile.y = editor->selectedY + y;
 
+            uint32_t prev = editor->currentAction - 1;
+            if(editor->currentAction == 0)
+            {
+                prev = MAPEDIT_MAX_ACTIONS - 1;
+            }
+
+            Action prev_action = editor->actions[prev];
+
+            int64_t delta = river2D_deltaTime_ns(&prev_action.stroke_start,
+                                                 &editor->lastActionStart);
+
+            uint64_t diff  = index - prev_action.map_index;
+            uint64_t diffY = diff / editor->mapHeight;
+            uint64_t diffX = diff % editor->mapHeight;
+            bool backwards = false;
+
+            if(prev_action.map_index > index)
+            {
+                diff  = prev_action.map_index - index;
+                diffY = diff / editor->mapHeight;
+                diffX = diff % editor->mapHeight;
+                backwards = true;
+            }
+
+            if(delta)
+            {
+                goto skipFill;
+            }
+
+            if(backwards && !diffY && diffX > 1)
+            {
+                for(uint64_t i = diffX - 1; i > 0; --i)
+                {
+                    uint64_t fillIndex = index + i;
+                    writeAction(editor, fillIndex, new_tile);
+                }
+            }
+            else if(!diffY && diffX > 1)
+            {
+                for(uint64_t i = diffX - 1; i > 0; --i)
+                {
+                    uint64_t fillIndex = index - i;
+                    writeAction(editor, fillIndex, new_tile);
+                }
+            }
+            else if(backwards && diffY > 1)
+            {
+                // FIXME: don't fill into the wrong layer!
+                // FIXME: don't fill into the wrong direction!
+                // for(uint64_t i = diffY - 1; i > 0; --i)
+                // {
+                //     uint64_t fillIndex = index + i * editor->mapWidth;
+                //     writeAction(editor, fillIndex, new_tile);
+                // }
+            }
+            else if(diffY > 1)
+            {
+                // for(uint64_t i = diffY - 1; i > 0; --i)
+                // {
+                //     uint64_t fillIndex = index - i * editor->mapWidth;
+                //     writeAction(editor, fillIndex, new_tile);
+                // }
+            }
+            // TODO: diagonals
+
+skipFill:
             writeAction(editor, index, new_tile);
             incrementAction(editor);
         }
