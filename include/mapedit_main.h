@@ -141,10 +141,10 @@ typedef struct EditorData
     uint16_t     tilesize;
     uint8_t      currentLayer;
     bool         isolate;
-    uint8_t      layers;
-    uint8_t      selectedX;
-    uint8_t      selectedY;
+    uint16_t     selectedX;
+    uint16_t     selectedY;
     uint8_t      selectMult;
+    uint8_t      layers;
     uint32_t     mapWidth;
     uint32_t     mapHeight;
     uint8_t      flags;
