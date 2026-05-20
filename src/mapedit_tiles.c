@@ -112,18 +112,18 @@ void mapedit_placeSelectedTiles
 
             uint64_t diff  = index - prev_action.map_index;
             uint64_t diffY = diff / editor->mapHeight;
-            uint64_t diffX = diff % editor->mapHeight;
+            uint64_t diffX = diff % editor->mapWidth;
             bool backwards = false;
 
             if(prev_action.map_index > index)
             {
                 diff  = prev_action.map_index - index;
                 diffY = diff / editor->mapHeight;
-                diffX = diff % editor->mapHeight;
+                diffX = diff % editor->mapWidth;
                 backwards = true;
             }
 
-            if(delta)
+            if(delta || (!diffX && !diffY))
             {
                 goto skipFill;
             }
@@ -134,6 +134,7 @@ void mapedit_placeSelectedTiles
                 {
                     uint64_t fillIndex = index + i;
                     writeAction(editor, fillIndex, new_tile);
+                    incrementAction(editor);
                 }
             }
             else if(!diffY && diffX > 1)
@@ -142,27 +143,39 @@ void mapedit_placeSelectedTiles
                 {
                     uint64_t fillIndex = index - i;
                     writeAction(editor, fillIndex, new_tile);
+                    incrementAction(editor);
                 }
             }
-            else if(backwards && diffY > 1)
+            else if(backwards && !diffX && diffY > 1)
             {
-                // FIXME: don't fill into the wrong layer!
-                // FIXME: don't fill into the wrong direction!
-                // for(uint64_t i = diffY - 1; i > 0; --i)
-                // {
-                //     uint64_t fillIndex = index + i * editor->mapWidth;
-                //     writeAction(editor, fillIndex, new_tile);
-                // }
+                for(uint64_t i = diffY - 1; i > 0; --i)
+                {
+                    uint64_t fillIndex = index + i * editor->mapWidth;
+
+                    if(fillIndex - index > editor->mapWidth * editor->mapHeight)
+                    {
+                        continue;
+                    }
+
+                    writeAction(editor, fillIndex, new_tile);
+                    incrementAction(editor);
+                }
             }
-            else if(diffY > 1)
+            else if(!diffX && diffY > 1)
             {
-                // for(uint64_t i = diffY - 1; i > 0; --i)
-                // {
-                //     uint64_t fillIndex = index - i * editor->mapWidth;
-                //     writeAction(editor, fillIndex, new_tile);
-                // }
+                for(uint64_t i = diffY - 1; i > 0; --i)
+                {
+                    uint64_t fillIndex = index - i * editor->mapWidth;
+
+                    if(index - fillIndex > editor->mapWidth * editor->mapHeight)
+                    {
+                        continue;
+                    }
+
+                    writeAction(editor, fillIndex, new_tile);
+                    incrementAction(editor);
+                }
             }
-            // TODO: diagonals
 
 skipFill:
             writeAction(editor, index, new_tile);
