@@ -122,21 +122,21 @@ int main
 
         if(mapped)
         {
-            uint16_t desiredFPS   = 10000;
-            double   ns_threshold = 1e9f / (double)(desiredFPS);
+            mapedit_update(&engine, &editor);
 
-            River2D_Time now     = river2D_queryTime();
-            int64_t      deltaNS = river2D_deltaTime_ns(&editor.lastPresentTime, &now);
+            // 243 -> 240 for the same rounding error reasons as islescape right now :p
+            uint32_t desiredFPS   = 243;
+            int64_t  ns_threshold = (int64_t)(1e9f / (double)(desiredFPS));
 
-            if(deltaNS < (int64_t)ns_threshold)
+            int64_t delta = (int64_t)river2D_deltaTime_now_ns(&editor.lastPresentTime);
+
+            if(delta < ns_threshold)
             {
-                struct timespec duration = {0, (int64_t)ns_threshold - deltaNS};
+                struct timespec duration = {0, ns_threshold - delta};
                 nanosleep(&duration, NULL);
             }
 
-            mapedit_update(&engine, &editor);
-            engine.bltBuffer(&engine);
-            editor.lastPresentTime = now;
+            mapedit_present(&engine, &editor);
         }
     }
 
