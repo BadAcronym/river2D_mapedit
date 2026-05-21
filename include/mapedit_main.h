@@ -8,23 +8,24 @@
 #define MAPEDIT_PLANE_BACKGROUND      0
 #define MAPEDIT_PLANE_VOID            1
 #define MAPEDIT_PLANE_HIGHLIGHT       2
-#define MAPEDIT_PLANE_FONT16          3
-#define MAPEDIT_PLANE_MAINMENU        4
-#define MAPEDIT_PLANE_PAUSEMENU       5
-#define MAPEDIT_PLANE_TILEPICKER      6
-#define MAPEDIT_PLANE_CONTEXTMENU     7
-#define MAPEDIT_PLANE_HUD2            8
-#define MAPEDIT_PLANE_HUD3            9
-#define MAPEDIT_PLANE_ICON_SAVING     10
-#define MAPEDIT_PLANE_ICON_SAVED      11
-#define MAPEDIT_PLANE_CURSOR_DEFAULT  12
-#define MAPEDIT_PLANE_CURSOR_HOVER    13
-#define MAPEDIT_PLANE_CURSOR_PLACE    14
-#define MAPEDIT_PLANE_CURSOR_NULL     15
-#define MAPEDIT_PLANE_TILESHEET       16
-#define MAPEDIT_PLANE_CURRENTLAYER    17
-#define MAPEDIT_PLANE_CURRENTFILE     18
-#define MAPEDIT_PLANE_FPS             19
+#define MAPEDIT_PLANE_HIGHLIGHT_SOLID 3
+#define MAPEDIT_PLANE_FONT16          4
+#define MAPEDIT_PLANE_MAINMENU        5
+#define MAPEDIT_PLANE_PAUSEMENU       6
+#define MAPEDIT_PLANE_TILEPICKER      7
+#define MAPEDIT_PLANE_CONTEXTMENU     8
+#define MAPEDIT_PLANE_HUD2            9
+#define MAPEDIT_PLANE_HUD3            10
+#define MAPEDIT_PLANE_ICON_SAVING     11
+#define MAPEDIT_PLANE_ICON_SAVED      12
+#define MAPEDIT_PLANE_CURSOR_DEFAULT  13
+#define MAPEDIT_PLANE_CURSOR_HOVER    14
+#define MAPEDIT_PLANE_CURSOR_PLACE    15
+#define MAPEDIT_PLANE_CURSOR_NULL     16
+#define MAPEDIT_PLANE_TILESHEET       17
+#define MAPEDIT_PLANE_CURRENTLAYER    18
+#define MAPEDIT_PLANE_CURRENTFILE     19
+#define MAPEDIT_PLANE_FPS             20
 
 #define MAPEDIT_BUTTON_LEFTM          0
 #define MAPEDIT_BUTTON_RIGHTM         1
@@ -155,6 +156,8 @@ typedef struct EditorData
     Button       saveas_b;
     Button       quit_b;
     Button       close_b;
+    Button       collision_b;
+    Button       animation_b;
     uint8_t      i_button;
     Tile         *tiles;
     Action       *actions;
