@@ -211,12 +211,10 @@ void mapedit_init
     set.alignment = RIVER2D_ALIGN_TOPLEFT;
     river2D_createButton(engine, &set);
 
-    // FIXME: point setting..
     set.name      = &animation_sv;
     set.img       = &engine->planes[MAPEDIT_PLANE_CONTEXTMENU];
     set.point.y   = (float)(charsize + vSpacing) /
                     (float)engine->planes[MAPEDIT_PLANE_CONTEXTMENU].height;
-    fprintf(stderr, "point.y: %f\n", set.point.y);
     set.button    = &editor->animation_b;
     river2D_createButton(engine, &set);
 

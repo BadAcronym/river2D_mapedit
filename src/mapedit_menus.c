@@ -475,12 +475,18 @@ f_internal void drawContextMenu
     rvCompositeSettings comp = {0};
     comp.dst        = &engine->backbuffer;
     comp.pictop     = RIVER2D_PICTOP_OVER;
-    comp.src        = &engine->planes[MAPEDIT_PLANE_CONTEXTMENU];
+    comp.src        = &engine->planes[MAPEDIT_PLANE_HIGHLIGHT_SOLID];
     comp.offsetDstX = tileLocX + (uint32_t)(editor->tilesize * 0.60f);
     comp.offsetDstY = tileLocY + (uint32_t)(editor->tilesize * 0.60f);
     comp.cropWidth  = engine->planes[MAPEDIT_PLANE_CONTEXTMENU].width;
     comp.cropHeight = engine->planes[MAPEDIT_PLANE_CONTEXTMENU].height;
+    river2D_compositeImage(engine, &comp);
 
+    uint32_t padding = (uint32_t)((float)engine->backbuffer.width * 0.003f);
+
+    comp.src = &engine->planes[MAPEDIT_PLANE_CONTEXTMENU];
+    comp.offsetDstX += padding;
+    comp.offsetDstY += padding;
     river2D_compositeImage(engine, &comp);
 }
 
