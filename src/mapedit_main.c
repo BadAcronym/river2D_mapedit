@@ -37,6 +37,15 @@ void mapedit_init
                 "\n\033[31;1;7mERROR: Unable to load highlight image!\033[0m\n");
     }
 
+    river2D_loadImage_file(engine, cstr_sv("assets/highlight_solid.qoi"),
+                           &engine->planes[MAPEDIT_PLANE_HIGHLIGHT_SOLID],
+                           RIVER2D_CHANNELS_BGRA, 8);
+    if(!engine->planes[MAPEDIT_PLANE_HIGHLIGHT_SOLID].data)
+    {
+        fprintf(stderr,
+                "\n\033[31;1;7mERROR: Unable to load solid highlight image!\033[0m\n");
+    }
+
     river2D_loadImage_file(engine, cstr_sv("assets/saving.qoi"),
                            &engine->planes[MAPEDIT_PLANE_ICON_SAVING],
                            RIVER2D_CHANNELS_BGRA, 8);
@@ -108,20 +117,13 @@ void mapedit_init
                         engine->backbuffer.width, engine->backbuffer.height);
 
     uint8_t charsize = 16;
-    uint8_t spacing  = 2;
+    uint8_t hSpacing = 1;
+    uint8_t vSpacing = 2;
     uint8_t elements = 3;
 
     river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_CONTEXTMENU],
-                        (charsize + spacing) * (uint32_t)animation_sv.size,
-                        (charsize + spacing) * elements);
-
-    uint64_t imgsize = engine->planes[MAPEDIT_PLANE_CONTEXTMENU].width *
-                       engine->planes[MAPEDIT_PLANE_CONTEXTMENU].height;
-
-    for(uint64_t i = 0; i < imgsize; ++i)
-    {
-        ((uint32_t*)engine->planes[MAPEDIT_PLANE_CONTEXTMENU].data)[i] = 0xFFFFFFFF;
-    }
+                        (charsize + hSpacing * 2) * (uint32_t)animation_sv.size,
+                        (charsize + vSpacing * 2) * elements);
 
     // always show FPS for now
     // if(engine->config.choices & MAPEDIT_CHOICE_SHOW_FPS_BIT)
@@ -145,8 +147,8 @@ void mapedit_init
     set.img      = &engine->planes[MAPEDIT_PLANE_MAINMENU];
     set.name     = &title_sv;
     set.font     = MAPEDIT_PLANE_FONT16;
-    set.charsize = 16;
-    set.spacing  = 1;
+    set.charsize = charsize;
+    set.spacing  = hSpacing;
     set.point.x  = 0.5f;
     set.point.y  = 0.2f;
     set.button   = &editor->new_b;
@@ -199,6 +201,23 @@ void mapedit_init
     set.point.y   = 0.9f - set.charsize / bufHeight;
     set.button    = &editor->close_b;
     set.alignment = RIVER2D_ALIGN_BOTTOMLEFT;
+    river2D_createButton(engine, &set);
+
+    set.name      = &collision_sv;
+    set.img       = &engine->planes[MAPEDIT_PLANE_CONTEXTMENU];
+    set.button    = &editor->collision_b;
+    set.point.x   = 0.0f;
+    set.point.y   = 0.0f;
+    set.alignment = RIVER2D_ALIGN_TOPLEFT;
+    river2D_createButton(engine, &set);
+
+    // FIXME: point setting..
+    set.name      = &animation_sv;
+    set.img       = &engine->planes[MAPEDIT_PLANE_CONTEXTMENU];
+    set.point.y   = (float)(charsize + vSpacing) /
+                    (float)engine->planes[MAPEDIT_PLANE_CONTEXTMENU].height;
+    fprintf(stderr, "point.y: %f\n", set.point.y);
+    set.button    = &editor->animation_b;
     river2D_createButton(engine, &set);
 
     StringView dir = cstr_sv("assets/custom/");
