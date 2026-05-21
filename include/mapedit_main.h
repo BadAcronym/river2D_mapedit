@@ -187,6 +187,12 @@ extern void mapedit_update
     EditorData *editor
 );
 
+extern void mapedit_present
+(
+    EngineData *engine,
+    EditorData *editor
+);
+
 extern void mapedit_scroll
 (
     EditorData *editor,

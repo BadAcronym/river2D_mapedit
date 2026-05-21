@@ -386,3 +386,12 @@ void mapedit_update
 
     ++editor->runningFrames;
 }
+
+void mapedit_present
+(
+    EngineData *engine,
+    EditorData *editor
+){
+    river2D_bltBuffer(engine);
+    editor->lastPresentTime = river2D_queryTime();
+}
