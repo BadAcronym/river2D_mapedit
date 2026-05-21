@@ -82,31 +82,6 @@ void mapedit_init
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load font image!\033[0m\n");
     }
 
-    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_NULL], 32, 32);
-    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE], 32, 32);
-    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],
-                        engine->backbuffer.width, engine->backbuffer.height);
-    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU],
-                        engine->backbuffer.width, engine->backbuffer.height);
-    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_SELECTTILE],
-                        engine->backbuffer.width, engine->backbuffer.height);
-
-    // always show FPS for now
-    // if(engine->config.choices & MAPEDIT_CHOICE_SHOW_FPS_BIT)
-    if(1)
-    {
-        StringView initial = cstr_sv("FPS: ????");
-
-        rvLoadTextSettings textSet = {0};
-        textSet.image    = &engine->planes[MAPEDIT_PLANE_FPS];
-        textSet.sv       = &initial;
-        textSet.font     = MAPEDIT_PLANE_FONT16;
-        textSet.charsize = 16;
-        textSet.spacing  = 1;
-
-        river2D_loadText(engine, &textSet);
-    }
-
     engine->controls.buttoncodes[MAPEDIT_BUTTON_LEFTM]   = RIVER2D_MOUSE1;
     engine->controls.buttoncodes[MAPEDIT_BUTTON_MIDDLEM] = RIVER2D_MOUSE2;
     engine->controls.buttoncodes[MAPEDIT_BUTTON_RIGHTM]  = RIVER2D_MOUSE3;
@@ -157,9 +132,52 @@ void mapedit_init
     StringView quit_sv   = cstr_sv("QUIT");
     StringView close_sv  = cstr_sv("CLOSE");
 
+    StringView collision_sv = cstr_sv("TOGGLE COLLISION");
+    StringView animation_sv = cstr_sv("EDIT ANIMATION FRAMES");
+
+    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_NULL], 32, 32);
+    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE], 32, 32);
+    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],
+                        engine->backbuffer.width, engine->backbuffer.height);
+    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU],
+                        engine->backbuffer.width, engine->backbuffer.height);
+    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_TILEPICKER],
+                        engine->backbuffer.width, engine->backbuffer.height);
+
+    uint8_t charsize = 16;
+    uint8_t spacing  = 2;
+    uint8_t elements = 3;
+
+    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_CONTEXTMENU],
+                        (charsize + spacing) * (uint32_t)animation_sv.size,
+                        (charsize + spacing) * elements);
+
+    uint64_t imgsize = engine->planes[MAPEDIT_PLANE_CONTEXTMENU].width *
+                       engine->planes[MAPEDIT_PLANE_CONTEXTMENU].height;
+
+    for(uint64_t i = 0; i < imgsize; ++i)
+    {
+        ((uint32_t*)engine->planes[MAPEDIT_PLANE_CONTEXTMENU].data)[i] = 0xFFFFFFFF;
+    }
+
+    // always show FPS for now
+    // if(engine->config.choices & MAPEDIT_CHOICE_SHOW_FPS_BIT)
+    if(1)
+    {
+        StringView initial = cstr_sv("FPS: ????");
+
+        rvLoadTextSettings textSet = {0};
+        textSet.image    = &engine->planes[MAPEDIT_PLANE_FPS];
+        textSet.sv       = &initial;
+        textSet.font     = MAPEDIT_PLANE_FONT16;
+        textSet.charsize = 16;
+        textSet.spacing  = 1;
+
+        river2D_loadText(engine, &textSet);
+    }
+
     // JANKY: I'm loading text by creating a button, then overwriting it, like for the
     // title.
-
     rvButtonSettings set = {0};
     set.img      = &engine->planes[MAPEDIT_PLANE_MAINMENU];
     set.name     = &title_sv;
@@ -213,7 +231,7 @@ void mapedit_init
     float bufHeight = (float)engine->backbuffer.height;
 
     set.name      = &close_sv;
-    set.img       = &engine->planes[MAPEDIT_PLANE_SELECTTILE];
+    set.img       = &engine->planes[MAPEDIT_PLANE_TILEPICKER];
     set.point.x   = 0.1f + set.charsize / (bufHeight * 2);
     set.point.y   = 0.9f - set.charsize / bufHeight;
     set.button    = &editor->close_b;

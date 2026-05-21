@@ -446,11 +446,11 @@ f_internal void drawTilePicker
 
     river2D_compositeImage(engine, &comp);
 
-    comp.src        = &engine->planes[MAPEDIT_PLANE_SELECTTILE];
+    comp.src        = &engine->planes[MAPEDIT_PLANE_TILEPICKER];
     comp.offsetDstX = 0;
     comp.offsetDstY = 0;
-    comp.cropWidth  = engine->planes[MAPEDIT_PLANE_SELECTTILE].width;
-    comp.cropHeight = engine->planes[MAPEDIT_PLANE_SELECTTILE].height;
+    comp.cropWidth  = engine->planes[MAPEDIT_PLANE_TILEPICKER].width;
+    comp.cropHeight = engine->planes[MAPEDIT_PLANE_TILEPICKER].height;
 
     river2D_compositeImage(engine, &comp);
 
@@ -472,17 +472,14 @@ f_internal void drawContextMenu
     uint32_t   tileLocX,
     uint32_t   tileLocY
 ){
-    uint8_t elements = 3;
-    uint8_t longest  = 10;
-
     rvCompositeSettings comp = {0};
     comp.dst        = &engine->backbuffer;
     comp.pictop     = RIVER2D_PICTOP_OVER;
-    comp.src        = &engine->planes[MAPEDIT_PLANE_VOID];
+    comp.src        = &engine->planes[MAPEDIT_PLANE_CONTEXTMENU];
     comp.offsetDstX = tileLocX + (uint32_t)(editor->tilesize * 0.60f);
     comp.offsetDstY = tileLocY + (uint32_t)(editor->tilesize * 0.60f);
-    comp.cropWidth  = 16 * longest;
-    comp.cropHeight = 16 * elements;
+    comp.cropWidth  = engine->planes[MAPEDIT_PLANE_CONTEXTMENU].width;
+    comp.cropHeight = engine->planes[MAPEDIT_PLANE_CONTEXTMENU].height;
 
     river2D_compositeImage(engine, &comp);
 }
