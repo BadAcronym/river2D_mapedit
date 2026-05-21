@@ -407,6 +407,27 @@ void mapedit_pollMainMenu
     }
 }
 
+f_internal void getSheetDims
+(
+    EngineData *engine,
+    EditorData *editor,
+    uint32_t   *sheet_width,
+    uint32_t   *sheet_height
+){
+    *sheet_width  = engine->planes[MAPEDIT_PLANE_TILESHEET].width;
+    *sheet_height = engine->planes[MAPEDIT_PLANE_TILESHEET].height;
+    float max_w = (float)engine->backbuffer.width  * 0.8f - 2 * editor->tilesize;
+    float max_h = (float)engine->backbuffer.height * 0.8f - 3 * editor->tilesize;
+    if((float)*sheet_width > max_w)
+    {
+        *sheet_width = (uint32_t)max_w;
+    }
+    if((float)*sheet_height > max_h)
+    {
+        *sheet_height = (uint32_t)max_h;
+    }
+}
+
 f_internal void drawTilePicker
 (
     EngineData *engine,
@@ -444,25 +465,26 @@ f_internal void drawTilePicker
     river2D_compositeImage(engine, &comp);
 }
 
-f_internal void getSheetDims
+f_internal void drawContextMenu
 (
     EngineData *engine,
     EditorData *editor,
-    uint32_t   *sheet_width,
-    uint32_t   *sheet_height
+    uint32_t   tileLocX,
+    uint32_t   tileLocY
 ){
-    *sheet_width  = engine->planes[MAPEDIT_PLANE_TILESHEET].width;
-    *sheet_height = engine->planes[MAPEDIT_PLANE_TILESHEET].height;
-    float max_w = (float)engine->backbuffer.width  * 0.8f - 2 * editor->tilesize;
-    float max_h = (float)engine->backbuffer.height * 0.8f - 3 * editor->tilesize;
-    if((float)*sheet_width > max_w)
-    {
-        *sheet_width = (uint32_t)max_w;
-    }
-    if((float)*sheet_height > max_h)
-    {
-        *sheet_height = (uint32_t)max_h;
-    }
+    uint8_t elements = 3;
+    uint8_t longest  = 10;
+
+    rvCompositeSettings comp = {0};
+    comp.dst        = &engine->backbuffer;
+    comp.pictop     = RIVER2D_PICTOP_OVER;
+    comp.src        = &engine->planes[MAPEDIT_PLANE_VOID];
+    comp.offsetDstX = tileLocX + (uint32_t)(editor->tilesize * 0.60f);
+    comp.offsetDstY = tileLocY + (uint32_t)(editor->tilesize * 0.60f);
+    comp.cropWidth  = 16 * longest;
+    comp.cropHeight = 16 * elements;
+
+    river2D_compositeImage(engine, &comp);
 }
 
 void mapedit_drawEditor
@@ -590,6 +612,17 @@ void mapedit_drawEditor
         drawTilePicker(engine, editor, sheet_width, sheet_height);
     }
 
+    if(editor->flags & MAPEDIT_FLAG_CONTEXTMENU)
+    {
+        float tileCornerX = 0.095f + (float)((float)editor->tilesize / fX);
+        float tileCornerY = 0.095f + (float)((float)editor->tilesize / fY);
+        uint32_t tileLocX = (uint32_t)(fX * (tileCornerX + 0.0055f) +
+                                       editor->selectedX * editor->tilesize);
+        uint32_t tileLocY = (uint32_t)(fY * (tileCornerY + 0.006f) +
+                                       editor->selectedY * editor->tilesize);
+        drawContextMenu(engine, editor, tileLocX, tileLocY);
+    }
+
     // always show FPS for now
     // if(engine->config.choices & MAPEDIT_CHOICE_SHOW_FPS_BIT)
     if(1)
@@ -608,33 +641,18 @@ void mapedit_drawEditor
     }
 }
 
-f_internal void drawContextMenu
-(
-    EngineData *engine,
-    EditorData *editor,
-    uint32_t   tileLocX,
-    uint32_t   tileLocY
-){
-    uint8_t elements = 3;
-    uint8_t longest  = 10;
-
-    rvCompositeSettings comp = {0};
-    comp.dst        = &engine->backbuffer;
-    comp.pictop     = RIVER2D_PICTOP_OVER;
-    comp.src        = &engine->planes[MAPEDIT_PLANE_VOID];
-    comp.offsetDstX = tileLocX + (uint32_t)(editor->tilesize * 0.60f);
-    comp.offsetDstY = tileLocY + (uint32_t)(editor->tilesize * 0.60f);
-    comp.cropWidth  = 16 * longest;
-    comp.cropHeight = 16 * elements;
-
-    river2D_compositeImage(engine, &comp);
-}
-
 f_internal void pollContextMenu
 (
     EngineData *engine,
     EditorData *editor
 ){
+    river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
+
+    if(engine->controls.buttonmap & MAPEDIT_BIT_RIGHTM)
+    {
+        editor->flags              &= ~MAPEDIT_FLAG_CONTEXTMENU;
+        engine->controls.buttonmap &= ~MAPEDIT_BIT_RIGHTM;
+    }
 }
 
 f_internal void pollTilePicker
@@ -735,18 +753,8 @@ f_internal void pollTilePicker
         {
             editor->selectedX           =  tileX;
             editor->selectedY           =  tileY + editor->viewScroll;
-            editor->flags              ^= MAPEDIT_FLAG_CONTEXTMENU;
+            editor->flags              |= MAPEDIT_FLAG_CONTEXTMENU;
             engine->controls.buttonmap &= ~MAPEDIT_BIT_RIGHTM;
-        }
-
-        if(editor->flags & MAPEDIT_FLAG_CONTEXTMENU)
-        {
-            tileLocX = (uint32_t)(fX * (tiles.upLeft.x + 0.0055f) +
-                                  editor->selectedX * editor->tilesize);
-            tileLocY = (uint32_t)(fY * (tiles.upLeft.y + 0.006f) +
-                                  editor->selectedY * editor->tilesize);
-            drawContextMenu(engine, editor, tileLocX, tileLocY);
-            pollContextMenu(engine, editor);
         }
         else if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
@@ -784,7 +792,12 @@ void mapedit_pollEditor
         engine->controls.keymap &= ~MAPEDIT_BIT_TILEPICKER;
     }
 
-    if(editor->flags & MAPEDIT_FLAG_TILEPICKER)
+    if(editor->flags & MAPEDIT_FLAG_CONTEXTMENU)
+    {
+        pollContextMenu(engine, editor);
+        return;
+    }
+    else if(editor->flags & MAPEDIT_FLAG_TILEPICKER)
     {
         pollTilePicker(engine, editor, sheet_width, sheet_height);
         return;
