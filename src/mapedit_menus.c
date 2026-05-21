@@ -613,17 +613,16 @@ void mapedit_drawEditor
     if(editor->flags & MAPEDIT_FLAG_TILEPICKER)
     {
         drawTilePicker(engine, editor, sheet_width, sheet_height);
-    }
-
-    if(editor->flags & MAPEDIT_FLAG_CONTEXTMENU)
-    {
-        float tileCornerX = 0.095f + (float)((float)editor->tilesize / fX);
-        float tileCornerY = 0.095f + (float)((float)editor->tilesize / fY);
-        uint32_t tileLocX = (uint32_t)(fX * (tileCornerX + 0.0055f) +
-                                       editor->selectedX * editor->tilesize);
-        uint32_t tileLocY = (uint32_t)(fY * (tileCornerY + 0.006f) +
-                                       editor->selectedY * editor->tilesize);
-        drawContextMenu(engine, editor, tileLocX, tileLocY);
+        if(editor->flags & MAPEDIT_FLAG_CONTEXTMENU)
+        {
+            float tileCornerX = 0.095f + (float)((float)editor->tilesize / fX);
+            float tileCornerY = 0.095f + (float)((float)editor->tilesize / fY);
+            uint32_t tileLocX = (uint32_t)(fX * (tileCornerX + 0.0055f) +
+                                           editor->selectedX * editor->tilesize);
+            uint32_t tileLocY = (uint32_t)(fY * (tileCornerY + 0.006f) +
+                                           editor->selectedY * editor->tilesize);
+            drawContextMenu(engine, editor, tileLocX, tileLocY);
+        }
     }
 
     // always show FPS for now
@@ -651,9 +650,11 @@ f_internal void pollContextMenu
 ){
     river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
 
-    if(engine->controls.buttonmap & MAPEDIT_BIT_RIGHTM)
-    {
+    if(engine->controls.buttonmap & MAPEDIT_BIT_RIGHTM ||
+       engine->controls.keymap    & MAPEDIT_BIT_MENU
+    ){
         editor->flags              &= ~MAPEDIT_FLAG_CONTEXTMENU;
+        engine->controls.keymap    &= ~MAPEDIT_BIT_MENU;
         engine->controls.buttonmap &= ~MAPEDIT_BIT_RIGHTM;
     }
 }
@@ -678,11 +679,19 @@ f_internal void pollTilePicker
     comp.dst    = &engine->backbuffer;
     comp.pictop = RIVER2D_PICTOP_OVER;
 
-    if(engine->controls.keymap & MAPEDIT_BIT_MENU)
-    {
-        engine->controls.keymap &= ~MAPEDIT_BIT_MENU;
+    if(engine->controls.keymap & MAPEDIT_BIT_TILEPICKER ||
+       engine->controls.keymap & MAPEDIT_BIT_MENU
+    ){
         editor->flags           &= ~MAPEDIT_FLAG_TILEPICKER;
+        editor->flags           &= ~MAPEDIT_FLAG_CONTEXTMENU;
+        engine->controls.keymap &= ~MAPEDIT_BIT_MENU;
+        engine->controls.keymap &= ~MAPEDIT_BIT_TILEPICKER;
         return;
+    }
+    else if(engine->controls.keymap & MAPEDIT_BIT_TILEPICKER)
+    {
+        editor->flags           |= MAPEDIT_FLAG_TILEPICKER;
+        engine->controls.keymap &= ~MAPEDIT_BIT_TILEPICKER;
     }
 
     if(river2D_insideRect(&engine->controls.pointer, &editor->close_b.area))
@@ -789,21 +798,23 @@ void mapedit_pollEditor
     uint32_t sheet_height = 0;
     getSheetDims(engine, editor, &sheet_width, &sheet_height);
 
-    if(engine->controls.keymap & MAPEDIT_BIT_TILEPICKER)
+    if(editor->flags & MAPEDIT_FLAG_TILEPICKER)
     {
-        editor->flags           ^= MAPEDIT_FLAG_TILEPICKER;
-        engine->controls.keymap &= ~MAPEDIT_BIT_TILEPICKER;
+        if(editor->flags & MAPEDIT_FLAG_CONTEXTMENU)
+        {
+            pollContextMenu(engine, editor);
+        }
+        else
+        {
+            pollTilePicker(engine, editor, sheet_width, sheet_height);
+        }
+        return;
     }
 
-    if(editor->flags & MAPEDIT_FLAG_CONTEXTMENU)
+    if(engine->controls.keymap & MAPEDIT_BIT_TILEPICKER)
     {
-        pollContextMenu(engine, editor);
-        return;
-    }
-    else if(editor->flags & MAPEDIT_FLAG_TILEPICKER)
-    {
-        pollTilePicker(engine, editor, sheet_width, sheet_height);
-        return;
+        editor->flags           |= MAPEDIT_FLAG_TILEPICKER;
+        engine->controls.keymap &= ~MAPEDIT_BIT_TILEPICKER;
     }
 
     if(engine->controls.keymap & MAPEDIT_BIT_UNDO &&
