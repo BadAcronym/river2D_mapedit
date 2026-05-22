@@ -648,14 +648,83 @@ f_internal void pollContextMenu
     EngineData *engine,
     EditorData *editor
 ){
-    river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
-
     if(engine->controls.buttonmap & MAPEDIT_BIT_RIGHTM ||
        engine->controls.keymap    & MAPEDIT_BIT_MENU
     ){
         editor->flags              &= ~MAPEDIT_FLAG_CONTEXTMENU;
         engine->controls.keymap    &= ~MAPEDIT_BIT_MENU;
         engine->controls.buttonmap &= ~MAPEDIT_BIT_RIGHTM;
+        return;
+    }
+
+    // to make room for key controls later
+    if(river2D_insideRect(&engine->controls.pointer, &editor->collision_b.area))
+    {
+        river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+        editor->collision_b.status |= RIVER2D_BIT_HOVER;
+        editor->animation_b.status &= ~RIVER2D_BIT_HOVER;
+    }
+    else if(river2D_insideRect(&engine->controls.pointer, &editor->animation_b.area))
+    {
+        river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+        editor->collision_b.status &= ~RIVER2D_BIT_HOVER;
+        editor->animation_b.status |= RIVER2D_BIT_HOVER;
+    }
+    else
+    {
+        river2D_changeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
+        editor->collision_b.status &= ~RIVER2D_BIT_HOVER;
+        editor->animation_b.status &= ~RIVER2D_BIT_HOVER;
+    }
+
+    float    fX          = (float)(engine->backbuffer.width);
+    float    fY          = (float)(engine->backbuffer.height);
+    float    tileUpLeftX = 0.095f + (float)((float)editor->tilesize / fX);
+    float    tileUpLeftY = 0.095f + (float)((float)editor->tilesize / fY);
+    float    deltaX      = engine->controls.pointer.x - tileUpLeftX;
+    float    deltaY      = engine->controls.pointer.y - tileUpLeftY;
+    uint16_t tileX       = (uint16_t)(deltaX * fX / editor->tilesize);
+    uint16_t tileY       = (uint16_t)(deltaY * fY / editor->tilesize);
+
+    bool confirmed = engine->controls.buttonmap & MAPEDIT_BIT_LEFTM ||
+                     engine->controls.keymap    & MAPEDIT_BIT_ENTER;
+
+    rvCompositeSettings comp = {0};
+    comp.dst    = &engine->backbuffer;
+    comp.pictop = RIVER2D_PICTOP_OVER;
+    comp.src    = &engine->planes[MAPEDIT_PLANE_BACKGROUND];
+
+    if(editor->collision_b.status & RIVER2D_BIT_HOVER)
+    {
+        float length = editor->collision_b.area.lowRight.x -
+                       editor->collision_b.area.upLeft.x;
+
+        comp.offsetDstX = (uint32_t)(editor->collision_b.area.upLeft.x * fX);
+        comp.offsetDstY = (uint32_t)(editor->collision_b.area.upLeft.y * fY) + 20;
+        comp.cropWidth  = (uint32_t)(length * fX);
+        comp.cropHeight = 5;
+        river2D_compositeImage(engine, &comp);
+
+        if(confirmed)
+        {
+            fprintf(stderr, "TODO: toggle tile collision bit: %u,%u\n", tileX, tileY);
+        }
+    }
+    else if(editor->animation_b.status & RIVER2D_BIT_HOVER)
+    {
+        float length = editor->animation_b.area.lowRight.x -
+                       editor->animation_b.area.upLeft.x;
+
+        comp.offsetDstX = (uint32_t)(editor->animation_b.area.upLeft.x * fX);
+        comp.offsetDstY = (uint32_t)(editor->animation_b.area.upLeft.y * fY) + 20;
+        comp.cropWidth  = (uint32_t)(length * fX);
+        comp.cropHeight = 5;
+        river2D_compositeImage(engine, &comp);
+
+        if(confirmed)
+        {
+            fprintf(stderr, "TODO: toggle tile animation bit: %u,%u\n", tileX, tileY);
+        }
     }
 }
 
