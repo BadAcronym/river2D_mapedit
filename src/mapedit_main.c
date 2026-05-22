@@ -211,11 +211,11 @@ void mapedit_init
     set.alignment = RIVER2D_ALIGN_TOPLEFT;
     river2D_createButton(engine, &set);
 
-    set.name      = &animation_sv;
-    set.img       = &engine->planes[MAPEDIT_PLANE_CONTEXTMENU];
-    set.point.y   = (float)(charsize + vSpacing) /
+    set.name    = &animation_sv;
+    set.img     = &engine->planes[MAPEDIT_PLANE_CONTEXTMENU];
+    set.point.y = (float)(charsize + vSpacing) /
                     (float)engine->planes[MAPEDIT_PLANE_CONTEXTMENU].height;
-    set.button    = &editor->animation_b;
+    set.button  = &editor->animation_b;
     river2D_createButton(engine, &set);
 
     StringView dir = cstr_sv("assets/custom/");
@@ -279,7 +279,6 @@ void mapedit_init
     editor->lastSaveTime.ns         = 1;
     engine->controls.lastScrollTime = now;
 
-    editor->currentState = MAPEDIT_STATE_MENU;
     char *buf = calloc(256, 1);
     editor->inputBuffer.data = buf;
     editor->inputBuffer.size = 256;
@@ -288,38 +287,40 @@ void mapedit_init
     engine->controls.buttoncodes[MAPEDIT_BUTTON_MIDDLEM] = RIVER2D_MOUSE2;
     engine->controls.buttoncodes[MAPEDIT_BUTTON_RIGHTM]  = RIVER2D_MOUSE3;
 
-    engine->controls.keycodes[MAPEDIT_KEY_LSHIFT]       = RIVER2D_ASCII_LSHIFT;
-    engine->controls.keycodes[MAPEDIT_KEY_RSHIFT]       = RIVER2D_ASCII_RSHIFT;
-    engine->controls.keycodes[MAPEDIT_KEY_LCTRL]        = RIVER2D_ASCII_LCTRL;
-    engine->controls.keycodes[MAPEDIT_KEY_RCTRL]        = RIVER2D_ASCII_RCTRL;
-    engine->controls.keycodes[MAPEDIT_KEY_ENTER]        = RIVER2D_ASCII_ENTER;
-    engine->controls.keycodes[MAPEDIT_KEY_BACKSPACE]    = RIVER2D_ASCII_BACKSPACE;
-    engine->controls.keycodes[MAPEDIT_KEY_DELETE]       = RIVER2D_ASCII_DELETE;
-    engine->controls.keycodes[MAPEDIT_KEY_MENU]         = RIVER2D_ASCII_ESCAPE;
-    engine->controls.keycodes[MAPEDIT_KEY_HOTBAR]       = RIVER2D_ASCII_TAB;
-    engine->controls.keycodes[MAPEDIT_KEY_UNDO]         = 'z';
-    engine->controls.keycodes[MAPEDIT_KEY_REDO]         = 'y';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER0]       = '0';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER1]       = '1';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER2]       = '2';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER3]       = '3';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER4]       = '4';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER5]       = '5';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER6]       = '6';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER7]       = '7';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER8]       = '8';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER9]       = '9';
-    engine->controls.keycodes[MAPEDIT_KEY_REDO]         = 'y';
-    engine->controls.keycodes[MAPEDIT_KEY_UNDO]         = 'z';
-    engine->controls.keycodes[MAPEDIT_KEY_DECREASE]     = '-';
-    engine->controls.keycodes[MAPEDIT_KEY_INCREASE]     = '=';
-    engine->controls.keycodes[MAPEDIT_KEY_SAVE]         = 's';
-    engine->controls.keycodes[MAPEDIT_KEY_QUIT]         = 'q';
-    engine->controls.keycodes[MAPEDIT_KEY_TILEPICKER]   = 't';
-    engine->controls.keycodes[MAPEDIT_KEY_UP]           = RIVER2D_ASCII_UP;
-    engine->controls.keycodes[MAPEDIT_KEY_DOWN]         = RIVER2D_ASCII_DOWN;
-    engine->controls.keycodes[MAPEDIT_KEY_LEFT]         = RIVER2D_ASCII_LEFT;
-    engine->controls.keycodes[MAPEDIT_KEY_RIGHT]        = RIVER2D_ASCII_RIGHT;
+    engine->controls.keycodes[MAPEDIT_KEY_LSHIFT]     = RIVER2D_ASCII_LSHIFT;
+    engine->controls.keycodes[MAPEDIT_KEY_RSHIFT]     = RIVER2D_ASCII_RSHIFT;
+    engine->controls.keycodes[MAPEDIT_KEY_LCTRL]      = RIVER2D_ASCII_LCTRL;
+    engine->controls.keycodes[MAPEDIT_KEY_RCTRL]      = RIVER2D_ASCII_RCTRL;
+    engine->controls.keycodes[MAPEDIT_KEY_ENTER]      = RIVER2D_ASCII_ENTER;
+    engine->controls.keycodes[MAPEDIT_KEY_BACKSPACE]  = RIVER2D_ASCII_BACKSPACE;
+    engine->controls.keycodes[MAPEDIT_KEY_DELETE]     = RIVER2D_ASCII_DELETE;
+    engine->controls.keycodes[MAPEDIT_KEY_MENU]       = RIVER2D_ASCII_ESCAPE;
+    engine->controls.keycodes[MAPEDIT_KEY_HOTBAR]     = RIVER2D_ASCII_TAB;
+    engine->controls.keycodes[MAPEDIT_KEY_UNDO]       = 'z';
+    engine->controls.keycodes[MAPEDIT_KEY_REDO]       = 'y';
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER0]     = '0';
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER1]     = '1';
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER2]     = '2';
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER3]     = '3';
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER4]     = '4';
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER5]     = '5';
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER6]     = '6';
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER7]     = '7';
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER8]     = '8';
+    engine->controls.keycodes[MAPEDIT_KEY_LAYER9]     = '9';
+    engine->controls.keycodes[MAPEDIT_KEY_REDO]       = 'y';
+    engine->controls.keycodes[MAPEDIT_KEY_UNDO]       = 'z';
+    engine->controls.keycodes[MAPEDIT_KEY_DECREASE]   = '-';
+    engine->controls.keycodes[MAPEDIT_KEY_INCREASE]   = '= ';
+    engine->controls.keycodes[MAPEDIT_KEY_SAVE]       = 's';
+    engine->controls.keycodes[MAPEDIT_KEY_QUIT]       = 'q';
+    engine->controls.keycodes[MAPEDIT_KEY_TILEPICKER] = 't';
+    engine->controls.keycodes[MAPEDIT_KEY_UP]         = RIVER2D_ASCII_UP;
+    engine->controls.keycodes[MAPEDIT_KEY_DOWN]       = RIVER2D_ASCII_DOWN;
+    engine->controls.keycodes[MAPEDIT_KEY_LEFT]       = RIVER2D_ASCII_LEFT;
+    engine->controls.keycodes[MAPEDIT_KEY_RIGHT]      = RIVER2D_ASCII_RIGHT;
+
+    editor->currentState = MAPEDIT_STATE_MENU;
 }
 
 int32_t mapedit_shutdown

@@ -472,19 +472,40 @@ f_internal void drawContextMenu
     uint32_t   tileLocX,
     uint32_t   tileLocY
 ){
+    uint32_t scrollHeight = editor->viewScroll * editor->tilesize;
+
     rvCompositeSettings comp = {0};
     comp.dst        = &engine->backbuffer;
     comp.pictop     = RIVER2D_PICTOP_OVER;
     comp.src        = &engine->planes[MAPEDIT_PLANE_HIGHLIGHT_SOLID];
     comp.offsetDstX = tileLocX + (uint32_t)(editor->tilesize * 0.60f);
-    comp.offsetDstY = tileLocY + (uint32_t)(editor->tilesize * 0.60f);
+    comp.offsetDstY = tileLocY + (uint32_t)(editor->tilesize * 0.60f) - scrollHeight;
     comp.cropWidth  = engine->planes[MAPEDIT_PLANE_CONTEXTMENU].width;
     comp.cropHeight = engine->planes[MAPEDIT_PLANE_CONTEXTMENU].height;
     river2D_compositeImage(engine, &comp);
 
-    uint32_t padding = (uint32_t)((float)engine->backbuffer.width * 0.003f);
+    float fX = (float)engine->backbuffer.width;
+    float fY = (float)engine->backbuffer.height;
 
-    comp.src = &engine->planes[MAPEDIT_PLANE_CONTEXTMENU];
+    float    fPad    = 0.003f;
+    uint32_t padding = (uint32_t)(fX * fPad);
+
+    float fOffsetX = (float)comp.offsetDstX / fX;
+    float fOffsetY = (float)comp.offsetDstY / fY;
+
+    float collision_length = (float)editor->collision_b.name.size * (17.0f) / fX + fPad;
+    editor->collision_b.area.upLeft.x   = fOffsetX + fPad;
+    editor->collision_b.area.upLeft.y   = fOffsetY;
+    editor->collision_b.area.lowRight.x = fOffsetX + collision_length;
+    editor->collision_b.area.lowRight.y = fOffsetY + 16.0f / fY + fPad / 2;
+
+    float animation_length = (float)editor->animation_b.name.size * 17.0f / fX + fPad;
+    editor->animation_b.area.upLeft.x   = fOffsetX + fPad;
+    editor->animation_b.area.upLeft.y   = fOffsetY + 16.0f / fY + fPad;
+    editor->animation_b.area.lowRight.x = fOffsetX + animation_length;
+    editor->animation_b.area.lowRight.y = fOffsetY + 32.0f / fY + fPad * 1.5f;
+
+    comp.src         = &engine->planes[MAPEDIT_PLANE_CONTEXTMENU];
     comp.offsetDstX += padding;
     comp.offsetDstY += padding;
     river2D_compositeImage(engine, &comp);
@@ -677,14 +698,8 @@ f_internal void pollContextMenu
         editor->animation_b.status &= ~RIVER2D_BIT_HOVER;
     }
 
-    float    fX          = (float)(engine->backbuffer.width);
-    float    fY          = (float)(engine->backbuffer.height);
-    float    tileUpLeftX = 0.095f + (float)((float)editor->tilesize / fX);
-    float    tileUpLeftY = 0.095f + (float)((float)editor->tilesize / fY);
-    float    deltaX      = engine->controls.pointer.x - tileUpLeftX;
-    float    deltaY      = engine->controls.pointer.y - tileUpLeftY;
-    uint16_t tileX       = (uint16_t)(deltaX * fX / editor->tilesize);
-    uint16_t tileY       = (uint16_t)(deltaY * fY / editor->tilesize);
+    float fX = (float)(engine->backbuffer.width);
+    float fY = (float)(engine->backbuffer.height);
 
     bool confirmed = engine->controls.buttonmap & MAPEDIT_BIT_LEFTM ||
                      engine->controls.keymap    & MAPEDIT_BIT_ENTER;
@@ -707,7 +722,11 @@ f_internal void pollContextMenu
 
         if(confirmed)
         {
-            fprintf(stderr, "TODO: toggle tile collision bit: %u,%u\n", tileX, tileY);
+            fprintf(stderr, "TODO: toggle tile collision bit: %u,%u\n", editor->selectedX, editor->selectedY);
+            editor->flags &= ~MAPEDIT_FLAG_CONTEXTMENU;
+            engine->controls.keymap    &= ~MAPEDIT_BIT_MENU;
+            engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
+            return;
         }
     }
     else if(editor->animation_b.status & RIVER2D_BIT_HOVER)
@@ -723,7 +742,11 @@ f_internal void pollContextMenu
 
         if(confirmed)
         {
-            fprintf(stderr, "TODO: toggle tile animation bit: %u,%u\n", tileX, tileY);
+            fprintf(stderr, "TODO: toggle tile animation bit: %u,%u\n", editor->selectedX, editor->selectedY);
+            editor->flags &= ~MAPEDIT_FLAG_CONTEXTMENU;
+            engine->controls.keymap    &= ~MAPEDIT_BIT_MENU;
+            engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
+            return;
         }
     }
 }
