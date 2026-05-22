@@ -664,6 +664,15 @@ void mapedit_drawEditor
     }
 }
 
+f_internal void toggleCurrentTileCollision
+(
+    EngineData *enigne,
+    EditorData *editor
+){
+    fprintf(stderr, "TODO: toggle tile collision bit: (%u,%u)\n",
+            editor->selectedX, editor->selectedY);
+}
+
 f_internal void pollContextMenu
 (
     EngineData *engine,
@@ -722,7 +731,7 @@ f_internal void pollContextMenu
 
         if(confirmed)
         {
-            fprintf(stderr, "TODO: toggle tile collision bit: %u,%u\n", editor->selectedX, editor->selectedY);
+            toggleCurrentTileCollision(engine, editor);
             editor->flags &= ~MAPEDIT_FLAG_CONTEXTMENU;
             engine->controls.keymap    &= ~MAPEDIT_BIT_MENU;
             engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
@@ -742,7 +751,8 @@ f_internal void pollContextMenu
 
         if(confirmed)
         {
-            fprintf(stderr, "TODO: toggle tile animation bit: %u,%u\n", editor->selectedX, editor->selectedY);
+            fprintf(stderr, "TODO: edit tile animation: (%u,%u)\n",
+                    editor->selectedX, editor->selectedY);
             editor->flags &= ~MAPEDIT_FLAG_CONTEXTMENU;
             engine->controls.keymap    &= ~MAPEDIT_BIT_MENU;
             engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
