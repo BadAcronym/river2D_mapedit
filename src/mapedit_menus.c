@@ -646,9 +646,7 @@ void mapedit_drawEditor
         }
     }
 
-    // always show FPS for now
-    // if(engine->config.choices & MAPEDIT_CHOICE_SHOW_FPS_BIT)
-    if(1)
+    if(engine->config.choices & MAPEDIT_CHOICE_SHOW_FPS_BIT)
     {
         updateFPS(engine, editor);
 

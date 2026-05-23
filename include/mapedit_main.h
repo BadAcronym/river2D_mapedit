@@ -110,6 +110,8 @@
 #define MAPEDIT_BIT_ANIMATED    0x02
 #define MAPEDIT_BIT_COLLISION   0x04
 
+#define MAPEDIT_CHOICE_SHOW_FPS_BIT 0x01
+
 typedef struct Tile
 {
     uint16_t x;

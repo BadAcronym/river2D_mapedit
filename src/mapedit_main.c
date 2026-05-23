@@ -125,9 +125,10 @@ void mapedit_init
                         (charsize + hSpacing * 2) * (uint32_t)animation_sv.size,
                         (charsize + vSpacing * 2) * elements);
 
-    // always show FPS for now
-    // if(engine->config.choices & MAPEDIT_CHOICE_SHOW_FPS_BIT)
-    if(1)
+    // always show, for now.
+    engine->config.choices |= MAPEDIT_CHOICE_SHOW_FPS_BIT;
+
+    if(engine->config.choices & MAPEDIT_CHOICE_SHOW_FPS_BIT)
     {
         StringView initial = cstr_sv("FPS: ????");
 
