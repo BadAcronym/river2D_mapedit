@@ -312,7 +312,7 @@ void mapedit_init
     engine->controls.keycodes[MAPEDIT_KEY_REDO]       = 'y';
     engine->controls.keycodes[MAPEDIT_KEY_UNDO]       = 'z';
     engine->controls.keycodes[MAPEDIT_KEY_DECREASE]   = '-';
-    engine->controls.keycodes[MAPEDIT_KEY_INCREASE]   = '= ';
+    engine->controls.keycodes[MAPEDIT_KEY_INCREASE]   = '=';
     engine->controls.keycodes[MAPEDIT_KEY_SAVE]       = 's';
     engine->controls.keycodes[MAPEDIT_KEY_QUIT]       = 'q';
     engine->controls.keycodes[MAPEDIT_KEY_TILEPICKER] = 't';
