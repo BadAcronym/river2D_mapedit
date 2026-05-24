@@ -84,7 +84,9 @@ void mapedit_saveProject
     }
 
     uint64_t tilecount = editor->layers * editor->mapHeight * editor->mapWidth;
-    fwrite(editor->tiles, sizeof(Tile), tilecount, file);
+    fwrite(editor->placedTiles, sizeof(TileIndex), tilecount, file);
+
+    // URGENT: write tile metadata array and its size
 
     river2D_syncImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET], false);
 
@@ -184,12 +186,14 @@ void mapedit_loadProject
     }
 
     uint64_t maxtilebyte = editor->layers * editor->mapWidth * editor->mapHeight *
-                           sizeof(Tile);
+                           sizeof(TileIndex);
 
     for(uint64_t i = 0; i < maxtilebyte && ((byte = fgetc(file)) != EOF); ++i)
     {
-        ((uint8_t*)editor->tiles)[i] = (uint8_t)byte;
+        ((uint8_t*)editor->placedTiles)[i] = (uint8_t)byte;
     }
+
+    // URGENT: read tile metadata array!
 
     if(engine->planes[MAPEDIT_PLANE_TILESHEET].data)
     {

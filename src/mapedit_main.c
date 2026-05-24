@@ -256,10 +256,10 @@ void mapedit_init
     editor->mapHeight = engine->config.canvas_height / editor->tilesize;
 
     uint64_t tilecount = editor->layers * editor->mapWidth * editor->mapHeight;
-    editor->tiles = malloc(tilecount * sizeof(Tile));
+    editor->placedTiles = malloc(tilecount * sizeof(TileIndex));
     for(uint32_t i = 0; i < tilecount; ++i)
     {
-        editor->tiles[i].flags |= MAPEDIT_BIT_INVALID;
+        editor->placedTiles[i].x = UINT16_MAX;
     }
 
     editor->actions = malloc(MAPEDIT_MAX_ACTIONS * sizeof(Action));
@@ -328,7 +328,7 @@ int32_t mapedit_shutdown
 (
     EditorData *editor
 ){
-    free(editor->tiles);
+    free(editor->placedTiles);
     free(editor->actions);
     free((void*)editor->inputBuffer.data);
     return 0;

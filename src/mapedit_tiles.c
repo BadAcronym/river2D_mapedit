@@ -31,7 +31,7 @@ f_internal void readAction_undo
     EditorData *editor
 ){
     Action action = editor->actions[editor->currentAction];
-    editor->tiles[action.map_index] = action.prev_tile;
+    editor->placedTiles[action.map_index] = action.prev_tile;
 }
 
 f_internal void readAction_redo
@@ -39,17 +39,17 @@ f_internal void readAction_redo
     EditorData *editor
 ){
     Action action = editor->actions[editor->currentAction];
-    editor->tiles[action.map_index] = action.new_tile;
+    editor->placedTiles[action.map_index] = action.new_tile;
 }
 
 f_internal void writeAction
 (
-    EditorData   *editor,
-    uint64_t     map_index,
-    Tile         new_tile
+    EditorData *editor,
+    uint64_t   map_index,
+    TileIndex  new_tile
 ){
-    Tile prev_tile = editor->tiles[map_index];
-    editor->tiles[map_index] = new_tile;
+    TileIndex prev_tile = editor->placedTiles[map_index];
+    editor->placedTiles[map_index] = new_tile;
 
     editor->actions[editor->currentAction].stroke_start = editor->lastActionStart;
     editor->actions[editor->currentAction].map_index    = map_index;
@@ -95,7 +95,7 @@ void mapedit_placeSelectedTiles
                 break;
             }
 
-            Tile new_tile = {0};
+            TileIndex new_tile = {0};
             new_tile.x = editor->selectedX + x;
             new_tile.y = editor->selectedY + y;
 

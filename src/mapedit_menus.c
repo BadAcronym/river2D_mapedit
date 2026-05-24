@@ -284,13 +284,13 @@ void mapedit_pollMainMenu
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM ||
            engine->controls.keymap    & MAPEDIT_BIT_ENTER
         ){
-            if(editor->previousState && editor->tiles)
+            if(editor->previousState && editor->placedTiles)
             {
                 uint64_t tilecount = editor->layers *
                                      editor->mapHeight * editor->mapWidth;
                 for(uint32_t i = 0; i < tilecount; ++i)
                 {
-                    editor->tiles[i].flags |= MAPEDIT_BIT_INVALID;
+                    editor->placedTiles[i].x = UINT16_MAX;
                 }
             }
 
@@ -545,11 +545,11 @@ void mapedit_drawEditor
             {
                 uint64_t index = z * editor->mapWidth * editor->mapHeight +
                                  y * editor->mapWidth + x;
-                if(!(editor->tiles[index].flags & MAPEDIT_BIT_INVALID))
+                if(editor->placedTiles[index].x != UINT16_MAX)
                 {
                     comp.src        = &engine->planes[MAPEDIT_PLANE_TILESHEET];
-                    comp.offsetSrcX = editor->tiles[index].x * editor->tilesize;
-                    comp.offsetSrcY = editor->tiles[index].y * editor->tilesize;
+                    comp.offsetSrcX = editor->placedTiles[index].x * editor->tilesize;
+                    comp.offsetSrcY = editor->placedTiles[index].y * editor->tilesize;
                     comp.offsetDstX = x * editor->tilesize;
                     comp.offsetDstY = y * editor->tilesize;
                     comp.cropWidth  = editor->tilesize;

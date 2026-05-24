@@ -106,29 +106,32 @@
 #define MAPEDIT_FLAG_TILEPICKER  0x01
 #define MAPEDIT_FLAG_CONTEXTMENU 0x02
 
-#define MAPEDIT_BIT_INVALID     0x01
-#define MAPEDIT_BIT_ANIMATED    0x02
-#define MAPEDIT_BIT_COLLISION   0x04
+#define MAPEDIT_BIT_ANIMATED    0x01
+#define MAPEDIT_BIT_COLLISION   0x02
 
 #define MAPEDIT_CHOICE_SHOW_FPS_BIT 0x01
 
-typedef struct Tile
+typedef struct TileIndex
 {
     uint16_t x;
     uint16_t y;
+}
+TileIndex;
+
+typedef struct TileMetadata
+{
     uint8_t  fps;
     uint8_t  flags;
-    int8_t   adv_x;
-    int8_t   adv_y;
+    int16_t  next;
 }
-Tile;
+TileMetadata;
 
 typedef struct Action
 {
     River2D_Time stroke_start;
     uint64_t     map_index;
-    Tile         prev_tile;
-    Tile         new_tile;
+    TileIndex    prev_tile;
+    TileIndex    new_tile;
 }
 Action;
 
@@ -161,7 +164,8 @@ typedef struct EditorData
     Button       collision_b;
     Button       animation_b;
     uint8_t      i_button;
-    Tile         *tiles;
+    TileIndex    *placedTiles;
+    TileMetadata *tileData;
     Action       *actions;
     uint32_t     currentAction;
     String       inputBuffer;
