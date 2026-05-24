@@ -545,6 +545,7 @@ void mapedit_drawEditor
             {
                 uint64_t index = z * editor->mapWidth * editor->mapHeight +
                                  y * editor->mapWidth + x;
+
                 if(editor->placedTiles[index].x != UINT16_MAX)
                 {
                     comp.src        = &engine->planes[MAPEDIT_PLANE_TILESHEET];
