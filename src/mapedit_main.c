@@ -262,6 +262,14 @@ void mapedit_init
         editor->placedTiles[i].x = UINT16_MAX;
     }
 
+    uint32_t sheetCountX = engine->planes[MAPEDIT_PLANE_TILESHEET].width /
+                           editor->tilesize;
+
+    uint32_t sheetCountY = engine->planes[MAPEDIT_PLANE_TILESHEET].height /
+                           editor->tilesize;
+
+    editor->tileData = calloc(sheetCountX * sheetCountY, sizeof(TileMetadata));
+
     editor->actions = malloc(MAPEDIT_MAX_ACTIONS * sizeof(Action));
     for(uint32_t i = 0; i < MAPEDIT_MAX_ACTIONS; ++i)
     {
@@ -329,6 +337,7 @@ int32_t mapedit_shutdown
     EditorData *editor
 ){
     free(editor->placedTiles);
+    free(editor->tileData);
     free(editor->actions);
     free((void*)editor->inputBuffer.data);
     return 0;
