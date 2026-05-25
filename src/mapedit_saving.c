@@ -32,19 +32,26 @@ void mapedit_saveProject
         ++sv_filename.size;
     }
 
+    if(editor->filename.data)
+    {
+        free((void*)editor->filename.data);
+    }
+
     StringView  ext = cstr_sv(".rte");
     const char* pos = sv_filename.data + sv_filename.size - 4;
 
     if(sv_find(ext, sv_filename) != pos)
     {
-        editor->filename = cstr_sv(sv_concat(sv_filename, ext));
+        const char *appended = sv_concat(sv_filename, ext);
+        editor->filename     = cstr_sv(appended);
     }
     else
     {
         editor->filename = sv_filename;
     }
 
-    FILE *file = fopen(sv_cstr(editor->filename), "wb");
+    const char *cstr_filename = sv_cstr(editor->filename);
+    FILE *file = fopen(cstr_filename, "wb");
     if(!file)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: could not open file for saving: "
@@ -62,24 +69,28 @@ void mapedit_saveProject
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. "
                 "fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
+        free((void*)cstr_filename);
         return;
     }
     if((elements = fwrite(&editor->mapWidth, 2, 1, file)) != 1)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. "
                 "fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
+        free((void*)cstr_filename);
         return;
     }
     if((elements = fwrite(&editor->mapHeight, 2, 1, file)) != 1)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. "
                 "fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
+        free((void*)cstr_filename);
         return;
     }
     if((elements = fwrite(&editor->layers, 1, 1, file)) != 1)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. "
                 "\033[0m\n");
+        free((void*)cstr_filename);
         return;
     }
 
@@ -98,11 +109,12 @@ void mapedit_saveProject
     uint64_t indexC = editor->layers * editor->mapHeight * editor->mapWidth;
     fwrite(editor->placedTiles, sizeof(TileIndex), indexC, file);
 
-    fclose(file);
+    editor->lastSaveTime = river2D_queryTime();
+
+    free((void*)cstr_filename);
 
     fprintf(stdout, "\nProject saved successfully.\n");
-
-    editor->lastSaveTime = river2D_queryTime();
+    fclose(file);
 }
 
 void mapedit_loadProject
@@ -123,12 +135,18 @@ void mapedit_loadProject
         ++sv_filename.size;
     }
 
+    if(editor->filename.data)
+    {
+        free((void*)editor->filename.data);
+    }
+
     StringView  ext = cstr_sv(".rte");
     const char* pos = sv_filename.data + sv_filename.size - 4;
 
     if(sv_find(ext, sv_filename) != pos)
     {
-        editor->filename = cstr_sv(sv_concat(sv_filename, ext));
+        const char *appended = sv_concat(sv_filename, ext);
+        editor->filename     = cstr_sv(appended);
     }
     else
     {
@@ -139,12 +157,14 @@ void mapedit_loadProject
     fprintf(stderr, "\nloading file: "PRI_SV"\n", ARG_SV(editor->filename));
 #endif
 
-    FILE *file = fopen(sv_cstr(editor->filename), "rb");
+    const char *cstr_filename = sv_cstr(editor->filename);
+    FILE *file = fopen(cstr_filename, "rb");
     if(!file)
     {
         fprintf(stderr, "\033[31;1;7mERROR: could not open file "
                 "named \""PRI_SV"\".\033[0m\n", ARG_SV(editor->inputBuffer));
         mapedit_changeState(editor, MAPEDIT_STATE_MENU);
+        free((void*)cstr_filename);
         return;
     }
 
@@ -157,6 +177,7 @@ void mapedit_loadProject
         {
             fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: "
                     PRI_SV"\033[0m\n", ARG_SV(editor->inputBuffer));
+            free((void*)cstr_filename);
             return;
         }
     }
@@ -166,24 +187,28 @@ void mapedit_loadProject
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
                 "\033[0m\n", sv_cstr(editor->filename));
+        free((void*)cstr_filename);
         return;
     }
     if((elements = fread(&editor->mapWidth, 2, 1, file)) != 1)
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
                 "\033[0m\n", sv_cstr(editor->filename));
+        free((void*)cstr_filename);
         return;
     }
     if((elements = fread(&editor->mapHeight, 2, 1, file)) != 1)
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
                 "\033[0m\n", sv_cstr(editor->filename));
+        free((void*)cstr_filename);
         return;
     }
     if((elements = fread(&editor->layers, 1, 1, file)) != 1)
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
                 "\033[0m\n", sv_cstr(editor->filename));
+        free((void*)cstr_filename);
         return;
     }
 
@@ -198,6 +223,7 @@ void mapedit_loadProject
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to load tilesheet into ptr."
                 "\033[0m\n");
+        free((void*)cstr_filename);
         return;
     }
     engine->planes[MAPEDIT_PLANE_TILESHEET].path = cstr_sv("loadProject");
@@ -217,7 +243,7 @@ void mapedit_loadProject
         ((uint8_t*)editor->placedTiles)[i] = (uint8_t)byte;
     }
 
-    free((void*)sv_cstr(editor->filename));
+    free((void*)cstr_filename);
 
     fclose(file);
 }
