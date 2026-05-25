@@ -104,7 +104,6 @@ void mapedit_placeSelectedTiles
             {
                 prev = MAPEDIT_MAX_ACTIONS - 1;
             }
-
             Action prev_action = editor->actions[prev];
 
             int64_t delta = river2D_deltaTime_ns(&prev_action.stroke_start,
@@ -128,6 +127,8 @@ void mapedit_placeSelectedTiles
                 goto skipFill;
             }
 
+            uint64_t layerSize = editor->mapWidth * editor->mapHeight;
+
             if(backwards && !diffY && diffX > 1)
             {
                 for(uint64_t i = diffX - 1; i > 0; --i)
@@ -150,12 +151,15 @@ void mapedit_placeSelectedTiles
             {
                 for(uint64_t i = diffY - 1; i > 0; --i)
                 {
-                    uint64_t fillIndex = index + i * editor->mapWidth;
+                    uint64_t rows          = i * editor->mapWidth;
+                    uint64_t curLayerIndex = index % layerSize;
 
-                    if(fillIndex - index > editor->mapWidth * editor->mapHeight)
+                    if(rows > curLayerIndex)
                     {
                         continue;
                     }
+
+                    uint64_t fillIndex = index + rows;
 
                     writeAction(editor, fillIndex, new_tile);
                     incrementAction(editor);
@@ -165,12 +169,15 @@ void mapedit_placeSelectedTiles
             {
                 for(uint64_t i = diffY - 1; i > 0; --i)
                 {
-                    uint64_t fillIndex = index - i * editor->mapWidth;
+                    uint64_t rows          = i * editor->mapWidth;
+                    uint64_t curLayerIndex = index % layerSize;
 
-                    if(index - fillIndex > editor->mapWidth * editor->mapHeight)
+                    if(rows > layerSize - curLayerIndex)
                     {
                         continue;
                     }
+
+                    uint64_t fillIndex = index - rows;
 
                     writeAction(editor, fillIndex, new_tile);
                     incrementAction(editor);
