@@ -91,7 +91,6 @@ void mapedit_saveProject
                       engine->planes[MAPEDIT_PLANE_TILESHEET].height,
                       IMGSURF_CHANNELS_BGRA, 8);
 
-    // TESTING: hopefully this works
     uint64_t dataC = engine->planes[MAPEDIT_PLANE_TILESHEET].width  / editor->tilesize *
                      engine->planes[MAPEDIT_PLANE_TILESHEET].height / editor->tilesize;
     fwrite(editor->tileData, sizeof(TileMetadata), dataC, file);
