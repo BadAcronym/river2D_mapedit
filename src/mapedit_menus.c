@@ -663,13 +663,14 @@ void mapedit_drawEditor
     }
 }
 
-f_internal void toggleCurrentTileCollision
+f_internal uint32_t sheetIndex
 (
-    EngineData *enigne,
+    EngineData *engine,
     EditorData *editor
 ){
-    fprintf(stderr, "TODO: toggle tile collision bit: (%u,%u)\n",
-            editor->selectedX, editor->selectedY);
+    uint32_t tileW = engine->planes[MAPEDIT_PLANE_TILESHEET].width /
+                     editor->tilesize;
+    return editor->selectedY * tileW + editor->selectedX;
 }
 
 f_internal void pollContextMenu
@@ -730,7 +731,9 @@ f_internal void pollContextMenu
 
         if(confirmed)
         {
-            toggleCurrentTileCollision(engine, editor);
+            uint32_t index = sheetIndex(engine, editor);
+            editor->tileData[index].flags ^= MAPEDIT_BIT_COLLISION;
+
             editor->flags &= ~MAPEDIT_FLAG_CONTEXTMENU;
             engine->controls.keymap    &= ~MAPEDIT_BIT_MENU;
             engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
@@ -750,8 +753,12 @@ f_internal void pollContextMenu
 
         if(confirmed)
         {
+            uint32_t index = sheetIndex(engine, editor);
+            editor->tileData[index].flags ^= MAPEDIT_BIT_ANIMATED;
+
             fprintf(stderr, "TODO: edit tile animation: (%u,%u)\n",
                     editor->selectedX, editor->selectedY);
+
             editor->flags &= ~MAPEDIT_FLAG_CONTEXTMENU;
             engine->controls.keymap    &= ~MAPEDIT_BIT_MENU;
             engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
