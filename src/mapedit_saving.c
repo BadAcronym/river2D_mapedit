@@ -83,11 +83,6 @@ void mapedit_saveProject
         return;
     }
 
-    uint64_t tilecount = editor->layers * editor->mapHeight * editor->mapWidth;
-    fwrite(editor->placedTiles, sizeof(TileIndex), tilecount, file);
-
-    // URGENT: write tile metadata array and its size
-
     river2D_syncImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET], false);
 
     imgsurf_write_ptr(file, engine->planes[MAPEDIT_PLANE_TILESHEET].data,
@@ -95,6 +90,14 @@ void mapedit_saveProject
                       engine->planes[MAPEDIT_PLANE_TILESHEET].width,
                       engine->planes[MAPEDIT_PLANE_TILESHEET].height,
                       IMGSURF_CHANNELS_BGRA, 8);
+
+    // TESTING: hopefully this works
+    uint64_t dataC = engine->planes[MAPEDIT_PLANE_TILESHEET].width  / editor->tilesize *
+                     engine->planes[MAPEDIT_PLANE_TILESHEET].height / editor->tilesize;
+    fwrite(editor->tileData, sizeof(TileMetadata), dataC, file);
+
+    uint64_t indexC = editor->layers * editor->mapHeight * editor->mapWidth;
+    fwrite(editor->placedTiles, sizeof(TileIndex), indexC, file);
 
     fclose(file);
 
@@ -185,21 +188,10 @@ void mapedit_loadProject
         return;
     }
 
-    uint64_t maxtilebyte = editor->layers * editor->mapWidth * editor->mapHeight *
-                           sizeof(TileIndex);
-
-    for(uint64_t i = 0; i < maxtilebyte && ((byte = fgetc(file)) != EOF); ++i)
-    {
-        ((uint8_t*)editor->placedTiles)[i] = (uint8_t)byte;
-    }
-
-    // URGENT: read tile metadata array!
-
     if(engine->planes[MAPEDIT_PLANE_TILESHEET].data)
     {
         river2D_destroyImage(&engine->planes[MAPEDIT_PLANE_TILESHEET]);
     }
-
     river2D_loadImage_ptr(engine, file, &engine->planes[MAPEDIT_PLANE_TILESHEET],
                           RIVER2D_CHANNELS_BGRA, 8);
 
@@ -209,8 +201,22 @@ void mapedit_loadProject
                 "\033[0m\n");
         return;
     }
-
     engine->planes[MAPEDIT_PLANE_TILESHEET].path = cstr_sv("loadProject");
+
+    uint64_t maxdatabyte = engine->planes[MAPEDIT_PLANE_TILESHEET].width  *
+                           engine->planes[MAPEDIT_PLANE_TILESHEET].height /
+                           (editor->tilesize * editor->tilesize) * sizeof(TileMetadata);
+    for(uint64_t i = 0; i < maxdatabyte && ((byte = fgetc(file)) != EOF); ++i)
+    {
+        ((uint8_t*)editor->tileData)[i] = (uint8_t)byte;
+    }
+
+    uint64_t maxtilebyte = editor->layers * editor->mapWidth * editor->mapHeight *
+                           sizeof(TileIndex);
+    for(uint64_t i = 0; i < maxtilebyte && ((byte = fgetc(file)) != EOF); ++i)
+    {
+        ((uint8_t*)editor->placedTiles)[i] = (uint8_t)byte;
+    }
 
     free((void*)sv_cstr(editor->filename));
 

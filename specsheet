@@ -4,5 +4,11 @@ uint16_t  map_width;
 uint16_t  map_height;
 uint8_t   layers;
 
-**array of tiles** (size map_width * map_height * sizeof(Tile))
-**tilesheet**      (size tilesheet_width * tilesheet_height * RIVER2D_BPP)
+**tilesheet**
+(size tilesheet_width * tilesheet_height * RIVER2D_BPP)
+
+**array of tile metadata**
+(size tilesheet_width / tilesize * tilesheet_height / tilesize * sizeof(TileMetadata))
+
+**array of placed tile indices**
+(size layers * map_width * map_height * sizeof(TileIndex))
