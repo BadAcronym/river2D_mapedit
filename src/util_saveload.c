@@ -1,4 +1,5 @@
 #include "mapedit_main.h"
+#include "imgsurf_main.h"
 
 TileMap mapedit_loadTilemap
 (
@@ -66,4 +67,48 @@ TileMap mapedit_loadTilemap
     }
 
     return map;
+}
+
+void mapedit_saveTilemap
+(
+    EngineData        *engine,
+    rvSaveMapSettings *set
+){
+    const char header[9] = "r2Dtiles";
+    fwrite(header, sizeof(header) - 1, 1, set->file);
+
+    size_t elements = 0;
+
+    if(((elements = fwrite(&set->tilesize,  2, 1, set->file)) != 1) ||
+       ((elements = fwrite(&set->mapWidth,  2, 1, set->file)) != 1) ||
+       ((elements = fwrite(&set->mapHeight, 2, 1, set->file)) != 1) ||
+       ((elements = fwrite(&set->layers,    1, 1, set->file)) != 1)
+    ){
+        set->errorcode = RV_ERROR_INVALID_HEADER;
+        return;
+    }
+
+    river2D_syncImage(engine, set->tilesheet, false);
+
+    imgsurf_write_ptr(set->file, set->tilesheet->data, IMGSURF_FILE_QOI,
+                      set->tilesheet->width, set->tilesheet->height,
+                      IMGSURF_CHANNELS_BGRA, 8);
+
+    if(!set->metadata)
+    {
+        set->errorcode = RV_ERROR_INVALID_METADATA;
+        return;
+    }
+    else if(!set->indices)
+    {
+        set->errorcode = RV_ERROR_INVALID_INDICES;
+        return;
+    }
+
+    uint64_t dataC = set->tilesheet->width  / set->tilesize *
+                     set->tilesheet->height / set->tilesize;
+    fwrite(set->metadata, sizeof(TileMetadata), dataC, set->file);
+
+    uint64_t indexC = set->layers * set->mapHeight * set->mapWidth;
+    fwrite(set->indices, sizeof(TileIndex), indexC, set->file);
 }

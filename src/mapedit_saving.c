@@ -1,5 +1,4 @@
 #include "mapedit_main.h"
-#include "imgsurf_main.h"
 #include "util_saveload.h"
 
 void mapedit_loadProject
@@ -91,13 +90,13 @@ void mapedit_saveProject
     EditorData *editor
 ){
     rvCompositeSettings comp = {0};
-    comp.src                 = &engine->planes[MAPEDIT_PLANE_ICON_SAVING];
-    comp.dst                 = &engine->backbuffer;
-    comp.pictop              = RIVER2D_PICTOP_OVER;
-    comp.cropWidth           = engine->planes[MAPEDIT_PLANE_ICON_SAVING].width;
-    comp.cropHeight          = engine->planes[MAPEDIT_PLANE_ICON_SAVING].height;
-    comp.offsetDstX          = 16;
-    comp.offsetDstY          = 16;
+    comp.src        = &engine->planes[MAPEDIT_PLANE_ICON_SAVING];
+    comp.dst        = &engine->backbuffer;
+    comp.pictop     = RIVER2D_PICTOP_OVER;
+    comp.cropWidth  = engine->planes[MAPEDIT_PLANE_ICON_SAVING].width;
+    comp.cropHeight = engine->planes[MAPEDIT_PLANE_ICON_SAVING].height;
+    comp.offsetDstX = 16;
+    comp.offsetDstY = 16;
 
     river2D_compositeImage(engine, &comp);
 
@@ -142,59 +141,27 @@ void mapedit_saveProject
         return;
     }
 
-    const char header[9] = "r2Dtiles";
-    fwrite(header, sizeof(header) - 1, 1, file);
+    rvSaveMapSettings set = {0};
+    set.file      = file;
+    set.tilesize  = editor->tilesize;
+    set.mapWidth  = editor->mapWidth;
+    set.mapHeight = editor->mapHeight;
+    set.layers    = editor->layers;
+    set.metadata  = editor->tileData;
+    set.indices   = editor->placedTiles;
+    set.tilesheet = &engine->planes[MAPEDIT_PLANE_TILESHEET];
 
-    size_t elements = 0;
+    mapedit_saveTilemap(engine, &set);
 
-    if((elements = fwrite(&editor->tilesize, 2, 1, file)) != 1)
+    if(set.errorcode == RV_ERROR_INVALID_HEADER)
     {
-        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. "
-                "fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
-        free((void*)cstr_filename);
-        return;
-    }
-    if((elements = fwrite(&editor->mapWidth, 2, 1, file)) != 1)
-    {
-        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. "
-                "fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
-        free((void*)cstr_filename);
-        return;
-    }
-    if((elements = fwrite(&editor->mapHeight, 2, 1, file)) != 1)
-    {
-        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. "
-                "fwrite returned %zu, expected %u.\033[0m\n", elements, 1);
-        free((void*)cstr_filename);
-        return;
-    }
-    if((elements = fwrite(&editor->layers, 1, 1, file)) != 1)
-    {
-        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile. "
+        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile."
                 "\033[0m\n");
-        free((void*)cstr_filename);
-        return;
     }
-
-    river2D_syncImage(engine, &engine->planes[MAPEDIT_PLANE_TILESHEET], false);
-
-    imgsurf_write_ptr(file, engine->planes[MAPEDIT_PLANE_TILESHEET].data,
-                      IMGSURF_FILE_QOI,
-                      engine->planes[MAPEDIT_PLANE_TILESHEET].width,
-                      engine->planes[MAPEDIT_PLANE_TILESHEET].height,
-                      IMGSURF_CHANNELS_BGRA, 8);
-
-    uint64_t dataC = engine->planes[MAPEDIT_PLANE_TILESHEET].width  / editor->tilesize *
-                     engine->planes[MAPEDIT_PLANE_TILESHEET].height / editor->tilesize;
-    fwrite(editor->tileData, sizeof(TileMetadata), dataC, file);
-
-    uint64_t indexC = editor->layers * editor->mapHeight * editor->mapWidth;
-    fwrite(editor->placedTiles, sizeof(TileIndex), indexC, file);
 
     editor->lastSaveTime = river2D_queryTime();
+    fprintf(stdout, "\nProject saved successfully.\n");
 
     free((void*)cstr_filename);
-
-    fprintf(stdout, "\nProject saved successfully.\n");
     fclose(file);
 }
