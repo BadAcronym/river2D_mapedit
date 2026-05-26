@@ -338,14 +338,11 @@ int32_t mapedit_shutdown
 ){
     free(editor->placedTiles);
     free(editor->tileData);
+
     free(editor->actions);
     if(editor->inputBuffer.data)
     {
         free((void*)editor->inputBuffer.data);
-    }
-    if(editor->filename.data)
-    {
-        free((void*)editor->filename.data);
     }
     return 0;
 }
