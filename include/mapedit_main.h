@@ -220,6 +220,7 @@ extern void mapedit_processPointer
 
 extern void mapedit_placeSelectedTiles
 (
+    EngineData *engine,
     EditorData *editor,
     uint16_t   tileX,
     uint16_t   tileY

@@ -121,6 +121,7 @@ void mapedit_saveProject
     StringView  ext = cstr_sv(".rte");
     const char* pos = sv_filename.data + sv_filename.size - 4;
 
+    // ASAN: use-after-free here, somehow.
     if(sv_find(ext, sv_filename) != pos)
     {
         const char *appended = sv_concat(sv_filename, ext);

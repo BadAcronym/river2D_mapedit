@@ -59,6 +59,7 @@ f_internal void writeAction
 
 void mapedit_placeSelectedTiles
 (
+    EngineData *engine,
     EditorData *editor,
     uint16_t   tileX,
     uint16_t   tileY
@@ -72,6 +73,16 @@ void mapedit_placeSelectedTiles
     if(topLeft > maxCurIndex)
     {
         topLeft = maxCurIndex;
+    }
+
+    // FIXME: actually fill in gaps here, too
+    // figure out a way to do selectMult-independent filling... 🤔
+    // we need to jump far enough back in the action history for that,
+    // selectMult * selectMult. 1^2 is still 1, but for a stencil of 2^2 we need to jump
+    // back 4.
+    if(engine->controls.keymap & MAPEDIT_BIT_LSHIFT)
+    {
+        goto skipFill;
     }
 
     for(uint8_t y = 0; y < editor->selectMult && !break_outer; ++y)

@@ -511,6 +511,27 @@ f_internal void drawContextMenu
     river2D_compositeImage(engine, &comp);
 }
 
+f_internal void getTileXY
+(
+    EngineData *engine,
+    EditorData *editor,
+    uint16_t   *tileX,
+    uint16_t   *tileY,
+    float      fX,
+    float      fY
+){
+    *tileX = (uint16_t)(engine->controls.pointer.x * fX / editor->tilesize);
+    *tileY = (uint16_t)(engine->controls.pointer.y * fY / editor->tilesize);
+
+    uint8_t  modX  = *tileX % editor->selectMult;
+    uint8_t  modY  = *tileY % editor->selectMult;
+    if(engine->controls.keymap & MAPEDIT_BIT_LSHIFT)
+    {
+        *tileX -= modX;
+        *tileY -= modY;
+    }
+}
+
 void mapedit_drawEditor
 (
     EngineData *engine,
@@ -598,24 +619,12 @@ void mapedit_drawEditor
         river2D_compositeImage(engine, &comp);
     }
 
-    float    fX    = (float)(engine->backbuffer.width);
-    float    fY    = (float)(engine->backbuffer.height);
-    uint16_t tileX = (uint16_t)(engine->controls.pointer.x * fX / editor->tilesize);
-    uint16_t tileY = (uint16_t)(engine->controls.pointer.y * fY / editor->tilesize);
-    uint8_t  modX  = tileX % editor->selectMult;
-    uint8_t  modY  = tileY % editor->selectMult;
+    float fX = (float)engine->backbuffer.width;
+    float fY = (float)engine->backbuffer.height;
 
-    if(engine->controls.keymap & MAPEDIT_BIT_LSHIFT)
-    {
-        if(modX)
-        {
-            tileX -= modX;
-        }
-        if(modY)
-        {
-            tileY -= modY;
-        }
-    }
+    uint16_t tileX = 0;
+    uint16_t tileY = 0;
+    getTileXY(engine, editor, &tileX, &tileY, fX, fY);
 
     comp.src        = &engine->planes[MAPEDIT_PLANE_TILESHEET];
     comp.dst        = &engine->backbuffer;
@@ -961,8 +970,9 @@ void mapedit_pollEditor
         return;
     }
 
-    uint16_t tileX = (uint16_t)(engine->controls.pointer.x * fX / editor->tilesize);
-    uint16_t tileY = (uint16_t)(engine->controls.pointer.y * fY / editor->tilesize);
+    uint16_t tileX = 0;
+    uint16_t tileY = 0;
+    getTileXY(engine, editor, &tileX, &tileY, fX, fY);
 
     //if(river2D_insideRect(&engine->controls.pointer, &editor->button))
     // {
@@ -974,7 +984,7 @@ void mapedit_pollEditor
 
         if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
         {
-            mapedit_placeSelectedTiles(editor, tileX, tileY);
+            mapedit_placeSelectedTiles(engine, editor, tileX, tileY);
         }
     }
 }
