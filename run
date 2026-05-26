@@ -66,5 +66,5 @@ fi
 
 popd > /dev/null
 
-chmod +x ./bin/$build/mapedit
-./bin/$build/mapedit
+chmod +x ./bin/mapedit/$build/mapedit
+./bin/mapedit/$build/mapedit
