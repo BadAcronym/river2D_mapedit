@@ -111,21 +111,6 @@
 
 #define MAPEDIT_CHOICE_SHOW_FPS_BIT 0x01
 
-typedef struct TileIndex
-{
-    uint16_t x;
-    uint16_t y;
-}
-TileIndex;
-
-typedef struct TileMetadata
-{
-    uint8_t  fps;
-    uint8_t  flags;
-    int16_t  next;
-}
-TileMetadata;
-
 typedef struct Action
 {
     River2D_Time stroke_start;

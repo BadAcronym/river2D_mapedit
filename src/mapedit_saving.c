@@ -1,5 +1,89 @@
 #include "mapedit_main.h"
 #include "imgsurf_main.h"
+#include "util_saveload.h"
+
+void mapedit_loadProject
+(
+    EngineData *engine,
+    EditorData *editor
+){
+    StringView sv_filename = {0};
+    sv_filename.data       = editor->inputBuffer.data;
+
+    for(size_t i = 0; editor->inputBuffer.size; ++i)
+    {
+        if(editor->inputBuffer.data[i] == '\0')
+        {
+            break;
+        }
+
+        ++sv_filename.size;
+    }
+
+    if(editor->filename.data)
+    {
+        free((void*)editor->filename.data);
+    }
+
+    StringView  ext = cstr_sv(".rte");
+    const char* pos = sv_filename.data + sv_filename.size - 4;
+
+    if(sv_find(ext, sv_filename) != pos)
+    {
+        const char *appended = sv_concat(sv_filename, ext);
+        editor->filename     = cstr_sv(appended);
+    }
+    else
+    {
+        editor->filename = sv_filename;
+    }
+
+#ifdef DEBUG
+    fprintf(stderr, "\nloading file: "PRI_SV"\n", ARG_SV(editor->filename));
+#endif
+
+    const char *cstr_filename = sv_cstr(editor->filename);
+    FILE *file = fopen(cstr_filename, "rb");
+    if(!file)
+    {
+        fprintf(stderr, "\033[31;1;7mERROR: could not open file "
+                "named \""PRI_SV"\".\033[0m\n", ARG_SV(editor->inputBuffer));
+        mapedit_changeState(editor, MAPEDIT_STATE_MENU);
+        free((void*)cstr_filename);
+        return;
+    }
+
+    rvLoadMapSettings set;
+    set.tilesheet = &engine->planes[MAPEDIT_PLANE_TILESHEET];
+    set.tilesize  = &editor->tilesize;
+    set.mapWidth  = &editor->mapWidth;
+    set.mapHeight = &editor->mapHeight;
+    set.layers    = &editor->layers;
+    set.file      = file;
+
+    TileMap map = mapedit_loadTilemap(engine, &set);
+
+    if(editor->tileData)
+    {
+        free(editor->tileData);
+    }
+    editor->tileData = map.metadata;
+
+    if(editor->placedTiles)
+    {
+        free(editor->placedTiles);
+    }
+    editor->placedTiles = map.indices;
+
+    if(set.errorcode == RV_ERROR_INVALID_HEADER)
+    {
+        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
+                "\033[0m\n", cstr_filename);
+    }
+
+    free((void*)cstr_filename);
+    fclose(file);
+}
 
 void mapedit_saveProject
 (
@@ -16,8 +100,6 @@ void mapedit_saveProject
     comp.offsetDstY          = 16;
 
     river2D_compositeImage(engine, &comp);
-
-    engine->bltBuffer(engine);
 
     StringView sv_filename = {0};
     sv_filename.data       = editor->inputBuffer.data;
@@ -114,136 +196,5 @@ void mapedit_saveProject
     free((void*)cstr_filename);
 
     fprintf(stdout, "\nProject saved successfully.\n");
-    fclose(file);
-}
-
-void mapedit_loadProject
-(
-    EngineData *engine,
-    EditorData *editor
-){
-    StringView sv_filename = {0};
-    sv_filename.data       = editor->inputBuffer.data;
-
-    for(size_t i = 0; editor->inputBuffer.size; ++i)
-    {
-        if(editor->inputBuffer.data[i] == '\0')
-        {
-            break;
-        }
-
-        ++sv_filename.size;
-    }
-
-    if(editor->filename.data)
-    {
-        free((void*)editor->filename.data);
-    }
-
-    StringView  ext = cstr_sv(".rte");
-    const char* pos = sv_filename.data + sv_filename.size - 4;
-
-    if(sv_find(ext, sv_filename) != pos)
-    {
-        const char *appended = sv_concat(sv_filename, ext);
-        editor->filename     = cstr_sv(appended);
-    }
-    else
-    {
-        editor->filename = sv_filename;
-    }
-
-#ifdef DEBUG
-    fprintf(stderr, "\nloading file: "PRI_SV"\n", ARG_SV(editor->filename));
-#endif
-
-    const char *cstr_filename = sv_cstr(editor->filename);
-    FILE *file = fopen(cstr_filename, "rb");
-    if(!file)
-    {
-        fprintf(stderr, "\033[31;1;7mERROR: could not open file "
-                "named \""PRI_SV"\".\033[0m\n", ARG_SV(editor->inputBuffer));
-        mapedit_changeState(editor, MAPEDIT_STATE_MENU);
-        free((void*)cstr_filename);
-        return;
-    }
-
-    const char header[9] = "r2Dtiles";
-    int byte;
-
-    for(uint8_t i = 0; i < 8 && ((byte = fgetc(file)) != EOF); ++i)
-    {
-        if(byte != header[i])
-        {
-            fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: "
-                    PRI_SV"\033[0m\n", ARG_SV(editor->inputBuffer));
-            free((void*)cstr_filename);
-            return;
-        }
-    }
-
-    size_t elements = 0;
-    if((elements = fread(&editor->tilesize, 2, 1, file)) != 1)
-    {
-        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
-                "\033[0m\n", sv_cstr(editor->filename));
-        free((void*)cstr_filename);
-        return;
-    }
-    if((elements = fread(&editor->mapWidth, 2, 1, file)) != 1)
-    {
-        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
-                "\033[0m\n", sv_cstr(editor->filename));
-        free((void*)cstr_filename);
-        return;
-    }
-    if((elements = fread(&editor->mapHeight, 2, 1, file)) != 1)
-    {
-        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
-                "\033[0m\n", sv_cstr(editor->filename));
-        free((void*)cstr_filename);
-        return;
-    }
-    if((elements = fread(&editor->layers, 1, 1, file)) != 1)
-    {
-        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
-                "\033[0m\n", sv_cstr(editor->filename));
-        free((void*)cstr_filename);
-        return;
-    }
-
-    if(engine->planes[MAPEDIT_PLANE_TILESHEET].data)
-    {
-        river2D_destroyImage(&engine->planes[MAPEDIT_PLANE_TILESHEET]);
-    }
-    river2D_loadImage_ptr(engine, file, &engine->planes[MAPEDIT_PLANE_TILESHEET],
-                          RIVER2D_CHANNELS_BGRA, 8);
-
-    if(!engine->planes[MAPEDIT_PLANE_TILESHEET].data)
-    {
-        fprintf(stderr, "\033[31;1;7mERROR: failed to load tilesheet into ptr."
-                "\033[0m\n");
-        free((void*)cstr_filename);
-        return;
-    }
-    engine->planes[MAPEDIT_PLANE_TILESHEET].path = cstr_sv("loadProject");
-
-    uint64_t maxdatabyte = engine->planes[MAPEDIT_PLANE_TILESHEET].width  *
-                           engine->planes[MAPEDIT_PLANE_TILESHEET].height /
-                           (editor->tilesize * editor->tilesize) * sizeof(TileMetadata);
-    for(uint64_t i = 0; i < maxdatabyte && ((byte = fgetc(file)) != EOF); ++i)
-    {
-        ((uint8_t*)editor->tileData)[i] = (uint8_t)byte;
-    }
-
-    uint64_t maxtilebyte = editor->layers * editor->mapWidth * editor->mapHeight *
-                           sizeof(TileIndex);
-    for(uint64_t i = 0; i < maxtilebyte && ((byte = fgetc(file)) != EOF); ++i)
-    {
-        ((uint8_t*)editor->placedTiles)[i] = (uint8_t)byte;
-    }
-
-    free((void*)cstr_filename);
-
     fclose(file);
 }
