@@ -574,12 +574,6 @@ void mapedit_drawEditor
 
                 if(editor->placedTiles[index].x != UINT16_MAX)
                 {
-                    fprintf(stderr, "x, y, z: %u, %u, %u\n", x, y, z);
-                    fprintf(stderr, "index: %lu\n", index);
-                    fprintf(stderr, "current tile: (%u, %u)\n",
-                            editor->placedTiles[index].x,
-                            editor->placedTiles[index].y);
-
                     comp.offsetSrcX = editor->placedTiles[index].x * editor->tilesize;
                     comp.offsetSrcY = editor->placedTiles[index].y * editor->tilesize;
                     comp.offsetDstX = x * editor->tilesize;
