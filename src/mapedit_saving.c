@@ -65,7 +65,16 @@ void mapedit_loadProject
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to load project file: %s. Code: %u"
                 "\033[0m\n", cstr_filename, set.errorcode);
+        free((void*)cstr_filename);
+        fclose(file);
+        return;
     }
+
+    #ifdef DEBUG
+    fprintf(stderr, "mapWidth: %u\n",  editor->mapWidth);
+    fprintf(stderr, "mapHeight: %u\n", editor->mapHeight);
+    fprintf(stderr, "mapLayers: %u\n", editor->mapLayers);
+    #endif
 
     if(editor->tileData)
     {
