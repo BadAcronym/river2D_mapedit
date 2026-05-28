@@ -558,6 +558,8 @@ void mapedit_drawEditor
     uint8_t startLayer = editor->isolate ? editor->currentLayer : 0;
     uint8_t endLayer   = editor->isolate ? editor->currentLayer + 1 : editor->layers;
 
+    comp.src = &engine->planes[MAPEDIT_PLANE_TILESHEET];
+
     for(uint8_t z = startLayer; z < endLayer; ++z)
     {
         for(uint32_t y = 0; y < editor->mapHeight; ++y)
@@ -569,7 +571,6 @@ void mapedit_drawEditor
 
                 if(editor->placedTiles[index].x != UINT16_MAX)
                 {
-                    comp.src        = &engine->planes[MAPEDIT_PLANE_TILESHEET];
                     comp.offsetSrcX = editor->placedTiles[index].x * editor->tilesize;
                     comp.offsetSrcY = editor->placedTiles[index].y * editor->tilesize;
                     comp.offsetDstX = x * editor->tilesize;
