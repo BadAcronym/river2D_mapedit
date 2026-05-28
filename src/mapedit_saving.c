@@ -61,6 +61,11 @@ void mapedit_loadProject
     set.tilesheet = &engine->planes[MAPEDIT_PLANE_TILESHEET];
 
     TileMap map = mapedit_loadTilemap(engine, &set);
+    if(set.errorcode)
+    {
+        fprintf(stderr, "\033[31;1;7mERROR: failed to load project file: %s. Code: %u"
+                "\033[0m\n", cstr_filename, set.errorcode);
+    }
 
     if(editor->tileData)
     {
@@ -73,12 +78,6 @@ void mapedit_loadProject
         free(editor->placedTiles);
     }
     editor->placedTiles = map.indices;
-
-    if(set.errorcode)
-    {
-        fprintf(stderr, "\033[31;1;7mERROR: failed to load project file: %s. Code: %u"
-                "\033[0m\n", cstr_filename, set.errorcode);
-    }
 
     free((void*)cstr_filename);
     fclose(file);
