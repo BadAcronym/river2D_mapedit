@@ -130,15 +130,17 @@ typedef struct EditorData
     River2D_Time lastActionStart;
     uint8_t      currentState;
     uint8_t      previousState;
-    uint16_t     tilesize;
     uint8_t      currentLayer;
     bool         isolate;
     uint16_t     selectedX;
     uint16_t     selectedY;
     uint8_t      selectMult;
+    uint16_t     tilesize;
     uint32_t     mapWidth;
     uint32_t     mapHeight;
     uint8_t      mapLayers;
+    TileMetadata *tileData;
+    TileIndex    *placedTiles;
     uint8_t      flags;
     Button       new_b;
     Button       load_b;
@@ -149,8 +151,6 @@ typedef struct EditorData
     Button       collision_b;
     Button       animation_b;
     uint8_t      i_button;
-    TileIndex    *placedTiles;
-    TileMetadata *tileData;
     Action       *actions;
     uint32_t     currentAction;
     String       inputBuffer;

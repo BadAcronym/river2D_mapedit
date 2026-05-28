@@ -57,7 +57,7 @@ void mapedit_loadProject
     set.tilesize  = &editor->tilesize;
     set.mapWidth  = &editor->mapWidth;
     set.mapHeight = &editor->mapHeight;
-    set.layers    = &editor->mapLayers;
+    set.mapLayers = &editor->mapLayers;
     set.tilesheet = &engine->planes[MAPEDIT_PLANE_TILESHEET];
 
     TileMap map = mapedit_loadTilemap(engine, &set);
@@ -155,7 +155,7 @@ void mapedit_saveProject
     set.tilesize  = editor->tilesize;
     set.mapWidth  = editor->mapWidth;
     set.mapHeight = editor->mapHeight;
-    set.layers    = editor->mapLayers;
+    set.mapLayers = editor->mapLayers;
     set.metadata  = editor->tileData;
     set.indices   = editor->placedTiles;
     set.tilesheet = &engine->planes[MAPEDIT_PLANE_TILESHEET];

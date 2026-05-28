@@ -23,7 +23,7 @@ TileMap mapedit_loadTilemap
     if(((elements = fread(set->tilesize,  2, 1, set->file)) != 1) ||
        ((elements = fread(set->mapWidth,  4, 1, set->file)) != 1) ||
        ((elements = fread(set->mapHeight, 4, 1, set->file)) != 1) ||
-       ((elements = fread(set->layers,    1, 1, set->file)) != 1)
+       ((elements = fread(set->mapLayers, 1, 1, set->file)) != 1)
     ){
         set->errorcode = RV_ERROR_INVALID_HEADER;
         return (TileMap){0};
@@ -48,7 +48,7 @@ TileMap mapedit_loadTilemap
     uint64_t sheetH = engine->planes[MAPEDIT_PLANE_TILESHEET].height / *set->tilesize;
 
     uint64_t maxdatabyte  = sheetW * sheetH * sizeof(TileMetadata);
-    uint64_t maxindexbyte = *set->layers * *set->mapWidth * *set->mapHeight *
+    uint64_t maxindexbyte = *set->mapLayers * *set->mapWidth * *set->mapHeight *
                            sizeof(TileIndex);
 
     TileMap map = {0};
@@ -82,7 +82,7 @@ void mapedit_saveTilemap
     if(((elems = fwrite(&set->tilesize,  2, 1, set->file)) != 1) ||
        ((elems = fwrite(&set->mapWidth,  4, 1, set->file)) != 1) ||
        ((elems = fwrite(&set->mapHeight, 4, 1, set->file)) != 1) ||
-       ((elems = fwrite(&set->layers,    1, 1, set->file)) != 1)
+       ((elems = fwrite(&set->mapLayers, 1, 1, set->file)) != 1)
     ){
         set->errorcode = RV_ERROR_INVALID_HEADER;
         return;
@@ -113,7 +113,7 @@ void mapedit_saveTilemap
         return;
     }
 
-    uint64_t indexC = set->layers * set->mapHeight * set->mapWidth;
+    uint64_t indexC = set->mapLayers * set->mapHeight * set->mapWidth;
     if((elems = fwrite(set->indices, sizeof(TileIndex), indexC, set->file) != indexC))
     {
         set->errorcode = RV_ERROR_WRITE_INDICES;
