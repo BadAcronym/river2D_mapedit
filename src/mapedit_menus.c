@@ -288,7 +288,8 @@ void mapedit_pollMainMenu
             {
                 uint64_t tilecount = editor->layers *
                                      editor->mapHeight * editor->mapWidth;
-                for(uint32_t i = 0; i < tilecount; ++i)
+
+                for(uint64_t i = 0; i < tilecount; ++i)
                 {
                     editor->placedTiles[i].x = UINT16_MAX;
                 }
