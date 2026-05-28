@@ -286,7 +286,7 @@ void mapedit_pollMainMenu
         ){
             if(editor->previousState && editor->placedTiles)
             {
-                uint64_t tilecount = editor->layers *
+                uint64_t tilecount = editor->mapLayers *
                                      editor->mapHeight * editor->mapWidth;
 
                 for(uint64_t i = 0; i < tilecount; ++i)
@@ -547,7 +547,7 @@ void mapedit_drawEditor
 
     river2D_compositeImage(engine, &comp);
 
-    for(uint8_t i = 0; i < editor->layers; ++i)
+    for(uint8_t i = 0; i < editor->mapLayers; ++i)
     {
         if(engine->controls.keymap & (MAPEDIT_BIT_LAYER0 << i))
         {
@@ -557,9 +557,11 @@ void mapedit_drawEditor
     }
 
     uint8_t startLayer = editor->isolate ? editor->currentLayer : 0;
-    uint8_t endLayer   = editor->isolate ? editor->currentLayer + 1 : editor->layers;
+    uint8_t endLayer   = editor->isolate ? editor->currentLayer + 1 : editor->mapLayers;
 
-    comp.src = &engine->planes[MAPEDIT_PLANE_TILESHEET];
+    comp.src        = &engine->planes[MAPEDIT_PLANE_TILESHEET];
+    comp.cropWidth  = editor->tilesize;
+    comp.cropHeight = editor->tilesize;
 
     for(uint8_t z = startLayer; z < endLayer; ++z)
     {
@@ -572,12 +574,16 @@ void mapedit_drawEditor
 
                 if(editor->placedTiles[index].x != UINT16_MAX)
                 {
+                    fprintf(stderr, "x, y, z: %u, %u, %u\n", x, y, z);
+                    fprintf(stderr, "index: %lu\n", index);
+                    fprintf(stderr, "current tile: (%u, %u)\n",
+                            editor->placedTiles[index].x,
+                            editor->placedTiles[index].y);
+
                     comp.offsetSrcX = editor->placedTiles[index].x * editor->tilesize;
                     comp.offsetSrcY = editor->placedTiles[index].y * editor->tilesize;
                     comp.offsetDstX = x * editor->tilesize;
                     comp.offsetDstY = y * editor->tilesize;
-                    comp.cropWidth  = editor->tilesize;
-                    comp.cropHeight = editor->tilesize;
 
                     river2D_compositeImage(engine, &comp);
                 }

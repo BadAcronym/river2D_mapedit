@@ -93,7 +93,7 @@ void mapedit_init
 
     editor->tilesize     = 32;
     editor->selectMult   = 1;
-    editor->layers       = 10;
+    editor->mapLayers    = 10;
     editor->currentLayer = 1;
 
     StringView title_sv  = cstr_sv("RIVER2D MAP EDITOR");
@@ -256,7 +256,7 @@ void mapedit_init
     editor->mapWidth  = engine->config.canvas_width  / editor->tilesize;
     editor->mapHeight = engine->config.canvas_height / editor->tilesize;
 
-    uint64_t tilecount  = editor->layers * editor->mapWidth * editor->mapHeight;
+    uint64_t tilecount  = editor->mapLayers * editor->mapWidth * editor->mapHeight;
     editor->placedTiles = malloc(tilecount * sizeof(TileIndex));
     for(uint64_t i = 0; i < tilecount; ++i)
     {

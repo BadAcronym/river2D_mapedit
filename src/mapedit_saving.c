@@ -52,13 +52,13 @@ void mapedit_loadProject
         return;
     }
 
-    rvLoadMapSettings set;
-    set.tilesheet = &engine->planes[MAPEDIT_PLANE_TILESHEET];
+    rvLoadMapSettings set = {0};
+    set.file      = file;
     set.tilesize  = &editor->tilesize;
     set.mapWidth  = &editor->mapWidth;
     set.mapHeight = &editor->mapHeight;
-    set.layers    = &editor->layers;
-    set.file      = file;
+    set.layers    = &editor->mapLayers;
+    set.tilesheet = &engine->planes[MAPEDIT_PLANE_TILESHEET];
 
     TileMap map = mapedit_loadTilemap(engine, &set);
 
@@ -74,10 +74,10 @@ void mapedit_loadProject
     }
     editor->placedTiles = map.indices;
 
-    if(set.errorcode == RV_ERROR_INVALID_HEADER)
+    if(set.errorcode)
     {
-        fprintf(stderr, "\033[31;1;7mERROR: failed to validate header in file: %s."
-                "\033[0m\n", cstr_filename);
+        fprintf(stderr, "\033[31;1;7mERROR: failed to load project file: %s. Code: %u"
+                "\033[0m\n", cstr_filename, set.errorcode);
     }
 
     free((void*)cstr_filename);
@@ -147,7 +147,7 @@ void mapedit_saveProject
     set.tilesize  = editor->tilesize;
     set.mapWidth  = editor->mapWidth;
     set.mapHeight = editor->mapHeight;
-    set.layers    = editor->layers;
+    set.layers    = editor->mapLayers;
     set.metadata  = editor->tileData;
     set.indices   = editor->placedTiles;
     set.tilesheet = &engine->planes[MAPEDIT_PLANE_TILESHEET];

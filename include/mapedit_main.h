@@ -136,9 +136,9 @@ typedef struct EditorData
     uint16_t     selectedX;
     uint16_t     selectedY;
     uint8_t      selectMult;
-    uint8_t      layers;
     uint32_t     mapWidth;
     uint32_t     mapHeight;
+    uint8_t      mapLayers;
     uint8_t      flags;
     Button       new_b;
     Button       load_b;
