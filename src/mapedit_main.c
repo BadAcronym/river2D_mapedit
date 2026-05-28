@@ -252,12 +252,13 @@ void mapedit_init
 
     free((void*)ls.data);
 
+    // NOTE: next subject to change, no? need be able to vary these two
     editor->mapWidth  = engine->config.canvas_width  / editor->tilesize;
     editor->mapHeight = engine->config.canvas_height / editor->tilesize;
 
-    uint64_t tilecount = editor->layers * editor->mapWidth * editor->mapHeight;
+    uint64_t tilecount  = editor->layers * editor->mapWidth * editor->mapHeight;
     editor->placedTiles = malloc(tilecount * sizeof(TileIndex));
-    for(uint32_t i = 0; i < tilecount; ++i)
+    for(uint64_t i = 0; i < tilecount; ++i)
     {
         editor->placedTiles[i].x = UINT16_MAX;
     }
@@ -269,8 +270,7 @@ void mapedit_init
                            editor->tilesize;
 
     editor->tileData = calloc(sheetCountX * sheetCountY, sizeof(TileMetadata));
-
-    editor->actions = malloc(MAPEDIT_MAX_ACTIONS * sizeof(Action));
+    editor->actions  = malloc(MAPEDIT_MAX_ACTIONS * sizeof(Action));
     for(uint32_t i = 0; i < MAPEDIT_MAX_ACTIONS; ++i)
     {
         editor->actions[i].stroke_start.s  = INT64_MIN;
