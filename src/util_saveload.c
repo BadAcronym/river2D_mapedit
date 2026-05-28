@@ -21,8 +21,8 @@ TileMap mapedit_loadTilemap
     size_t elements = 0;
 
     if(((elements = fread(set->tilesize,  2, 1, set->file)) != 1) ||
-       ((elements = fread(set->mapWidth,  2, 1, set->file)) != 1) ||
-       ((elements = fread(set->mapHeight, 2, 1, set->file)) != 1) ||
+       ((elements = fread(set->mapWidth,  4, 1, set->file)) != 1) ||
+       ((elements = fread(set->mapHeight, 4, 1, set->file)) != 1) ||
        ((elements = fread(set->layers,    1, 1, set->file)) != 1)
     ){
         set->errorcode = RV_ERROR_INVALID_HEADER;
@@ -80,8 +80,8 @@ void mapedit_saveTilemap
     size_t elements = 0;
 
     if(((elements = fwrite(&set->tilesize,  2, 1, set->file)) != 1) ||
-       ((elements = fwrite(&set->mapWidth,  2, 1, set->file)) != 1) ||
-       ((elements = fwrite(&set->mapHeight, 2, 1, set->file)) != 1) ||
+       ((elements = fwrite(&set->mapWidth,  4, 1, set->file)) != 1) ||
+       ((elements = fwrite(&set->mapHeight, 4, 1, set->file)) != 1) ||
        ((elements = fwrite(&set->layers,    1, 1, set->file)) != 1)
     ){
         set->errorcode = RV_ERROR_INVALID_HEADER;

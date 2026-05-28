@@ -1,7 +1,7 @@
 const char header[8] = "r2Dtiles";
 uint16_t  tilesize;
-uint16_t  map_width;
-uint16_t  map_height;
+uint32_t  map_width;
+uint32_t  map_height;
 uint8_t   layers;
 
 **tilesheet**
