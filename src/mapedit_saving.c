@@ -153,11 +153,11 @@ void mapedit_saveProject
     set.tilesheet = &engine->planes[MAPEDIT_PLANE_TILESHEET];
 
     mapedit_saveTilemap(engine, &set);
-
-    if(set.errorcode == RV_ERROR_INVALID_HEADER)
+    if(set.errorcode)
     {
-        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write header to savefile."
-                "\033[0m\n");
+        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write savefile. Code: %u"
+                "\033[0m\n", set.errorcode);
+        return;
     }
 
     editor->lastSaveTime = river2D_queryTime();
