@@ -42,7 +42,7 @@ TileMap mapedit_loadTilemap
         set->errorcode = RV_ERROR_LOADIMAGE_PTR;
         return (TileMap){0};
     }
-    set->tilesheet->path = cstr_sv("mapedit_readRTE");
+    set->tilesheet->path = cstr_sv("mapedit_loadTilemap");
 
     uint64_t sheetW = set->tilesheet->width  / *set->tilesize;
     uint64_t sheetH = set->tilesheet->height / *set->tilesize;
