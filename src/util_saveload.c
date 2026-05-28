@@ -77,12 +77,12 @@ void mapedit_saveTilemap
     const char header[9] = "r2Dtiles";
     fwrite(header, sizeof(header) - 1, 1, set->file);
 
-    size_t elements = 0;
+    size_t elems = 0;
 
-    if(((elements = fwrite(&set->tilesize,  2, 1, set->file)) != 1) ||
-       ((elements = fwrite(&set->mapWidth,  4, 1, set->file)) != 1) ||
-       ((elements = fwrite(&set->mapHeight, 4, 1, set->file)) != 1) ||
-       ((elements = fwrite(&set->layers,    1, 1, set->file)) != 1)
+    if(((elems = fwrite(&set->tilesize,  2, 1, set->file)) != 1) ||
+       ((elems = fwrite(&set->mapWidth,  4, 1, set->file)) != 1) ||
+       ((elems = fwrite(&set->mapHeight, 4, 1, set->file)) != 1) ||
+       ((elems = fwrite(&set->layers,    1, 1, set->file)) != 1)
     ){
         set->errorcode = RV_ERROR_INVALID_HEADER;
         return;
@@ -107,8 +107,16 @@ void mapedit_saveTilemap
 
     uint64_t dataC = set->tilesheet->width  / set->tilesize *
                      set->tilesheet->height / set->tilesize;
-    fwrite(set->metadata, sizeof(TileMetadata), dataC, set->file);
+    if((elems = fwrite(set->metadata, sizeof(TileMetadata), dataC, set->file) != dataC))
+    {
+        set->errorcode = RV_ERROR_WRITE_METADATA;
+        return;
+    }
 
     uint64_t indexC = set->layers * set->mapHeight * set->mapWidth;
-    fwrite(set->indices, sizeof(TileIndex), indexC, set->file);
+    if((elems = fwrite(set->indices, sizeof(TileIndex), indexC, set->file) != indexC))
+    {
+        set->errorcode = RV_ERROR_WRITE_INDICES;
+        return;
+    }
 }
