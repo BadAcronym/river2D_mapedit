@@ -44,10 +44,10 @@ TileMap mapedit_loadTilemap
     }
     set->tilesheet->path = cstr_sv("mapedit_readRTE");
 
-    uint64_t maxdatabyte = engine->planes[MAPEDIT_PLANE_TILESHEET].width  *
-                           engine->planes[MAPEDIT_PLANE_TILESHEET].height /
-                           (*set->tilesize * *set->tilesize) * sizeof(TileMetadata);
+    uint64_t sheetW = engine->planes[MAPEDIT_PLANE_TILESHEET].width  / *set->tilesize;
+    uint64_t sheetH = engine->planes[MAPEDIT_PLANE_TILESHEET].height / *set->tilesize;
 
+    uint64_t maxdatabyte  = sheetW * sheetH * sizeof(TileMetadata);
     uint64_t maxindexbyte = *set->layers * *set->mapWidth * *set->mapHeight *
                            sizeof(TileIndex);
 
