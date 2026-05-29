@@ -28,10 +28,10 @@ void mapedit_init
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load black image!\033[0m\n");
     }
 
-    river2D_loadImage_file(engine, cstr_sv("assets/darken.qoi"),
-                           &engine->planes[MAPEDIT_PLANE_DARKEN],
+    river2D_loadImage_file(engine, cstr_sv("assets/collision.qoi"),
+                           &engine->planes[MAPEDIT_PLANE_COLLISION],
                            RIVER2D_CHANNELS_BGRA, 8);
-    if(!engine->planes[MAPEDIT_PLANE_DARKEN].data)
+    if(!engine->planes[MAPEDIT_PLANE_COLLISION].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load darken image!\033[0m\n");
     }
@@ -332,6 +332,7 @@ void mapedit_init
     engine->controls.keycodes[MAPEDIT_KEY_SAVE]       = 's';
     engine->controls.keycodes[MAPEDIT_KEY_QUIT]       = 'q';
     engine->controls.keycodes[MAPEDIT_KEY_TILEPICKER] = 't';
+    engine->controls.keycodes[MAPEDIT_KEY_WIREFRAME]  = 'w';
     engine->controls.keycodes[MAPEDIT_KEY_UP]         = RIVER2D_ASCII_UP;
     engine->controls.keycodes[MAPEDIT_KEY_DOWN]       = RIVER2D_ASCII_DOWN;
     engine->controls.keycodes[MAPEDIT_KEY_LEFT]       = RIVER2D_ASCII_LEFT;

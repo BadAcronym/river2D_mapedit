@@ -559,7 +559,6 @@ void mapedit_drawEditor
     uint8_t startLayer = editor->isolate ? editor->currentLayer : 0;
     uint8_t endLayer   = editor->isolate ? editor->currentLayer + 1 : editor->mapLayers;
 
-    comp.src        = &engine->planes[MAPEDIT_PLANE_TILESHEET];
     comp.cropWidth  = editor->tilesize;
     comp.cropHeight = editor->tilesize;
 
@@ -572,15 +571,26 @@ void mapedit_drawEditor
                 uint64_t index = z * editor->mapWidth * editor->mapHeight +
                                  y * editor->mapWidth + x;
 
-                if(editor->placedTiles[index].x != UINT16_MAX)
+                if(editor->placedTiles[index].x == UINT16_MAX)
                 {
-                    comp.offsetSrcX = editor->placedTiles[index].x * editor->tilesize;
-                    comp.offsetSrcY = editor->placedTiles[index].y * editor->tilesize;
-                    comp.offsetDstX = x * editor->tilesize;
-                    comp.offsetDstY = y * editor->tilesize;
-
-                    river2D_compositeImage(engine, &comp);
+                    continue;
                 }
+
+                comp.src        = &engine->planes[MAPEDIT_PLANE_TILESHEET];
+                comp.offsetSrcX = editor->placedTiles[index].x * editor->tilesize;
+                comp.offsetSrcY = editor->placedTiles[index].y * editor->tilesize;
+                comp.offsetDstX = x * editor->tilesize;
+                comp.offsetDstY = y * editor->tilesize;
+
+                river2D_compositeImage(engine, &comp);
+
+                if(!(editor->flags & MAPEDIT_FLAG_WIREFRAME))
+                {
+                    continue;
+                }
+
+                comp.src = &engine->planes[MAPEDIT_PLANE_COLLISION];
+                river2D_compositeImage(engine, &comp);
             }
         }
     }
@@ -798,11 +808,9 @@ f_internal void pollTilePicker
     comp.dst    = &engine->backbuffer;
     comp.pictop = RIVER2D_PICTOP_OVER;
 
-    if(engine->controls.keymap & MAPEDIT_BIT_TILEPICKER ||
-       engine->controls.keymap & MAPEDIT_BIT_MENU
-    ){
-        editor->flags           &= ~MAPEDIT_FLAG_TILEPICKER;
-        editor->flags           &= ~MAPEDIT_FLAG_CONTEXTMENU;
+    if(engine->controls.keymap & MAPEDIT_BIT_MENU)
+    {
+        editor->flags           = 0;
         engine->controls.keymap &= ~MAPEDIT_BIT_MENU;
         engine->controls.keymap &= ~MAPEDIT_BIT_TILEPICKER;
         return;
@@ -872,9 +880,9 @@ f_internal void pollTilePicker
         uint32_t tileLocY = (uint32_t)(fY * (tiles.upLeft.y + 0.006f) +
                                        tileY * editor->tilesize);
 
-        comp.src        = &engine->planes[MAPEDIT_PLANE_HIGHLIGHT];
         comp.offsetDstX = tileLocX;
         comp.offsetDstY = tileLocY;
+        comp.src        = &engine->planes[MAPEDIT_PLANE_HIGHLIGHT];
         comp.cropWidth  = editor->tilesize * editor->selectMult;
         comp.cropHeight = editor->tilesize * editor->selectMult;
 
@@ -917,6 +925,15 @@ void mapedit_pollEditor
     uint32_t sheet_height = 0;
     getSheetDims(engine, editor, &sheet_width, &sheet_height);
 
+    bool control = engine->controls.keymap & MAPEDIT_BIT_LCTRL ||
+                   engine->controls.keymap & MAPEDIT_BIT_RCTRL;
+
+    if(control && engine->controls.keymap & MAPEDIT_BIT_WIREFRAME)
+    {
+        editor->flags           ^= MAPEDIT_FLAG_WIREFRAME;
+        engine->controls.keymap &= ~MAPEDIT_BIT_WIREFRAME;
+    }
+
     if(editor->flags & MAPEDIT_FLAG_TILEPICKER)
     {
         if(editor->flags & MAPEDIT_FLAG_CONTEXTMENU)
@@ -936,16 +953,14 @@ void mapedit_pollEditor
         engine->controls.keymap &= ~MAPEDIT_BIT_TILEPICKER;
     }
 
-    if(engine->controls.keymap & MAPEDIT_BIT_UNDO &&
-       engine->controls.keymap & MAPEDIT_BIT_LCTRL
-    ){
+    if(control &&engine->controls.keymap & MAPEDIT_BIT_UNDO)
+    {
         mapedit_undo(editor);
         engine->controls.keymap &= ~MAPEDIT_BIT_UNDO;
         return;
     }
-    else if(engine->controls.keymap & MAPEDIT_BIT_REDO &&
-            engine->controls.keymap & MAPEDIT_BIT_LCTRL
-    ){
+    else if(control && engine->controls.keymap & MAPEDIT_BIT_REDO)
+    {
         mapedit_redo(editor);
         engine->controls.keymap &= ~MAPEDIT_BIT_REDO;
         return;
