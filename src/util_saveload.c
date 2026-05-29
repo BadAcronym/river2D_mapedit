@@ -1,4 +1,4 @@
-#include "mapedit_main.h"
+#include "river2D_main.h"
 #include "imgsurf_main.h"
 
 TileMap mapedit_loadTilemap
