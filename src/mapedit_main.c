@@ -28,6 +28,14 @@ void mapedit_init
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load black image!\033[0m\n");
     }
 
+    river2D_loadImage_file(engine, cstr_sv("assets/darken.qoi"),
+                           &engine->planes[MAPEDIT_PLANE_DARKEN],
+                           RIVER2D_CHANNELS_BGRA, 8);
+    if(!engine->planes[MAPEDIT_PLANE_DARKEN].data)
+    {
+        fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load darken image!\033[0m\n");
+    }
+
     river2D_loadImage_file(engine, cstr_sv("assets/highlight.qoi"),
                            &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
                            RIVER2D_CHANNELS_BGRA, 8);
