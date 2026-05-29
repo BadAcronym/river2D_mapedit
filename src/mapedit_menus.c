@@ -589,8 +589,17 @@ void mapedit_drawEditor
                     continue;
                 }
 
-                comp.src = &engine->planes[MAPEDIT_PLANE_COLLISION];
-                river2D_compositeImage(engine, &comp);
+                uint64_t sheetW = engine->planes[MAPEDIT_PLANE_TILESHEET].width /
+                                  editor->tilesize;
+
+                uint64_t dataIndex = editor->placedTiles[index].y * sheetW +
+                                     editor->placedTiles[index].x;
+
+                if(editor->tileData[dataIndex].flags & MAPEDIT_BIT_COLLISION)
+                {
+                    comp.src = &engine->planes[MAPEDIT_PLANE_COLLISION];
+                    river2D_compositeImage(engine, &comp);
+                }
             }
         }
     }
@@ -808,9 +817,11 @@ f_internal void pollTilePicker
     comp.dst    = &engine->backbuffer;
     comp.pictop = RIVER2D_PICTOP_OVER;
 
-    if(engine->controls.keymap & MAPEDIT_BIT_MENU)
-    {
-        editor->flags           = 0;
+    if(engine->controls.keymap & MAPEDIT_BIT_TILEPICKER ||
+       engine->controls.keymap & MAPEDIT_BIT_MENU
+    ){
+        editor->flags           &= ~MAPEDIT_FLAG_TILEPICKER;
+        editor->flags           &= ~MAPEDIT_FLAG_CONTEXTMENU;
         engine->controls.keymap &= ~MAPEDIT_BIT_MENU;
         engine->controls.keymap &= ~MAPEDIT_BIT_TILEPICKER;
         return;
