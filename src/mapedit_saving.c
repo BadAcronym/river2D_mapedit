@@ -129,7 +129,6 @@ void mapedit_saveProject
     StringView  ext = cstr_sv(".rte");
     const char* pos = sv_filename.data + sv_filename.size - 4;
 
-    // ASAN: use-after-free here, somehow.
     if(sv_find(ext, sv_filename) != pos)
     {
         const char *appended = sv_concat(sv_filename, ext);
@@ -146,7 +145,7 @@ void mapedit_saveProject
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: could not open file for saving: "
                 PRI_SV".\033[0m\n", ARG_SV(editor->filename));
-        free((void*)sv_filename.data);
+        free((void*)cstr_filename);
         return;
     }
 
@@ -165,12 +164,13 @@ void mapedit_saveProject
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: failed to write savefile. Code: %u"
                 "\033[0m\n", set.errorcode);
+        free((void*)cstr_filename);
+        fclose(file);
         return;
     }
 
     editor->lastSaveTime = river2D_queryTime();
     fprintf(stdout, "\nProject saved successfully.\n");
-
     free((void*)cstr_filename);
     fclose(file);
 }
