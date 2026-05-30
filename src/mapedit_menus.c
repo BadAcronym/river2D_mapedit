@@ -595,7 +595,7 @@ void mapedit_drawEditor
                 uint64_t dataIndex = editor->placedTiles[index].y * sheetW +
                                      editor->placedTiles[index].x;
 
-                if(editor->tileData[dataIndex].flags & MAPEDIT_BIT_COLLISION)
+                if(editor->tileData[dataIndex].flags & RV_TILE_BIT_COLLISION)
                 {
                     comp.src = &engine->planes[MAPEDIT_PLANE_COLLISION];
                     river2D_compositeImage(engine, &comp);
@@ -762,7 +762,7 @@ f_internal void pollContextMenu
         if(confirmed)
         {
             uint32_t index = sheetIndex(engine, editor);
-            editor->tileData[index].flags ^= MAPEDIT_BIT_COLLISION;
+            editor->tileData[index].flags ^= RV_TILE_BIT_COLLISION;
 
             editor->flags &= ~MAPEDIT_FLAG_CONTEXTMENU;
             engine->controls.keymap    &= ~MAPEDIT_BIT_MENU;
@@ -784,7 +784,7 @@ f_internal void pollContextMenu
         if(confirmed)
         {
             uint32_t index = sheetIndex(engine, editor);
-            editor->tileData[index].flags ^= MAPEDIT_BIT_ANIMATED;
+            editor->tileData[index].flags ^= RV_TILE_BIT_ANIMATED;
 
             fprintf(stderr, "TODO: edit tile animation: (%u,%u)\n",
                     editor->selectedX, editor->selectedY);
