@@ -252,7 +252,7 @@ void mapedit_init
 
         river2D_loadImage_file(engine, expanded, &tmp, RIVER2D_CHANNELS_BGRA, 8);
         river2D_appendImage(engine, &tmp, &engine->planes[MAPEDIT_PLANE_TILESHEET],
-                            RIVER2D_VERTICAL);
+                            RV_VERTICAL);
 
         river2D_destroyImage(&tmp);
         free((void*)expanded.data);
