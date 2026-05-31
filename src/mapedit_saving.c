@@ -100,13 +100,13 @@ void mapedit_saveProject
     rvCompositeSettings comp = {0};
     comp.src        = &engine->planes[MAPEDIT_PLANE_ICON_SAVING];
     comp.dst        = &engine->backbuffer;
-    comp.pictop     = RIVER2D_PICTOP_OVER;
+    comp.pictop     = RV_PICTOP_OVER;
     comp.cropWidth  = engine->planes[MAPEDIT_PLANE_ICON_SAVING].width;
     comp.cropHeight = engine->planes[MAPEDIT_PLANE_ICON_SAVING].height;
     comp.offsetDstX = 16;
     comp.offsetDstY = 16;
 
-    river2D_compositeImage(engine, &comp);
+    rvCompositeImage(engine, &comp);
 
     StringView sv_filename = {0};
     sv_filename.data       = editor->inputBuffer.data;
@@ -169,7 +169,7 @@ void mapedit_saveProject
         return;
     }
 
-    editor->lastSaveTime = river2D_queryTime();
+    editor->lastSaveTime = rvQueryTime();
     fprintf(stdout, "\nProject saved successfully.\n");
     free((void*)cstr_filename);
     fclose(file);

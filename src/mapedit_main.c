@@ -11,89 +11,89 @@ void mapedit_init
     EngineData *engine,
     EditorData *editor
 ){
-    river2D_loadImage_file(engine, cstr_sv("assets/background.qoi"),
+    rvLoadImage_file(engine, cstr_sv("assets/background.qoi"),
                            &engine->planes[MAPEDIT_PLANE_BACKGROUND],
-                           RIVER2D_CHANNELS_BGRA, 8);
+                           RV_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_BACKGROUND].data)
     {
         fprintf(stderr,
                 "\n\033[31;1;7mERROR: Unable to load background image!\033[0m\n");
     }
 
-    river2D_loadImage_file(engine, cstr_sv("assets/black.qoi"),
+    rvLoadImage_file(engine, cstr_sv("assets/black.qoi"),
                            &engine->planes[MAPEDIT_PLANE_VOID],
-                           RIVER2D_CHANNELS_BGRA, 8);
+                           RV_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_VOID].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load black image!\033[0m\n");
     }
 
-    river2D_loadImage_file(engine, cstr_sv("assets/collision.qoi"),
+    rvLoadImage_file(engine, cstr_sv("assets/collision.qoi"),
                            &engine->planes[MAPEDIT_PLANE_COLLISION],
-                           RIVER2D_CHANNELS_BGRA, 8);
+                           RV_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_COLLISION].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load darken image!\033[0m\n");
     }
 
-    river2D_loadImage_file(engine, cstr_sv("assets/highlight.qoi"),
+    rvLoadImage_file(engine, cstr_sv("assets/highlight.qoi"),
                            &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
-                           RIVER2D_CHANNELS_BGRA, 8);
+                           RV_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_HIGHLIGHT].data)
     {
         fprintf(stderr,
                 "\n\033[31;1;7mERROR: Unable to load highlight image!\033[0m\n");
     }
 
-    river2D_loadImage_file(engine, cstr_sv("assets/highlight_solid.qoi"),
+    rvLoadImage_file(engine, cstr_sv("assets/highlight_solid.qoi"),
                            &engine->planes[MAPEDIT_PLANE_HIGHLIGHT_SOLID],
-                           RIVER2D_CHANNELS_BGRA, 8);
+                           RV_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_HIGHLIGHT_SOLID].data)
     {
         fprintf(stderr,
                 "\n\033[31;1;7mERROR: Unable to load solid highlight image!\033[0m\n");
     }
 
-    river2D_loadImage_file(engine, cstr_sv("assets/saving.qoi"),
+    rvLoadImage_file(engine, cstr_sv("assets/saving.qoi"),
                            &engine->planes[MAPEDIT_PLANE_ICON_SAVING],
-                           RIVER2D_CHANNELS_BGRA, 8);
+                           RV_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_ICON_SAVING].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load saving icon!\033[0m\n");
     }
-    river2D_loadImage_file(engine, cstr_sv("assets/saved.qoi"),
+    rvLoadImage_file(engine, cstr_sv("assets/saved.qoi"),
                            &engine->planes[MAPEDIT_PLANE_ICON_SAVED],
-                           RIVER2D_CHANNELS_BGRA, 8);
+                           RV_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_ICON_SAVED].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load saved icon!\033[0m\n");
     }
 
-    river2D_loadImage_file(engine, cstr_sv("assets/cursor_default.qoi"),
+    rvLoadImage_file(engine, cstr_sv("assets/cursor_default.qoi"),
                            &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT],
-                           RIVER2D_CHANNELS_BGRA, 8);
+                           RV_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load default cursor!\033[0m\n");
     }
-    river2D_loadImage_file(engine, cstr_sv("assets/cursor_hover.qoi"),
+    rvLoadImage_file(engine, cstr_sv("assets/cursor_hover.qoi"),
                            &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER],
-                           RIVER2D_CHANNELS_BGRA, 8);
+                           RV_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_CURSOR_HOVER].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load hover cursor!\033[0m\n");
     }
-    river2D_loadImage_file(engine, cstr_sv("assets/cursor_place.qoi"),
+    rvLoadImage_file(engine, cstr_sv("assets/cursor_place.qoi"),
                            &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE],
-                           RIVER2D_CHANNELS_BGRA, 8);
+                           RV_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_CURSOR_PLACE].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load place cursor!\033[0m\n");
     }
 
-    river2D_loadImage_file(engine, cstr_sv("assets/font_default_16.qoi"),
+    rvLoadImage_file(engine, cstr_sv("assets/font_default_16.qoi"),
                            &engine->planes[MAPEDIT_PLANE_FONT16],
-                           RIVER2D_CHANNELS_BGRA, 8);
+                           RV_CHANNELS_BGRA, 8);
     if(!engine->planes[MAPEDIT_PLANE_FONT16].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load font image!\033[0m\n");
@@ -104,7 +104,7 @@ void mapedit_init
     editor->mapLayers    = 10;
     editor->currentLayer = 1;
 
-    StringView title_sv  = cstr_sv("RIVER2D MAP EDITOR");
+    StringView title_sv  = cstr_sv("RV MAP EDITOR");
     StringView new_sv    = cstr_sv("NEW PROJECT");
     StringView load_sv   = cstr_sv("LOAD PROJECT");
     StringView save_sv   = cstr_sv("SAVE PROJECT");
@@ -115,13 +115,13 @@ void mapedit_init
     StringView collision_sv = cstr_sv("TOGGLE COLLISION");
     StringView animation_sv = cstr_sv("EDIT ANIMATION FRAMES");
 
-    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_NULL], 32, 32);
-    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE], 32, 32);
-    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],
+    rvCreateImage(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_NULL], 32, 32);
+    rvCreateImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE], 32, 32);
+    rvCreateImage(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],
                         engine->backbuffer.width, engine->backbuffer.height);
-    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU],
+    rvCreateImage(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU],
                         engine->backbuffer.width, engine->backbuffer.height);
-    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_TILEPICKER],
+    rvCreateImage(engine, &engine->planes[MAPEDIT_PLANE_TILEPICKER],
                         engine->backbuffer.width, engine->backbuffer.height);
 
     uint8_t charsize = 16;
@@ -129,7 +129,7 @@ void mapedit_init
     uint8_t vSpacing = 2;
     uint8_t elements = 3;
 
-    river2D_createImage(engine, &engine->planes[MAPEDIT_PLANE_CONTEXTMENU],
+    rvCreateImage(engine, &engine->planes[MAPEDIT_PLANE_CONTEXTMENU],
                         (charsize + hSpacing * 2) * (uint32_t)animation_sv.size,
                         (charsize + vSpacing * 2) * elements);
 
@@ -147,7 +147,7 @@ void mapedit_init
         textSet.charsize = 16;
         textSet.spacing  = 1;
 
-        river2D_loadText(engine, &textSet);
+        rvLoadText(engine, &textSet);
     }
 
     // JANKY: I'm loading text by creating a button, then overwriting it, like for the
@@ -161,46 +161,46 @@ void mapedit_init
     set.point.x  = 0.5f;
     set.point.y  = 0.2f;
     set.button   = &editor->new_b;
-    river2D_createButton(engine, &set);
+    rvCreateButton(engine, &set);
 
     set.img = &engine->planes[MAPEDIT_PLANE_PAUSEMENU];
-    river2D_createButton(engine, &set);
+    rvCreateButton(engine, &set);
 
     set.img     = &engine->planes[MAPEDIT_PLANE_MAINMENU];
     set.name    = &new_sv;
     set.point.y = 0.4f;
-    river2D_createButton(engine, &set);
+    rvCreateButton(engine, &set);
 
     set.img = &engine->planes[MAPEDIT_PLANE_PAUSEMENU];
-    river2D_createButton(engine, &set);
+    rvCreateButton(engine, &set);
 
     set.img     = &engine->planes[MAPEDIT_PLANE_MAINMENU];
     set.name    = &load_sv;
     set.point.y = 0.48f;
     set.button  = &editor->load_b;
-    river2D_createButton(engine, &set);
+    rvCreateButton(engine, &set);
 
     set.img = &engine->planes[MAPEDIT_PLANE_PAUSEMENU];
-    river2D_createButton(engine, &set);
+    rvCreateButton(engine, &set);
 
     set.name    = &save_sv;
     set.point.y = 0.56f;
     set.button  = &editor->save_b;
-    river2D_createButton(engine, &set);
+    rvCreateButton(engine, &set);
 
     set.name    = &saveas_sv;
     set.point.y = 0.64f;
     set.button  = &editor->saveas_b;
-    river2D_createButton(engine, &set);
+    rvCreateButton(engine, &set);
 
     set.img     = &engine->planes[MAPEDIT_PLANE_MAINMENU];
     set.name    = &quit_sv;
     set.point.y = 0.8f;
     set.button  = &editor->quit_b;
-    river2D_createButton(engine, &set);
+    rvCreateButton(engine, &set);
 
     set.img = &engine->planes[MAPEDIT_PLANE_PAUSEMENU];
-    river2D_createButton(engine, &set);
+    rvCreateButton(engine, &set);
 
     float bufHeight = (float)engine->backbuffer.height;
 
@@ -209,26 +209,26 @@ void mapedit_init
     set.point.x   = 0.1f + set.charsize / (bufHeight * 2);
     set.point.y   = 0.9f - set.charsize / bufHeight;
     set.button    = &editor->close_b;
-    set.alignment = RIVER2D_ALIGN_BOTTOMLEFT;
-    river2D_createButton(engine, &set);
+    set.alignment = RV_ALIGN_BOTTOMLEFT;
+    rvCreateButton(engine, &set);
 
     set.name      = &collision_sv;
     set.img       = &engine->planes[MAPEDIT_PLANE_CONTEXTMENU];
     set.button    = &editor->collision_b;
     set.point.x   = 0.0f;
     set.point.y   = 0.0f;
-    set.alignment = RIVER2D_ALIGN_TOPLEFT;
-    river2D_createButton(engine, &set);
+    set.alignment = RV_ALIGN_TOPLEFT;
+    rvCreateButton(engine, &set);
 
     set.name    = &animation_sv;
     set.img     = &engine->planes[MAPEDIT_PLANE_CONTEXTMENU];
     set.point.y = (float)(charsize + vSpacing) /
                     (float)engine->planes[MAPEDIT_PLANE_CONTEXTMENU].height;
     set.button  = &editor->animation_b;
-    river2D_createButton(engine, &set);
+    rvCreateButton(engine, &set);
 
     StringView dir = cstr_sv("assets/custom/");
-    StringView ls  = river2D_listFiles(dir);
+    StringView ls  = rvListFiles(dir);
 
     StringView folder = cstr_sv("assets/custom/");
 
@@ -248,13 +248,13 @@ void mapedit_init
             continue;
         }
 
-        River2D_Image tmp;
+        RiverImage tmp;
 
-        river2D_loadImage_file(engine, expanded, &tmp, RIVER2D_CHANNELS_BGRA, 8);
-        river2D_appendImage(engine, &tmp, &engine->planes[MAPEDIT_PLANE_TILESHEET],
+        rvLoadImage_file(engine, expanded, &tmp, RV_CHANNELS_BGRA, 8);
+        rvAppendImage(engine, &tmp, &engine->planes[MAPEDIT_PLANE_TILESHEET],
                             RV_VERTICAL);
 
-        river2D_destroyImage(&tmp);
+        rvDestroyImage(&tmp);
         free((void*)expanded.data);
     }
 
@@ -290,7 +290,7 @@ void mapedit_init
         editor->inputBuffer = cstr_str("unnamed_project");
     }
 
-    River2D_Time now                = river2D_queryTime();
+    RiverTime now = rvQueryTime();
     editor->lastPresentTime         = now;
     editor->lastSaveTime.s          = 1;
     editor->lastSaveTime.ns         = 1;
@@ -300,19 +300,19 @@ void mapedit_init
     editor->inputBuffer.data = buf;
     editor->inputBuffer.size = 256;
 
-    engine->controls.buttoncodes[MAPEDIT_BUTTON_LEFTM]   = RIVER2D_MOUSE1;
-    engine->controls.buttoncodes[MAPEDIT_BUTTON_MIDDLEM] = RIVER2D_MOUSE2;
-    engine->controls.buttoncodes[MAPEDIT_BUTTON_RIGHTM]  = RIVER2D_MOUSE3;
+    engine->controls.buttoncodes[MAPEDIT_BUTTON_LEFTM]   = RV_MOUSE1;
+    engine->controls.buttoncodes[MAPEDIT_BUTTON_MIDDLEM] = RV_MOUSE2;
+    engine->controls.buttoncodes[MAPEDIT_BUTTON_RIGHTM]  = RV_MOUSE3;
 
-    engine->controls.keycodes[MAPEDIT_KEY_LSHIFT]     = RIVER2D_ASCII_LSHIFT;
-    engine->controls.keycodes[MAPEDIT_KEY_RSHIFT]     = RIVER2D_ASCII_RSHIFT;
-    engine->controls.keycodes[MAPEDIT_KEY_LCTRL]      = RIVER2D_ASCII_LCTRL;
-    engine->controls.keycodes[MAPEDIT_KEY_RCTRL]      = RIVER2D_ASCII_RCTRL;
-    engine->controls.keycodes[MAPEDIT_KEY_ENTER]      = RIVER2D_ASCII_ENTER;
-    engine->controls.keycodes[MAPEDIT_KEY_BACKSPACE]  = RIVER2D_ASCII_BACKSPACE;
-    engine->controls.keycodes[MAPEDIT_KEY_DELETE]     = RIVER2D_ASCII_DELETE;
-    engine->controls.keycodes[MAPEDIT_KEY_MENU]       = RIVER2D_ASCII_ESCAPE;
-    engine->controls.keycodes[MAPEDIT_KEY_HOTBAR]     = RIVER2D_ASCII_TAB;
+    engine->controls.keycodes[MAPEDIT_KEY_LSHIFT]     = RV_ASCII_LSHIFT;
+    engine->controls.keycodes[MAPEDIT_KEY_RSHIFT]     = RV_ASCII_RSHIFT;
+    engine->controls.keycodes[MAPEDIT_KEY_LCTRL]      = RV_ASCII_LCTRL;
+    engine->controls.keycodes[MAPEDIT_KEY_RCTRL]      = RV_ASCII_RCTRL;
+    engine->controls.keycodes[MAPEDIT_KEY_ENTER]      = RV_ASCII_ENTER;
+    engine->controls.keycodes[MAPEDIT_KEY_BACKSPACE]  = RV_ASCII_BACKSPACE;
+    engine->controls.keycodes[MAPEDIT_KEY_DELETE]     = RV_ASCII_DELETE;
+    engine->controls.keycodes[MAPEDIT_KEY_MENU]       = RV_ASCII_ESCAPE;
+    engine->controls.keycodes[MAPEDIT_KEY_HOTBAR]     = RV_ASCII_TAB;
     engine->controls.keycodes[MAPEDIT_KEY_UNDO]       = 'z';
     engine->controls.keycodes[MAPEDIT_KEY_REDO]       = 'y';
     engine->controls.keycodes[MAPEDIT_KEY_LAYER0]     = '0';
@@ -333,10 +333,10 @@ void mapedit_init
     engine->controls.keycodes[MAPEDIT_KEY_QUIT]       = 'q';
     engine->controls.keycodes[MAPEDIT_KEY_TILEPICKER] = 't';
     engine->controls.keycodes[MAPEDIT_KEY_WIREFRAME]  = 'w';
-    engine->controls.keycodes[MAPEDIT_KEY_UP]         = RIVER2D_ASCII_UP;
-    engine->controls.keycodes[MAPEDIT_KEY_DOWN]       = RIVER2D_ASCII_DOWN;
-    engine->controls.keycodes[MAPEDIT_KEY_LEFT]       = RIVER2D_ASCII_LEFT;
-    engine->controls.keycodes[MAPEDIT_KEY_RIGHT]      = RIVER2D_ASCII_RIGHT;
+    engine->controls.keycodes[MAPEDIT_KEY_UP]         = RV_ASCII_UP;
+    engine->controls.keycodes[MAPEDIT_KEY_DOWN]       = RV_ASCII_DOWN;
+    engine->controls.keycodes[MAPEDIT_KEY_LEFT]       = RV_ASCII_LEFT;
+    engine->controls.keycodes[MAPEDIT_KEY_RIGHT]      = RV_ASCII_RIGHT;
 
     editor->currentState = MAPEDIT_STATE_MENU;
 }
@@ -420,6 +420,6 @@ void mapedit_present
     EngineData *engine,
     EditorData *editor
 ){
-    river2D_bltBuffer(engine);
-    editor->lastPresentTime = river2D_queryTime();
+    rvBltBuffer(engine);
+    editor->lastPresentTime = rvQueryTime();
 }

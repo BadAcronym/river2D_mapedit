@@ -86,32 +86,32 @@ LRESULT CALLBACK win32WindowCallback
         }
         case WM_LBUTTONDOWN:
         {
-            mapedit_processButtons(global_editor, &global_engine->controls, RIVER2D_MOUSE1, true);
+            mapedit_processButtons(global_editor, &global_engine->controls, RV_MOUSE1, true);
             break;
         }
         case WM_LBUTTONUP:
         {
-            mapedit_processButtons(global_editor, &global_engine->controls, RIVER2D_MOUSE1, false);
+            mapedit_processButtons(global_editor, &global_engine->controls, RV_MOUSE1, false);
             break;
         }
         case WM_RBUTTONDOWN:
         {
-            mapedit_processButtons(global_editor, &global_engine->controls, RIVER2D_MOUSE2, true);
+            mapedit_processButtons(global_editor, &global_engine->controls, RV_MOUSE2, true);
             break;
         }
         case WM_RBUTTONUP:
         {
-            mapedit_processButtons(global_editor, &global_engine->controls, RIVER2D_MOUSE2, false);
+            mapedit_processButtons(global_editor, &global_engine->controls, RV_MOUSE2, false);
             break;
         }
         case WM_MBUTTONDOWN:
         {
-            mapedit_processButtons(global_editor, &global_engine->controls, RIVER2D_MOUSE3, true);
+            mapedit_processButtons(global_editor, &global_engine->controls, RV_MOUSE3, true);
             break;
         }
         case WM_MBUTTONUP:
         {
-            mapedit_processButtons(global_editor, &global_engine->controls, RIVER2D_MOUSE3, false);
+            mapedit_processButtons(global_editor, &global_engine->controls, RV_MOUSE3, false);
             break;
         }
         case WM_MOUSEWHEEL:
@@ -159,16 +159,16 @@ int CALLBACK WinMain
 
     EditorData    editor = {0};
     EngineData    engine = {0};
-    River2D_Image planes[RIVER2D_MAX_PLANES] = {0};
+    River2D_Image planes[RV_MAX_PLANES] = {0};
 
-    river2D_resolveRenderer(&engine, LIBPATH, RIVER2D_RENDERER_SOFTWARE);
+    rvResolveRenderer(&engine, LIBPATH, RV_RENDERER_SOFTWARE);
 
-    river2D_loadConfig(&engine.config);
-    engine.config.choices |= RIVER2D_CHOICE_STATIC_CANVAS_BIT;
+    rvLoadConfig(&engine.config);
+    engine.config.choices |= RV_CHOICE_STATIC_CANVAS_BIT;
     engine.windowName     =  "River2D Map Editor";
     engine.instance       =  instance;
 
-    river2D_init(&engine, planes);
+    rvInit(&engine, planes);
     mapedit_init(&engine, &editor);
 
     global_engine = &engine;
@@ -214,8 +214,8 @@ int CALLBACK WinMain
 
         uint16_t desiredFPS = 144;
 
-        River2D_Time now          = river2D_queryTime();
-        int64_t      deltaMS      = river2D_deltaTime_ms(&editor.lastPresentTime, &now);
+        River2D_Time now          = rvQueryTime();
+        int64_t      deltaMS      = rvDeltaTime_ms(&editor.lastPresentTime, &now);
         double       ms_threshold = 1000 / (double)(desiredFPS);
 
         if(deltaMS < ms_threshold)

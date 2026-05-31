@@ -114,21 +114,21 @@
 
 typedef struct Action
 {
-    River2D_Time stroke_start;
-    uint64_t     map_index;
-    TileIndex    prev_tile;
-    TileIndex    new_tile;
+    RiverTime stroke_start;
+    uint64_t  map_index;
+    TileIndex prev_tile;
+    TileIndex new_tile;
 }
 Action;
 
 typedef struct EditorData
 {
     uint16_t     runningFrames;
-    River2D_Time lastFPSTime;
-    River2D_Time lastUpdateTime;
-    River2D_Time lastPresentTime;
-    River2D_Time lastSaveTime;
-    River2D_Time lastActionStart;
+    RiverTime lastFPSTime;
+    RiverTime lastUpdateTime;
+    RiverTime lastPresentTime;
+    RiverTime lastSaveTime;
+    RiverTime lastActionStart;
     uint8_t      currentState;
     uint8_t      previousState;
     uint8_t      currentLayer;
@@ -199,15 +199,15 @@ extern void mapedit_updateSelectSize
 
 extern void mapedit_processButtons
 (
-    EditorData         *editor,
-    River2D_ControlMap *controls,
-    uint32_t           button,
-    bool               isDown
+    EditorData    *editor,
+    RiverControls *controls,
+    uint32_t      button,
+    bool          isDown
 );
 
 extern void mapedit_processKeys
 (
-    River2D_ControlMap *controls,
+    RiverControls *controls,
     AsciiKey           key,
     bool               isDown
 );

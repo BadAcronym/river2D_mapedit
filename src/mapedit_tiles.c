@@ -107,7 +107,7 @@ void mapedit_placeSelectedTiles
             }
             Action prev_action = editor->actions[prev];
 
-            int64_t delta = river2D_deltaTime_ns(&prev_action.stroke_start,
+            int64_t delta = rvDeltaTime_ns(&prev_action.stroke_start,
                                                  &editor->lastActionStart);
 
             uint64_t diff  = index - prev_action.map_index;
@@ -242,7 +242,7 @@ void mapedit_undo
         editor->currentLayer = (uint8_t)floor((double)currentAction.map_index /
                                               (editor->mapWidth * editor->mapHeight));
 
-        int64_t deltaNS = river2D_deltaTime_ns(&prevAction.stroke_start,
+        int64_t deltaNS = rvDeltaTime_ns(&prevAction.stroke_start,
                                                &currentAction.stroke_start);
         if(deltaNS != 0)
         {
@@ -274,7 +274,7 @@ void mapedit_redo
 
     if(prevAction.stroke_start.s  >= 0 &&
        prevAction.stroke_start.ns >= 0 &&
-       river2D_deltaTime_ns(&currentAction.stroke_start, &prevAction.stroke_start) > 0
+       rvDeltaTime_ns(&currentAction.stroke_start, &prevAction.stroke_start) > 0
     ){
         return;
     }
@@ -297,8 +297,8 @@ void mapedit_redo
                                               (editor->mapWidth * editor->mapHeight));
         incrementAction(editor);
 
-        int64_t deltaNS = river2D_deltaTime_ns(&nextAction.stroke_start,
-                                               &currentAction.stroke_start);
+        int64_t deltaNS = rvDeltaTime_ns(&nextAction.stroke_start,
+                                         &currentAction.stroke_start);
         if(deltaNS != 0)
         {
             break;

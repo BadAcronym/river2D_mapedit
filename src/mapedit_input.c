@@ -4,11 +4,11 @@
 
 f_internal bool processButton_function
 (
-    River2D_ControlMap *controls,
-    uint64_t           desired,
-    uint64_t           button,
-    uint64_t           bit,
-    bool               isDown
+    RiverControls *controls,
+    uint64_t      desired,
+    uint64_t      button,
+    uint64_t      bit,
+    bool          isDown
 ){
     if(button == controls->buttoncodes[desired])
     {
@@ -32,11 +32,11 @@ processButton_function(controls, bmacro, button, bitmacro, isDown)
 
 f_internal void processKey_function
 (
-    River2D_ControlMap *controls,
-    uint8_t            desired,
-    AsciiKey           key,
-    uint64_t           bit,
-    bool               isDown
+    RiverControls *controls,
+    uint8_t       desired,
+    AsciiKey      key,
+    uint64_t      bit,
+    bool          isDown
 ){
     if(isDown && key.key == controls->keycodes[desired])
     {
@@ -55,16 +55,16 @@ processKey_function(controls, kmacro, key, bitmacro, isDown)
 
 void mapedit_processButtons
 (
-    EditorData         *editor,
-    River2D_ControlMap *controls,
-    uint32_t           button,
-    bool               isDown
+    EditorData    *editor,
+    RiverControls *controls,
+    uint32_t      button,
+    bool          isDown
 ){
     if(processButton(MAPEDIT_BUTTON_LEFTM, MAPEDIT_BIT_LEFTM))
     {
         if(isDown)
         {
-            editor->lastActionStart = river2D_queryTime();
+            editor->lastActionStart = rvQueryTime();
         }
 
         return;
@@ -79,9 +79,9 @@ void mapedit_processButtons
 
 void mapedit_processKeys
 (
-    River2D_ControlMap *controls,
-    AsciiKey           key,
-    bool               isDown
+    RiverControls *controls,
+    AsciiKey      key,
+    bool          isDown
 ){
     if(isDown)
     {
@@ -136,7 +136,7 @@ void mapedit_processPointer
     uint32_t   x,
     uint32_t   y
 ){
-    Dimensions dim = river2D_getWindowSize(engine);
+    Dimensions dim = rvGetWindowSize(engine);
 
     if(x > dim.width)
     {
