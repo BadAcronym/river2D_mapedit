@@ -31,9 +31,9 @@ TileMap mapedit_loadTilemap
 
     if(set->tilesheet->data)
     {
-        river2D_destroyImage(set->tilesheet);
+        rvDestroyImage(set->tilesheet);
     }
-    river2D_loadImage_ptr(engine, set->file, set->tilesheet, RIVER2D_CHANNELS_BGRA, 8);
+    rvLoadImage_ptr(engine, set->file, set->tilesheet, RV_CHANNELS_BGRA, 8);
 
     if(!set->tilesheet->data)
     {
@@ -88,7 +88,7 @@ void mapedit_saveTilemap
         return;
     }
 
-    river2D_syncImage(engine, set->tilesheet, false);
+    rvSyncImage(engine, set->tilesheet, false);
 
     imgsurf_write_ptr(set->file, set->tilesheet->data, IMGSURF_FILE_QOI,
                       set->tilesheet->width, set->tilesheet->height,
