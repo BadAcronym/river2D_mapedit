@@ -1,5 +1,4 @@
 #include "mapedit_main.h"
-#include "util_saveload.h"
 
 void mapedit_loadProject
 (
@@ -60,7 +59,7 @@ void mapedit_loadProject
     set.mapLayers = &editor->mapLayers;
     set.tilesheet = &engine->planes[MAPEDIT_PLANE_TILESHEET];
 
-    TileMap map = mapedit_loadTilemap(engine, &set);
+    TileMap map = rvLoadTilemap(engine, &set);
     if(set.errorcode)
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to load project file: %s. Code: %u"
@@ -159,7 +158,7 @@ void mapedit_saveProject
     set.indices   = editor->placedTiles;
     set.tilesheet = &engine->planes[MAPEDIT_PLANE_TILESHEET];
 
-    mapedit_saveTilemap(engine, &set);
+    rvSaveTilemap(engine, &set);
     if(set.errorcode)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: failed to write savefile. Code: %u"
