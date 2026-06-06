@@ -208,8 +208,8 @@ extern void mapedit_processButtons
 extern void mapedit_processKeys
 (
     RiverControls *controls,
-    AsciiKey           key,
-    bool               isDown
+    AsciiKey      key,
+    bool          isDown
 );
 
 extern void mapedit_processPointer
