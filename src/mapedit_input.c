@@ -118,11 +118,11 @@ void mapedit_processKeys
     processKey(MAPEDIT_KEY_SAVE,       MAPEDIT_BIT_SAVE      );
     processKey(MAPEDIT_KEY_QUIT,       MAPEDIT_BIT_QUIT      );
     processKey(MAPEDIT_KEY_TILEPICKER, MAPEDIT_BIT_TILEPICKER);
-    processKey(MAPEDIT_KEY_WIREFRAME,  MAPEDIT_BIT_WIREFRAME);
-    processKey(MAPEDIT_KEY_UP,         MAPEDIT_BIT_UP);
-    processKey(MAPEDIT_KEY_DOWN,       MAPEDIT_BIT_DOWN);
-    processKey(MAPEDIT_KEY_LEFT,       MAPEDIT_BIT_LEFT);
-    processKey(MAPEDIT_KEY_RIGHT,      MAPEDIT_BIT_RIGHT);
+    processKey(MAPEDIT_KEY_WIREFRAME,  MAPEDIT_BIT_WIREFRAME );
+    processKey(MAPEDIT_KEY_UP,         MAPEDIT_BIT_UP        );
+    processKey(MAPEDIT_KEY_DOWN,       MAPEDIT_BIT_DOWN      );
+    processKey(MAPEDIT_KEY_LEFT,       MAPEDIT_BIT_LEFT      );
+    processKey(MAPEDIT_KEY_RIGHT,      MAPEDIT_BIT_RIGHT     );
 
 #ifdef DEBUG
     fprintf(stderr, "key: %x\n", key.key);
