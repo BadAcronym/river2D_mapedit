@@ -20,11 +20,11 @@ void mapedit_loadProject
 
     StringView  ext = cstr_sv(".rte");
     const char* pos = sv_filename.data + sv_filename.size - 4;
-    const char* appended = 0;
+    char appended[4096] = {0};
 
     if(sv_find(ext, sv_filename) != pos)
     {
-        appended = sv_concat(sv_filename, ext);
+        sv_concat(sv_filename, ext, appended);
         editor->filename = cstr_sv(appended);
     }
     else
@@ -36,18 +36,14 @@ void mapedit_loadProject
     fprintf(stderr, "\nloading file: "PRI_SV"\n", ARG_SV(editor->filename));
 #endif
 
-    const char *cstr_filename = sv_cstr(editor->filename);
+    char cstr_filename[4096] = {0};
+    sv_cstr(editor->filename, cstr_filename);
     FILE *file = fopen(cstr_filename, "rb");
     if(!file)
     {
         fprintf(stderr, "\033[31;1;7mERROR: could not open file "
                 "named \""PRI_SV"\".\033[0m\n", ARG_SV(editor->inputBuffer));
         mapedit_changeState(editor, MAPEDIT_STATE_MENU);
-        free((void*)cstr_filename);
-        if(appended)
-        {
-            free((void*)appended);
-        }
         return;
     }
 
@@ -64,11 +60,6 @@ void mapedit_loadProject
     {
         fprintf(stderr, "\033[31;1;7mERROR: failed to load project file: %s. Code: %u"
                 "\033[0m\n", cstr_filename, set.errorcode);
-        free((void*)cstr_filename);
-        if(appended)
-        {
-            free((void*)appended);
-        }
         fclose(file);
         return;
     }
@@ -91,11 +82,6 @@ void mapedit_loadProject
     }
     editor->placedTiles = map.indices;
 
-    free((void*)cstr_filename);
-    if(appended)
-    {
-        free((void*)appended);
-    }
     fclose(file);
 }
 
@@ -130,11 +116,11 @@ void mapedit_saveProject
 
     StringView  ext = cstr_sv(".rte");
     const char* pos = sv_filename.data + sv_filename.size - 4;
-    const char* appended = 0;
+    char appended[4096] = {0};
 
     if(sv_find(ext, sv_filename) != pos)
     {
-        appended = sv_concat(sv_filename, ext);
+        sv_concat(sv_filename, ext, appended);
         editor->filename = cstr_sv(appended);
     }
     else
@@ -142,17 +128,13 @@ void mapedit_saveProject
         editor->filename = sv_filename;
     }
 
-    const char *cstr_filename = sv_cstr(editor->filename);
+    char cstr_filename[4096] = {0};
+    sv_cstr(editor->filename, cstr_filename);
     FILE *file = fopen(cstr_filename, "wb");
     if(!file)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: could not open file for saving: "
                 PRI_SV".\033[0m\n", ARG_SV(editor->filename));
-        free((void*)cstr_filename);
-        if(appended)
-        {
-            free((void*)appended);
-        }
         return;
     }
 
@@ -171,21 +153,11 @@ void mapedit_saveProject
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: failed to write savefile. Code: %u"
                 "\033[0m\n", set.errorcode);
-        free((void*)cstr_filename);
-        if(appended)
-        {
-            free((void*)appended);
-        }
         fclose(file);
         return;
     }
 
     editor->lastSaveTime = rvQueryTime();
     fprintf(stdout, "\nProject saved successfully.\n");
-    free((void*)cstr_filename);
-    if(appended)
-    {
-        free((void*)appended);
-    }
     fclose(file);
 }

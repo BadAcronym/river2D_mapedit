@@ -240,7 +240,10 @@ void mapedit_init
             break;
         }
 
-        StringView expanded = cstr_sv(sv_concat(folder, file));
+        char *expanded_cstr = calloc(4096, 1);
+        sv_concat(folder, file, expanded_cstr);
+
+        StringView expanded = cstr_sv(expanded_cstr);
 
         if(!sv_find(cstr_sv(".qoi"), expanded))
         {
