@@ -12,89 +12,89 @@ void mapedit_init
     EditorData *editor
 ){
     rvLoadImage_file(engine, cstr_sv("assets/background.qoi"),
-                           &engine->planes[MAPEDIT_PLANE_BACKGROUND],
+                           &engine->planes[ME_PLANE_BACKGROUND],
                            RV_CHANNELS_BGRA, 8);
-    if(!engine->planes[MAPEDIT_PLANE_BACKGROUND].data)
+    if(!engine->planes[ME_PLANE_BACKGROUND].data)
     {
         fprintf(stderr,
                 "\n\033[31;1;7mERROR: Unable to load background image!\033[0m\n");
     }
 
     rvLoadImage_file(engine, cstr_sv("assets/black.qoi"),
-                           &engine->planes[MAPEDIT_PLANE_VOID],
+                           &engine->planes[ME_PLANE_VOID],
                            RV_CHANNELS_BGRA, 8);
-    if(!engine->planes[MAPEDIT_PLANE_VOID].data)
+    if(!engine->planes[ME_PLANE_VOID].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load black image!\033[0m\n");
     }
 
     rvLoadImage_file(engine, cstr_sv("assets/collision.qoi"),
-                           &engine->planes[MAPEDIT_PLANE_COLLISION],
+                           &engine->planes[ME_PLANE_COLLISION],
                            RV_CHANNELS_BGRA, 8);
-    if(!engine->planes[MAPEDIT_PLANE_COLLISION].data)
+    if(!engine->planes[ME_PLANE_COLLISION].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load darken image!\033[0m\n");
     }
 
     rvLoadImage_file(engine, cstr_sv("assets/highlight.qoi"),
-                           &engine->planes[MAPEDIT_PLANE_HIGHLIGHT],
+                           &engine->planes[ME_PLANE_HIGHLIGHT],
                            RV_CHANNELS_BGRA, 8);
-    if(!engine->planes[MAPEDIT_PLANE_HIGHLIGHT].data)
+    if(!engine->planes[ME_PLANE_HIGHLIGHT].data)
     {
         fprintf(stderr,
                 "\n\033[31;1;7mERROR: Unable to load highlight image!\033[0m\n");
     }
 
     rvLoadImage_file(engine, cstr_sv("assets/highlight_solid.qoi"),
-                           &engine->planes[MAPEDIT_PLANE_HIGHLIGHT_SOLID],
+                           &engine->planes[ME_PLANE_HIGHLIGHT_SOLID],
                            RV_CHANNELS_BGRA, 8);
-    if(!engine->planes[MAPEDIT_PLANE_HIGHLIGHT_SOLID].data)
+    if(!engine->planes[ME_PLANE_HIGHLIGHT_SOLID].data)
     {
         fprintf(stderr,
                 "\n\033[31;1;7mERROR: Unable to load solid highlight image!\033[0m\n");
     }
 
     rvLoadImage_file(engine, cstr_sv("assets/saving.qoi"),
-                           &engine->planes[MAPEDIT_PLANE_ICON_SAVING],
+                           &engine->planes[ME_PLANE_ICON_SAVING],
                            RV_CHANNELS_BGRA, 8);
-    if(!engine->planes[MAPEDIT_PLANE_ICON_SAVING].data)
+    if(!engine->planes[ME_PLANE_ICON_SAVING].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load saving icon!\033[0m\n");
     }
     rvLoadImage_file(engine, cstr_sv("assets/saved.qoi"),
-                           &engine->planes[MAPEDIT_PLANE_ICON_SAVED],
+                           &engine->planes[ME_PLANE_ICON_SAVED],
                            RV_CHANNELS_BGRA, 8);
-    if(!engine->planes[MAPEDIT_PLANE_ICON_SAVED].data)
+    if(!engine->planes[ME_PLANE_ICON_SAVED].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load saved icon!\033[0m\n");
     }
 
     rvLoadImage_file(engine, cstr_sv("assets/cursor_default.qoi"),
-                           &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT],
+                           &engine->planes[ME_PLANE_CURSOR_DEFAULT],
                            RV_CHANNELS_BGRA, 8);
-    if(!engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT].data)
+    if(!engine->planes[ME_PLANE_CURSOR_DEFAULT].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load default cursor!\033[0m\n");
     }
     rvLoadImage_file(engine, cstr_sv("assets/cursor_hover.qoi"),
-                           &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER],
+                           &engine->planes[ME_PLANE_CURSOR_HOVER],
                            RV_CHANNELS_BGRA, 8);
-    if(!engine->planes[MAPEDIT_PLANE_CURSOR_HOVER].data)
+    if(!engine->planes[ME_PLANE_CURSOR_HOVER].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load hover cursor!\033[0m\n");
     }
     rvLoadImage_file(engine, cstr_sv("assets/cursor_place.qoi"),
-                           &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE],
+                           &engine->planes[ME_PLANE_CURSOR_PLACE],
                            RV_CHANNELS_BGRA, 8);
-    if(!engine->planes[MAPEDIT_PLANE_CURSOR_PLACE].data)
+    if(!engine->planes[ME_PLANE_CURSOR_PLACE].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load place cursor!\033[0m\n");
     }
 
     rvLoadImage_file(engine, cstr_sv("assets/font_default_16.qoi"),
-                           &engine->planes[MAPEDIT_PLANE_FONT16],
+                           &engine->planes[ME_PLANE_FONT16],
                            RV_CHANNELS_BGRA, 8);
-    if(!engine->planes[MAPEDIT_PLANE_FONT16].data)
+    if(!engine->planes[ME_PLANE_FONT16].data)
     {
         fprintf(stderr, "\n\033[31;1;7mERROR: Unable to load font image!\033[0m\n");
     }
@@ -115,13 +115,13 @@ void mapedit_init
     StringView collision_sv = cstr_sv("TOGGLE COLLISION");
     StringView animation_sv = cstr_sv("EDIT ANIMATION FRAMES");
 
-    rvCreateImage(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_NULL], 32, 32);
-    rvCreateImage(engine, &engine->planes[MAPEDIT_PLANE_CURRENTFILE], 32, 32);
-    rvCreateImage(engine, &engine->planes[MAPEDIT_PLANE_MAINMENU],
+    rvCreateImage(engine, &engine->planes[ME_PLANE_CURSOR_NULL], 32, 32);
+    rvCreateImage(engine, &engine->planes[ME_PLANE_CURRENTFILE], 32, 32);
+    rvCreateImage(engine, &engine->planes[ME_PLANE_MAINMENU],
                         engine->backbuffer.width, engine->backbuffer.height);
-    rvCreateImage(engine, &engine->planes[MAPEDIT_PLANE_PAUSEMENU],
+    rvCreateImage(engine, &engine->planes[ME_PLANE_PAUSEMENU],
                         engine->backbuffer.width, engine->backbuffer.height);
-    rvCreateImage(engine, &engine->planes[MAPEDIT_PLANE_TILEPICKER],
+    rvCreateImage(engine, &engine->planes[ME_PLANE_TILEPICKER],
                         engine->backbuffer.width, engine->backbuffer.height);
 
     uint8_t charsize = 16;
@@ -129,21 +129,21 @@ void mapedit_init
     uint8_t vSpacing = 2;
     uint8_t elements = 3;
 
-    rvCreateImage(engine, &engine->planes[MAPEDIT_PLANE_CONTEXTMENU],
+    rvCreateImage(engine, &engine->planes[ME_PLANE_CONTEXTMENU],
                         (charsize + hSpacing * 2) * (uint32_t)animation_sv.size,
                         (charsize + vSpacing * 2) * elements);
 
     // always show, for now.
-    engine->config.choices |= MAPEDIT_CHOICE_SHOW_FPS_BIT;
+    engine->config.choices |= ME_CHOICE_SHOW_FPS_BIT;
 
-    if(engine->config.choices & MAPEDIT_CHOICE_SHOW_FPS_BIT)
+    if(engine->config.choices & ME_CHOICE_SHOW_FPS_BIT)
     {
         StringView initial = cstr_sv("FPS: ????");
 
         rvLoadTextSettings textSet = {0};
-        textSet.image    = &engine->planes[MAPEDIT_PLANE_FPS];
+        textSet.image    = &engine->planes[ME_PLANE_FPS];
         textSet.sv       = &initial;
-        textSet.font     = MAPEDIT_PLANE_FONT16;
+        textSet.font     = ME_PLANE_FONT16;
         textSet.charsize = 16;
         textSet.spacing  = 1;
 
@@ -153,9 +153,9 @@ void mapedit_init
     // JANKY: I'm loading text by creating a button, then overwriting it, like for the
     // title.
     rvButtonSettings set = {0};
-    set.img      = &engine->planes[MAPEDIT_PLANE_MAINMENU];
+    set.img      = &engine->planes[ME_PLANE_MAINMENU];
     set.name     = &title_sv;
-    set.font     = MAPEDIT_PLANE_FONT16;
+    set.font     = ME_PLANE_FONT16;
     set.charsize = charsize;
     set.spacing  = hSpacing;
     set.point.x  = 0.5f;
@@ -163,24 +163,24 @@ void mapedit_init
     set.button   = &editor->new_b;
     rvCreateButton(engine, &set);
 
-    set.img = &engine->planes[MAPEDIT_PLANE_PAUSEMENU];
+    set.img = &engine->planes[ME_PLANE_PAUSEMENU];
     rvCreateButton(engine, &set);
 
-    set.img     = &engine->planes[MAPEDIT_PLANE_MAINMENU];
+    set.img     = &engine->planes[ME_PLANE_MAINMENU];
     set.name    = &new_sv;
     set.point.y = 0.4f;
     rvCreateButton(engine, &set);
 
-    set.img = &engine->planes[MAPEDIT_PLANE_PAUSEMENU];
+    set.img = &engine->planes[ME_PLANE_PAUSEMENU];
     rvCreateButton(engine, &set);
 
-    set.img     = &engine->planes[MAPEDIT_PLANE_MAINMENU];
+    set.img     = &engine->planes[ME_PLANE_MAINMENU];
     set.name    = &load_sv;
     set.point.y = 0.48f;
     set.button  = &editor->load_b;
     rvCreateButton(engine, &set);
 
-    set.img = &engine->planes[MAPEDIT_PLANE_PAUSEMENU];
+    set.img = &engine->planes[ME_PLANE_PAUSEMENU];
     rvCreateButton(engine, &set);
 
     set.name    = &save_sv;
@@ -193,19 +193,19 @@ void mapedit_init
     set.button  = &editor->saveas_b;
     rvCreateButton(engine, &set);
 
-    set.img     = &engine->planes[MAPEDIT_PLANE_MAINMENU];
+    set.img     = &engine->planes[ME_PLANE_MAINMENU];
     set.name    = &quit_sv;
     set.point.y = 0.8f;
     set.button  = &editor->quit_b;
     rvCreateButton(engine, &set);
 
-    set.img = &engine->planes[MAPEDIT_PLANE_PAUSEMENU];
+    set.img = &engine->planes[ME_PLANE_PAUSEMENU];
     rvCreateButton(engine, &set);
 
     float bufHeight = (float)engine->backbuffer.height;
 
     set.name      = &close_sv;
-    set.img       = &engine->planes[MAPEDIT_PLANE_TILEPICKER];
+    set.img       = &engine->planes[ME_PLANE_TILEPICKER];
     set.point.x   = 0.1f + set.charsize / (bufHeight * 2);
     set.point.y   = 0.9f - set.charsize / bufHeight;
     set.button    = &editor->close_b;
@@ -213,7 +213,7 @@ void mapedit_init
     rvCreateButton(engine, &set);
 
     set.name      = &collision_sv;
-    set.img       = &engine->planes[MAPEDIT_PLANE_CONTEXTMENU];
+    set.img       = &engine->planes[ME_PLANE_CONTEXTMENU];
     set.button    = &editor->collision_b;
     set.point.x   = 0.0f;
     set.point.y   = 0.0f;
@@ -221,9 +221,9 @@ void mapedit_init
     rvCreateButton(engine, &set);
 
     set.name    = &animation_sv;
-    set.img     = &engine->planes[MAPEDIT_PLANE_CONTEXTMENU];
+    set.img     = &engine->planes[ME_PLANE_CONTEXTMENU];
     set.point.y = (float)(charsize + vSpacing) /
-                    (float)engine->planes[MAPEDIT_PLANE_CONTEXTMENU].height;
+                    (float)engine->planes[ME_PLANE_CONTEXTMENU].height;
     set.button  = &editor->animation_b;
     rvCreateButton(engine, &set);
 
@@ -254,7 +254,7 @@ void mapedit_init
         RiverImage tmp;
 
         rvLoadImage_file(engine, expanded, &tmp, RV_CHANNELS_BGRA, 8);
-        rvAppendImage(engine, &tmp, &engine->planes[MAPEDIT_PLANE_TILESHEET],
+        rvAppendImage(engine, &tmp, &engine->planes[ME_PLANE_TILESHEET],
                             RV_VERTICAL);
 
         rvDestroyImage(&tmp);
@@ -274,15 +274,15 @@ void mapedit_init
         editor->placedTiles[i].x = UINT16_MAX;
     }
 
-    uint32_t sheetCountX = engine->planes[MAPEDIT_PLANE_TILESHEET].width /
+    uint32_t sheetCountX = engine->planes[ME_PLANE_TILESHEET].width /
                            editor->tilesize;
 
-    uint32_t sheetCountY = engine->planes[MAPEDIT_PLANE_TILESHEET].height /
+    uint32_t sheetCountY = engine->planes[ME_PLANE_TILESHEET].height /
                            editor->tilesize;
 
     editor->tileData = calloc(sheetCountX * sheetCountY, sizeof(TileMetadata));
-    editor->actions  = malloc(MAPEDIT_MAX_ACTIONS * sizeof(Action));
-    for(uint32_t i = 0; i < MAPEDIT_MAX_ACTIONS; ++i)
+    editor->actions  = malloc(ME_MAX_ACTIONS * sizeof(Action));
+    for(uint32_t i = 0; i < ME_MAX_ACTIONS; ++i)
     {
         editor->actions[i].stroke_start.s  = INT64_MIN;
         editor->actions[i].stroke_start.ns = INT64_MIN;
@@ -303,45 +303,45 @@ void mapedit_init
     editor->inputBuffer.data = buf;
     editor->inputBuffer.size = 256;
 
-    engine->controls.buttoncodes[MAPEDIT_BUTTON_LEFTM]   = RV_MOUSE1;
-    engine->controls.buttoncodes[MAPEDIT_BUTTON_MIDDLEM] = RV_MOUSE2;
-    engine->controls.buttoncodes[MAPEDIT_BUTTON_RIGHTM]  = RV_MOUSE3;
+    engine->controls.buttoncodes[ME_BUTTON_LEFTM]   = RV_MOUSE1;
+    engine->controls.buttoncodes[ME_BUTTON_MIDDLEM] = RV_MOUSE2;
+    engine->controls.buttoncodes[ME_BUTTON_RIGHTM]  = RV_MOUSE3;
 
-    engine->controls.keycodes[MAPEDIT_KEY_LSHIFT]     = RV_ASCII_LSHIFT;
-    engine->controls.keycodes[MAPEDIT_KEY_RSHIFT]     = RV_ASCII_RSHIFT;
-    engine->controls.keycodes[MAPEDIT_KEY_LCTRL]      = RV_ASCII_LCTRL;
-    engine->controls.keycodes[MAPEDIT_KEY_RCTRL]      = RV_ASCII_RCTRL;
-    engine->controls.keycodes[MAPEDIT_KEY_ENTER]      = RV_ASCII_ENTER;
-    engine->controls.keycodes[MAPEDIT_KEY_BACKSPACE]  = RV_ASCII_BACKSPACE;
-    engine->controls.keycodes[MAPEDIT_KEY_DELETE]     = RV_ASCII_DELETE;
-    engine->controls.keycodes[MAPEDIT_KEY_MENU]       = RV_ASCII_ESCAPE;
-    engine->controls.keycodes[MAPEDIT_KEY_HOTBAR]     = RV_ASCII_TAB;
-    engine->controls.keycodes[MAPEDIT_KEY_UNDO]       = 'z';
-    engine->controls.keycodes[MAPEDIT_KEY_REDO]       = 'y';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER0]     = '0';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER1]     = '1';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER2]     = '2';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER3]     = '3';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER4]     = '4';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER5]     = '5';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER6]     = '6';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER7]     = '7';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER8]     = '8';
-    engine->controls.keycodes[MAPEDIT_KEY_LAYER9]     = '9';
-    engine->controls.keycodes[MAPEDIT_KEY_REDO]       = 'y';
-    engine->controls.keycodes[MAPEDIT_KEY_UNDO]       = 'z';
-    engine->controls.keycodes[MAPEDIT_KEY_DECREASE]   = '-';
-    engine->controls.keycodes[MAPEDIT_KEY_INCREASE]   = '=';
-    engine->controls.keycodes[MAPEDIT_KEY_SAVE]       = 's';
-    engine->controls.keycodes[MAPEDIT_KEY_QUIT]       = 'q';
-    engine->controls.keycodes[MAPEDIT_KEY_TILEPICKER] = 't';
-    engine->controls.keycodes[MAPEDIT_KEY_WIREFRAME]  = 'w';
-    engine->controls.keycodes[MAPEDIT_KEY_UP]         = RV_ASCII_UP;
-    engine->controls.keycodes[MAPEDIT_KEY_DOWN]       = RV_ASCII_DOWN;
-    engine->controls.keycodes[MAPEDIT_KEY_LEFT]       = RV_ASCII_LEFT;
-    engine->controls.keycodes[MAPEDIT_KEY_RIGHT]      = RV_ASCII_RIGHT;
+    engine->controls.keycodes[ME_KEY_LSHIFT]     = RV_ASCII_LSHIFT;
+    engine->controls.keycodes[ME_KEY_RSHIFT]     = RV_ASCII_RSHIFT;
+    engine->controls.keycodes[ME_KEY_LCTRL]      = RV_ASCII_LCTRL;
+    engine->controls.keycodes[ME_KEY_RCTRL]      = RV_ASCII_RCTRL;
+    engine->controls.keycodes[ME_KEY_ENTER]      = RV_ASCII_ENTER;
+    engine->controls.keycodes[ME_KEY_BACKSPACE]  = RV_ASCII_BACKSPACE;
+    engine->controls.keycodes[ME_KEY_DELETE]     = RV_ASCII_DELETE;
+    engine->controls.keycodes[ME_KEY_MENU]       = RV_ASCII_ESCAPE;
+    engine->controls.keycodes[ME_KEY_HOTBAR]     = RV_ASCII_TAB;
+    engine->controls.keycodes[ME_KEY_UNDO]       = 'z';
+    engine->controls.keycodes[ME_KEY_REDO]       = 'y';
+    engine->controls.keycodes[ME_KEY_LAYER0]     = '0';
+    engine->controls.keycodes[ME_KEY_LAYER1]     = '1';
+    engine->controls.keycodes[ME_KEY_LAYER2]     = '2';
+    engine->controls.keycodes[ME_KEY_LAYER3]     = '3';
+    engine->controls.keycodes[ME_KEY_LAYER4]     = '4';
+    engine->controls.keycodes[ME_KEY_LAYER5]     = '5';
+    engine->controls.keycodes[ME_KEY_LAYER6]     = '6';
+    engine->controls.keycodes[ME_KEY_LAYER7]     = '7';
+    engine->controls.keycodes[ME_KEY_LAYER8]     = '8';
+    engine->controls.keycodes[ME_KEY_LAYER9]     = '9';
+    engine->controls.keycodes[ME_KEY_REDO]       = 'y';
+    engine->controls.keycodes[ME_KEY_UNDO]       = 'z';
+    engine->controls.keycodes[ME_KEY_DECREASE]   = '-';
+    engine->controls.keycodes[ME_KEY_INCREASE]   = '=';
+    engine->controls.keycodes[ME_KEY_SAVE]       = 's';
+    engine->controls.keycodes[ME_KEY_QUIT]       = 'q';
+    engine->controls.keycodes[ME_KEY_TILEPICKER] = 't';
+    engine->controls.keycodes[ME_KEY_WIREFRAME]  = 'w';
+    engine->controls.keycodes[ME_KEY_UP]         = RV_ASCII_UP;
+    engine->controls.keycodes[ME_KEY_DOWN]       = RV_ASCII_DOWN;
+    engine->controls.keycodes[ME_KEY_LEFT]       = RV_ASCII_LEFT;
+    engine->controls.keycodes[ME_KEY_RIGHT]      = RV_ASCII_RIGHT;
 
-    editor->currentState = MAPEDIT_STATE_MENU;
+    editor->currentState = ME_STATE_MENU;
 }
 
 int32_t mapedit_shutdown
@@ -371,7 +371,7 @@ void mapedit_changeState
         return;
     }
 
-    if(nextState == MAPEDIT_STATE_MENU)
+    if(nextState == ME_STATE_MENU)
     {
         editor->i_button = 0;
     }
@@ -385,22 +385,22 @@ void mapedit_update
     EngineData *engine,
     EditorData *editor
 ){
-    if(editor->currentState == MAPEDIT_STATE_MENU)
+    if(editor->currentState == ME_STATE_MENU)
     {
         mapedit_drawMainMenu(engine, editor);
         mapedit_pollMainMenu(engine, editor);
     }
-    else if(editor->currentState == MAPEDIT_STATE_EDIT)
+    else if(editor->currentState == ME_STATE_EDIT)
     {
         mapedit_drawEditor(engine, editor);
         mapedit_pollEditor(engine, editor);
     }
-    else if(editor->currentState == MAPEDIT_STATE_LOAD)
+    else if(editor->currentState == ME_STATE_LOAD)
     {
         mapedit_drawFilePicker(engine);
         mapedit_pollLoadFile(engine, editor);
     }
-    else if(editor->currentState == MAPEDIT_STATE_SAVEAS)
+    else if(editor->currentState == ME_STATE_SAVEAS)
     {
         mapedit_drawFilePicker(engine);
         mapedit_pollSaveFile(engine, editor);

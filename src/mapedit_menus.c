@@ -18,9 +18,9 @@ f_internal void updateFPS
     StringView fps_sv = cstr_sv(fpsStr);
 
     rvLoadTextSettings textSet = {0};
-    textSet.image    = &engine->planes[MAPEDIT_PLANE_FPS];
+    textSet.image    = &engine->planes[ME_PLANE_FPS];
     textSet.sv       = &fps_sv;
-    textSet.font     = MAPEDIT_PLANE_FONT16;
+    textSet.font     = ME_PLANE_FONT16;
     textSet.charsize = 16;
     textSet.spacing  = 1;
 
@@ -36,27 +36,27 @@ void mapedit_drawMainMenu
     EditorData *editor
 ){
     rvCompositeSettings comp = {0};
-    comp.src        = &engine->planes[MAPEDIT_PLANE_BACKGROUND];
+    comp.src        = &engine->planes[ME_PLANE_BACKGROUND];
     comp.dst        = &engine->backbuffer;
     comp.pictop     = RV_PICTOP_OVER;
-    comp.cropWidth  = engine->planes[MAPEDIT_PLANE_BACKGROUND].width;
-    comp.cropHeight = engine->planes[MAPEDIT_PLANE_BACKGROUND].height;
+    comp.cropWidth  = engine->planes[ME_PLANE_BACKGROUND].width;
+    comp.cropHeight = engine->planes[ME_PLANE_BACKGROUND].height;
 
     rvCompositeImage(engine, &comp);
 
     if(!editor->previousState)
     {
-        comp.src        = &engine->planes[MAPEDIT_PLANE_MAINMENU];
-        comp.cropWidth  = engine->planes[MAPEDIT_PLANE_MAINMENU].width;
-        comp.cropHeight = engine->planes[MAPEDIT_PLANE_MAINMENU].height;
+        comp.src        = &engine->planes[ME_PLANE_MAINMENU];
+        comp.cropWidth  = engine->planes[ME_PLANE_MAINMENU].width;
+        comp.cropHeight = engine->planes[ME_PLANE_MAINMENU].height;
 
         rvCompositeImage(engine, &comp);
     }
     else
     {
-        comp.src        = &engine->planes[MAPEDIT_PLANE_PAUSEMENU];
-        comp.cropWidth  = engine->planes[MAPEDIT_PLANE_PAUSEMENU].width;
-        comp.cropHeight = engine->planes[MAPEDIT_PLANE_PAUSEMENU].height;
+        comp.src        = &engine->planes[ME_PLANE_PAUSEMENU];
+        comp.cropWidth  = engine->planes[ME_PLANE_PAUSEMENU].width;
+        comp.cropHeight = engine->planes[ME_PLANE_PAUSEMENU].height;
 
         rvCompositeImage(engine, &comp);
     }
@@ -64,11 +64,11 @@ void mapedit_drawMainMenu
     float deltaMS = rvDeltaTime_now_ms(&editor->lastSaveTime);
     if(deltaMS < 250)
     {
-        comp.src        = &engine->planes[MAPEDIT_PLANE_ICON_SAVED];
+        comp.src        = &engine->planes[ME_PLANE_ICON_SAVED];
         comp.offsetDstX = 16;
         comp.offsetDstY = 16;
-        comp.cropWidth  = engine->planes[MAPEDIT_PLANE_ICON_SAVED].width;
-        comp.cropHeight = engine->planes[MAPEDIT_PLANE_ICON_SAVED].height;
+        comp.cropWidth  = engine->planes[ME_PLANE_ICON_SAVED].width;
+        comp.cropHeight = engine->planes[ME_PLANE_ICON_SAVED].height;
 
         rvCompositeImage(engine, &comp);
     }
@@ -238,42 +238,42 @@ void mapedit_pollMainMenu
     comp.dst    = &engine->backbuffer;
     comp.pictop = RV_PICTOP_OVER;
 
-    if(engine->controls.keymap & MAPEDIT_BIT_LCTRL &&
-       engine->controls.keymap & MAPEDIT_BIT_QUIT
+    if(engine->controls.keymap & ME_BIT_LCTRL &&
+       engine->controls.keymap & ME_BIT_QUIT
     ){
         engine->running = false;
         return;
     }
 
-    if(editor->previousState && engine->controls.keymap & MAPEDIT_BIT_MENU)
+    if(editor->previousState && engine->controls.keymap & ME_BIT_MENU)
     {
         mapedit_changeState(editor, editor->previousState);
-        engine->controls.keymap &= ~MAPEDIT_BIT_MENU;
+        engine->controls.keymap &= ~ME_BIT_MENU;
         return;
     }
 
     pollHovers(engine, editor);
 
-    if(engine->controls.keymap & MAPEDIT_BIT_UP)
+    if(engine->controls.keymap & ME_BIT_UP)
     {
         nextButton(editor, true);
-        engine->controls.keymap &= ~MAPEDIT_BIT_UP;
+        engine->controls.keymap &= ~ME_BIT_UP;
     }
-    else if(engine->controls.keymap & MAPEDIT_BIT_DOWN)
+    else if(engine->controls.keymap & ME_BIT_DOWN)
     {
         nextButton(editor, false);
-        engine->controls.keymap &= ~MAPEDIT_BIT_DOWN;
+        engine->controls.keymap &= ~ME_BIT_DOWN;
     }
 
     if(editor->new_b.status & RV_BIT_HOVER)
     {
-        rvChangeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+        rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_HOVER]);
 
         float length = editor->new_b.area.lowRight.x - editor->new_b.area.upLeft.x;
         float fX     = (float)(engine->backbuffer.width);
         float fY     = (float)(engine->backbuffer.height);
 
-        comp.src        = &engine->planes[MAPEDIT_PLANE_HIGHLIGHT];
+        comp.src        = &engine->planes[ME_PLANE_HIGHLIGHT];
         comp.offsetDstX = (uint32_t)(editor->new_b.area.upLeft.x * fX);
         comp.offsetDstY = (uint32_t)(editor->new_b.area.upLeft.y * fY + 20);
         comp.cropWidth  = (uint32_t)(length * fX);
@@ -281,8 +281,8 @@ void mapedit_pollMainMenu
 
         rvCompositeImage(engine, &comp);
 
-        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM ||
-           engine->controls.keymap    & MAPEDIT_BIT_ENTER
+        if(engine->controls.buttonmap & ME_BIT_LEFTM ||
+           engine->controls.keymap    & ME_BIT_ENTER
         ){
             if(editor->previousState && editor->placedTiles)
             {
@@ -295,19 +295,19 @@ void mapedit_pollMainMenu
                 }
             }
 
-            mapedit_changeState(editor, MAPEDIT_STATE_EDIT);
-            engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
+            mapedit_changeState(editor, ME_STATE_EDIT);
+            engine->controls.buttonmap &= ~ME_BIT_LEFTM;
         }
     }
     else if(editor->load_b.status & RV_BIT_HOVER)
     {
-        rvChangeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+        rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_HOVER]);
 
         float length = editor->load_b.area.lowRight.x - editor->load_b.area.upLeft.x;
         float fX     = (float)(engine->backbuffer.width);
         float fY     = (float)(engine->backbuffer.height);
 
-        comp.src        = &engine->planes[MAPEDIT_PLANE_HIGHLIGHT];
+        comp.src        = &engine->planes[ME_PLANE_HIGHLIGHT];
         comp.offsetDstX = (uint32_t)(editor->load_b.area.upLeft.x * fX);
         comp.offsetDstY = (uint32_t)(editor->load_b.area.upLeft.y * fY + 20);
         comp.cropWidth  = (uint32_t)(length * fX);
@@ -315,24 +315,24 @@ void mapedit_pollMainMenu
 
         rvCompositeImage(engine, &comp);
 
-        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM ||
-           engine->controls.keymap    & MAPEDIT_BIT_ENTER
+        if(engine->controls.buttonmap & ME_BIT_LEFTM ||
+           engine->controls.keymap    & ME_BIT_ENTER
         ){
             engine->controls.ascii = 0x00;
-            engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
-            engine->controls.keymap    &= ~MAPEDIT_BIT_ENTER;
-            mapedit_changeState(editor, MAPEDIT_STATE_LOAD);
+            engine->controls.buttonmap &= ~ME_BIT_LEFTM;
+            engine->controls.keymap    &= ~ME_BIT_ENTER;
+            mapedit_changeState(editor, ME_STATE_LOAD);
         }
     }
     else if(editor->quit_b.status & RV_BIT_HOVER)
     {
-        rvChangeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+        rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_HOVER]);
 
         float length = editor->quit_b.area.lowRight.x - editor->quit_b.area.upLeft.x;
         float fX     = (float)(engine->backbuffer.width);
         float fY     = (float)(engine->backbuffer.height);
 
-        comp.src        = &engine->planes[MAPEDIT_PLANE_HIGHLIGHT];
+        comp.src        = &engine->planes[ME_PLANE_HIGHLIGHT];
         comp.offsetDstX = (uint32_t)(editor->quit_b.area.upLeft.x * fX);
         comp.offsetDstY = (uint32_t)(editor->quit_b.area.upLeft.y * fY + 20);
         comp.cropWidth  = (uint32_t)(length * fX);
@@ -340,21 +340,21 @@ void mapedit_pollMainMenu
 
         rvCompositeImage(engine, &comp);
 
-        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM ||
-           engine->controls.keymap    & MAPEDIT_BIT_ENTER
+        if(engine->controls.buttonmap & ME_BIT_LEFTM ||
+           engine->controls.keymap    & ME_BIT_ENTER
         ){
             engine->running = false;
         }
     }
     else if(editor->previousState && editor->save_b.status & RV_BIT_HOVER)
     {
-        rvChangeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+        rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_HOVER]);
 
         float length = editor->save_b.area.lowRight.x - editor->save_b.area.upLeft.x;
         float fX     = (float)(engine->backbuffer.width);
         float fY     = (float)(engine->backbuffer.height);
 
-        comp.src        = &engine->planes[MAPEDIT_PLANE_HIGHLIGHT];
+        comp.src        = &engine->planes[ME_PLANE_HIGHLIGHT];
         comp.offsetDstX = (uint32_t)(editor->save_b.area.upLeft.x * fX);
         comp.offsetDstY = (uint32_t)(editor->save_b.area.upLeft.y * fY + 20);
         comp.cropWidth  = (uint32_t)(length * fX);
@@ -362,23 +362,23 @@ void mapedit_pollMainMenu
 
         rvCompositeImage(engine, &comp);
 
-        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM ||
-           engine->controls.keymap    & MAPEDIT_BIT_ENTER
+        if(engine->controls.buttonmap & ME_BIT_LEFTM ||
+           engine->controls.keymap    & ME_BIT_ENTER
         ){
-            engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
-            engine->controls.keymap    &= ~MAPEDIT_BIT_ENTER;
+            engine->controls.buttonmap &= ~ME_BIT_LEFTM;
+            engine->controls.keymap    &= ~ME_BIT_ENTER;
             mapedit_saveProject(engine, editor);
         }
     }
     else if(editor->previousState && editor->saveas_b.status & RV_BIT_HOVER)
     {
-        rvChangeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+        rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_HOVER]);
 
         float length = editor->saveas_b.area.lowRight.x - editor->saveas_b.area.upLeft.x;
         float fX     = (float)(engine->backbuffer.width);
         float fY     = (float)(engine->backbuffer.height);
 
-        comp.src        = &engine->planes[MAPEDIT_PLANE_HIGHLIGHT];
+        comp.src        = &engine->planes[ME_PLANE_HIGHLIGHT];
         comp.offsetDstX = (uint32_t)(editor->saveas_b.area.upLeft.x * fX);
         comp.offsetDstY = (uint32_t)(editor->saveas_b.area.upLeft.y * fY + 20);
         comp.cropWidth  = (uint32_t)(length * fX);
@@ -386,23 +386,23 @@ void mapedit_pollMainMenu
 
         rvCompositeImage(engine, &comp);
 
-        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
+        if(engine->controls.buttonmap & ME_BIT_LEFTM)
         {
-            engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
-            engine->controls.keymap    &= ~MAPEDIT_BIT_ENTER;
-            mapedit_changeState(editor, MAPEDIT_STATE_SAVEAS);
+            engine->controls.buttonmap &= ~ME_BIT_LEFTM;
+            engine->controls.keymap    &= ~ME_BIT_ENTER;
+            mapedit_changeState(editor, ME_STATE_SAVEAS);
         }
     }
     else if(!editor->i_button)
     {
-        rvChangeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
+        rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_DEFAULT]);
 
         #ifdef DEBUG
-        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
+        if(engine->controls.buttonmap & ME_BIT_LEFTM)
         {
             fprintf(stderr, "clicked @ X: %f Y: %f\n",
                     engine->controls.pointer.x, engine->controls.pointer.y);
-            engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
+            engine->controls.buttonmap &= ~ME_BIT_LEFTM;
         }
         #endif
     }
@@ -415,8 +415,8 @@ f_internal void getSheetDims
     uint32_t   *sheet_width,
     uint32_t   *sheet_height
 ){
-    *sheet_width  = engine->planes[MAPEDIT_PLANE_TILESHEET].width;
-    *sheet_height = engine->planes[MAPEDIT_PLANE_TILESHEET].height;
+    *sheet_width  = engine->planes[ME_PLANE_TILESHEET].width;
+    *sheet_height = engine->planes[ME_PLANE_TILESHEET].height;
     float max_w = (float)engine->backbuffer.width  * 0.8f - 2 * editor->tilesize;
     float max_h = (float)engine->backbuffer.height * 0.8f - 3 * editor->tilesize;
     if((float)*sheet_width > max_w)
@@ -439,7 +439,7 @@ f_internal void drawTilePicker
     rvCompositeSettings comp = {0};
     comp.dst        = &engine->backbuffer;
     comp.pictop     = RV_PICTOP_OVER;
-    comp.src        = &engine->planes[MAPEDIT_PLANE_BACKGROUND];
+    comp.src        = &engine->planes[ME_PLANE_BACKGROUND];
     comp.offsetDstX = engine->backbuffer.width  / 10;
     comp.offsetDstY = engine->backbuffer.height / 10;
     comp.cropWidth  = (uint32_t)((float)engine->backbuffer.width  / 1.25f);
@@ -447,15 +447,15 @@ f_internal void drawTilePicker
 
     rvCompositeImage(engine, &comp);
 
-    comp.src        = &engine->planes[MAPEDIT_PLANE_TILEPICKER];
+    comp.src        = &engine->planes[ME_PLANE_TILEPICKER];
     comp.offsetDstX = 0;
     comp.offsetDstY = 0;
-    comp.cropWidth  = engine->planes[MAPEDIT_PLANE_TILEPICKER].width;
-    comp.cropHeight = engine->planes[MAPEDIT_PLANE_TILEPICKER].height;
+    comp.cropWidth  = engine->planes[ME_PLANE_TILEPICKER].width;
+    comp.cropHeight = engine->planes[ME_PLANE_TILEPICKER].height;
 
     rvCompositeImage(engine, &comp);
 
-    comp.src        = &engine->planes[MAPEDIT_PLANE_TILESHEET];
+    comp.src        = &engine->planes[ME_PLANE_TILESHEET];
     comp.offsetSrcX = 0;
     comp.offsetSrcY = editor->viewScroll * editor->tilesize;
     comp.offsetDstX = engine->backbuffer.width  / 10 + editor->tilesize;
@@ -478,11 +478,11 @@ f_internal void drawContextMenu
     rvCompositeSettings comp = {0};
     comp.dst        = &engine->backbuffer;
     comp.pictop     = RV_PICTOP_OVER;
-    comp.src        = &engine->planes[MAPEDIT_PLANE_HIGHLIGHT_SOLID];
+    comp.src        = &engine->planes[ME_PLANE_HIGHLIGHT_SOLID];
     comp.offsetDstX = tileLocX + (uint32_t)(editor->tilesize * 0.60f);
     comp.offsetDstY = tileLocY + (uint32_t)(editor->tilesize * 0.60f) - scrollHeight;
-    comp.cropWidth  = engine->planes[MAPEDIT_PLANE_CONTEXTMENU].width;
-    comp.cropHeight = engine->planes[MAPEDIT_PLANE_CONTEXTMENU].height;
+    comp.cropWidth  = engine->planes[ME_PLANE_CONTEXTMENU].width;
+    comp.cropHeight = engine->planes[ME_PLANE_CONTEXTMENU].height;
     rvCompositeImage(engine, &comp);
 
     float fX = (float)engine->backbuffer.width;
@@ -506,7 +506,7 @@ f_internal void drawContextMenu
     editor->animation_b.area.lowRight.x = fOffsetX + animation_length;
     editor->animation_b.area.lowRight.y = fOffsetY + 32.0f / fY + fPad * 1.5f;
 
-    comp.src         = &engine->planes[MAPEDIT_PLANE_CONTEXTMENU];
+    comp.src         = &engine->planes[ME_PLANE_CONTEXTMENU];
     comp.offsetDstX += padding;
     comp.offsetDstY += padding;
     rvCompositeImage(engine, &comp);
@@ -526,7 +526,7 @@ f_internal void getTileXY
 
     uint8_t  modX  = *tileX % editor->selectMult;
     uint8_t  modY  = *tileY % editor->selectMult;
-    if(engine->controls.keymap & MAPEDIT_BIT_LSHIFT)
+    if(engine->controls.keymap & ME_BIT_LSHIFT)
     {
         *tileX -= modX;
         *tileY -= modY;
@@ -539,20 +539,20 @@ void mapedit_drawEditor
     EditorData *editor
 ){
     rvCompositeSettings comp = {0};
-    comp.src        = &engine->planes[MAPEDIT_PLANE_VOID];
+    comp.src        = &engine->planes[ME_PLANE_VOID];
     comp.dst        = &engine->backbuffer;
     comp.pictop     = RV_PICTOP_OVER;
-    comp.cropWidth  = engine->planes[MAPEDIT_PLANE_VOID].width;
-    comp.cropHeight = engine->planes[MAPEDIT_PLANE_VOID].height;
+    comp.cropWidth  = engine->planes[ME_PLANE_VOID].width;
+    comp.cropHeight = engine->planes[ME_PLANE_VOID].height;
 
     rvCompositeImage(engine, &comp);
 
     for(uint8_t i = 0; i < editor->mapLayers; ++i)
     {
-        if(engine->controls.keymap & (MAPEDIT_BIT_LAYER0 << i))
+        if(engine->controls.keymap & (ME_BIT_LAYER0 << i))
         {
             editor->currentLayer = i;
-            editor->isolate      = engine->controls.keymap & MAPEDIT_BIT_LSHIFT;
+            editor->isolate      = engine->controls.keymap & ME_BIT_LSHIFT;
         }
     }
 
@@ -576,7 +576,7 @@ void mapedit_drawEditor
                     continue;
                 }
 
-                comp.src        = &engine->planes[MAPEDIT_PLANE_TILESHEET];
+                comp.src        = &engine->planes[ME_PLANE_TILESHEET];
                 comp.offsetSrcX = editor->placedTiles[index].x * editor->tilesize;
                 comp.offsetSrcY = editor->placedTiles[index].y * editor->tilesize;
                 comp.offsetDstX = x * editor->tilesize;
@@ -584,12 +584,12 @@ void mapedit_drawEditor
 
                 rvCompositeImage(engine, &comp);
 
-                if(!(editor->flags & MAPEDIT_FLAG_WIREFRAME))
+                if(!(editor->flags & ME_FLAG_WIREFRAME))
                 {
                     continue;
                 }
 
-                uint64_t sheetW = engine->planes[MAPEDIT_PLANE_TILESHEET].width /
+                uint64_t sheetW = engine->planes[ME_PLANE_TILESHEET].width /
                                   editor->tilesize;
 
                 uint64_t dataIndex = editor->placedTiles[index].y * sheetW +
@@ -597,7 +597,7 @@ void mapedit_drawEditor
 
                 if(editor->tileData[dataIndex].flags & RV_TILE_BIT_COLLISION)
                 {
-                    comp.src = &engine->planes[MAPEDIT_PLANE_COLLISION];
+                    comp.src = &engine->planes[ME_PLANE_COLLISION];
                     rvCompositeImage(engine, &comp);
                 }
             }
@@ -611,29 +611,29 @@ void mapedit_drawEditor
 
     rvLoadTextSettings set = {0};
     set.sv       = &layer_sv;
-    set.image    = &engine->planes[MAPEDIT_PLANE_CURRENTLAYER];
-    set.font     = MAPEDIT_PLANE_FONT16;
+    set.image    = &engine->planes[ME_PLANE_CURRENTLAYER];
+    set.font     = ME_PLANE_FONT16;
     set.charsize = 16;
     set.spacing  = 1;
 
     rvLoadText(engine, &set);
 
-    comp.src        = &engine->planes[MAPEDIT_PLANE_CURRENTLAYER];
+    comp.src        = &engine->planes[ME_PLANE_CURRENTLAYER];
     comp.offsetSrcX = 0;
     comp.offsetSrcY = 0;
     comp.offsetDstX = (uint32_t)(0.95f * (float)engine->backbuffer.width);
     comp.offsetDstY = (uint32_t)(0.025f * (float)engine->backbuffer.width);
-    comp.cropWidth  = engine->planes[MAPEDIT_PLANE_CURRENTLAYER].width;
-    comp.cropHeight = engine->planes[MAPEDIT_PLANE_CURRENTLAYER].height;
+    comp.cropWidth  = engine->planes[ME_PLANE_CURRENTLAYER].width;
+    comp.cropHeight = engine->planes[ME_PLANE_CURRENTLAYER].height;
 
     rvCompositeImage(engine, &comp);
 
     float deltaMS = rvDeltaTime_now_ms(&editor->lastSaveTime);
     if(deltaMS < 250)
     {
-        comp.src        = &engine->planes[MAPEDIT_PLANE_ICON_SAVED];
-        comp.cropWidth  = engine->planes[MAPEDIT_PLANE_ICON_SAVED].width;
-        comp.cropHeight = engine->planes[MAPEDIT_PLANE_ICON_SAVED].height;
+        comp.src        = &engine->planes[ME_PLANE_ICON_SAVED];
+        comp.cropWidth  = engine->planes[ME_PLANE_ICON_SAVED].width;
+        comp.cropHeight = engine->planes[ME_PLANE_ICON_SAVED].height;
         comp.offsetDstX = 16;
         comp.offsetDstY = 16;
 
@@ -647,7 +647,7 @@ void mapedit_drawEditor
     uint16_t tileY = 0;
     getTileXY(engine, editor, &tileX, &tileY, fX, fY);
 
-    comp.src        = &engine->planes[MAPEDIT_PLANE_TILESHEET];
+    comp.src        = &engine->planes[ME_PLANE_TILESHEET];
     comp.dst        = &engine->backbuffer;
     comp.offsetSrcX = editor->selectedX * editor->tilesize;
     comp.offsetSrcY = editor->selectedY * editor->tilesize;
@@ -662,10 +662,10 @@ void mapedit_drawEditor
     uint32_t sheet_height = 0;
     getSheetDims(engine, editor, &sheet_width, &sheet_height);
 
-    if(editor->flags & MAPEDIT_FLAG_TILEPICKER)
+    if(editor->flags & ME_FLAG_TILEPICKER)
     {
         drawTilePicker(engine, editor, sheet_width, sheet_height);
-        if(editor->flags & MAPEDIT_FLAG_CONTEXTMENU)
+        if(editor->flags & ME_FLAG_CONTEXTMENU)
         {
             float tileCornerX = 0.095f + (float)((float)editor->tilesize / fX);
             float tileCornerY = 0.095f + (float)((float)editor->tilesize / fY);
@@ -677,13 +677,13 @@ void mapedit_drawEditor
         }
     }
 
-    if(engine->config.choices & MAPEDIT_CHOICE_SHOW_FPS_BIT)
+    if(engine->config.choices & ME_CHOICE_SHOW_FPS_BIT)
     {
         updateFPS(engine, editor);
 
-        comp.src        = &engine->planes[MAPEDIT_PLANE_FPS];
-        comp.cropWidth  = engine->planes[MAPEDIT_PLANE_FPS].width;
-        comp.cropHeight = engine->planes[MAPEDIT_PLANE_FPS].height;
+        comp.src        = &engine->planes[ME_PLANE_FPS];
+        comp.cropWidth  = engine->planes[ME_PLANE_FPS].width;
+        comp.cropHeight = engine->planes[ME_PLANE_FPS].height;
         comp.offsetSrcX = 0;
         comp.offsetSrcY = 0;
         comp.offsetDstX = 0;
@@ -698,7 +698,7 @@ f_internal uint32_t sheetIndex
     EngineData *engine,
     EditorData *editor
 ){
-    uint32_t tileW = engine->planes[MAPEDIT_PLANE_TILESHEET].width /
+    uint32_t tileW = engine->planes[ME_PLANE_TILESHEET].width /
                      editor->tilesize;
     return editor->selectedY * tileW + editor->selectedX;
 }
@@ -708,31 +708,31 @@ f_internal void pollContextMenu
     EngineData *engine,
     EditorData *editor
 ){
-    if(engine->controls.buttonmap & MAPEDIT_BIT_RIGHTM ||
-       engine->controls.keymap    & MAPEDIT_BIT_MENU
+    if(engine->controls.buttonmap & ME_BIT_RIGHTM ||
+       engine->controls.keymap    & ME_BIT_MENU
     ){
-        editor->flags              &= ~MAPEDIT_FLAG_CONTEXTMENU;
-        engine->controls.keymap    &= ~MAPEDIT_BIT_MENU;
-        engine->controls.buttonmap &= ~MAPEDIT_BIT_RIGHTM;
+        editor->flags              &= ~ME_FLAG_CONTEXTMENU;
+        engine->controls.keymap    &= ~ME_BIT_MENU;
+        engine->controls.buttonmap &= ~ME_BIT_RIGHTM;
         return;
     }
 
     // to make room for key controls later
     if(rvInsideRect(&engine->controls.pointer, &editor->collision_b.area))
     {
-        rvChangeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+        rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_HOVER]);
         editor->collision_b.status |= RV_BIT_HOVER;
         editor->animation_b.status &= ~RV_BIT_HOVER;
     }
     else if(rvInsideRect(&engine->controls.pointer, &editor->animation_b.area))
     {
-        rvChangeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+        rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_HOVER]);
         editor->collision_b.status &= ~RV_BIT_HOVER;
         editor->animation_b.status |= RV_BIT_HOVER;
     }
     else
     {
-        rvChangeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
+        rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_DEFAULT]);
         editor->collision_b.status &= ~RV_BIT_HOVER;
         editor->animation_b.status &= ~RV_BIT_HOVER;
     }
@@ -740,13 +740,13 @@ f_internal void pollContextMenu
     float fX = (float)(engine->backbuffer.width);
     float fY = (float)(engine->backbuffer.height);
 
-    bool confirmed = engine->controls.buttonmap & MAPEDIT_BIT_LEFTM ||
-                     engine->controls.keymap    & MAPEDIT_BIT_ENTER;
+    bool confirmed = engine->controls.buttonmap & ME_BIT_LEFTM ||
+                     engine->controls.keymap    & ME_BIT_ENTER;
 
     rvCompositeSettings comp = {0};
     comp.dst    = &engine->backbuffer;
     comp.pictop = RV_PICTOP_OVER;
-    comp.src    = &engine->planes[MAPEDIT_PLANE_BACKGROUND];
+    comp.src    = &engine->planes[ME_PLANE_BACKGROUND];
 
     if(editor->collision_b.status & RV_BIT_HOVER)
     {
@@ -764,9 +764,9 @@ f_internal void pollContextMenu
             uint32_t index = sheetIndex(engine, editor);
             editor->tileData[index].flags ^= RV_TILE_BIT_COLLISION;
 
-            editor->flags &= ~MAPEDIT_FLAG_CONTEXTMENU;
-            engine->controls.keymap    &= ~MAPEDIT_BIT_MENU;
-            engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
+            editor->flags &= ~ME_FLAG_CONTEXTMENU;
+            engine->controls.keymap    &= ~ME_BIT_MENU;
+            engine->controls.buttonmap &= ~ME_BIT_LEFTM;
             return;
         }
     }
@@ -789,9 +789,9 @@ f_internal void pollContextMenu
             fprintf(stderr, "TODO: edit tile animation: (%u,%u)\n",
                     editor->selectedX, editor->selectedY);
 
-            editor->flags &= ~MAPEDIT_FLAG_CONTEXTMENU;
-            engine->controls.keymap    &= ~MAPEDIT_BIT_MENU;
-            engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
+            editor->flags &= ~ME_FLAG_CONTEXTMENU;
+            engine->controls.keymap    &= ~ME_BIT_MENU;
+            engine->controls.buttonmap &= ~ME_BIT_LEFTM;
             return;
         }
     }
@@ -817,29 +817,29 @@ f_internal void pollTilePicker
     comp.dst    = &engine->backbuffer;
     comp.pictop = RV_PICTOP_OVER;
 
-    if(engine->controls.keymap & MAPEDIT_BIT_TILEPICKER ||
-       engine->controls.keymap & MAPEDIT_BIT_MENU
+    if(engine->controls.keymap & ME_BIT_TILEPICKER ||
+       engine->controls.keymap & ME_BIT_MENU
     ){
-        editor->flags           &= ~MAPEDIT_FLAG_TILEPICKER;
-        editor->flags           &= ~MAPEDIT_FLAG_CONTEXTMENU;
-        engine->controls.keymap &= ~MAPEDIT_BIT_MENU;
-        engine->controls.keymap &= ~MAPEDIT_BIT_TILEPICKER;
+        editor->flags           &= ~ME_FLAG_TILEPICKER;
+        editor->flags           &= ~ME_FLAG_CONTEXTMENU;
+        engine->controls.keymap &= ~ME_BIT_MENU;
+        engine->controls.keymap &= ~ME_BIT_TILEPICKER;
         return;
     }
-    else if(engine->controls.keymap & MAPEDIT_BIT_TILEPICKER)
+    else if(engine->controls.keymap & ME_BIT_TILEPICKER)
     {
-        editor->flags           |= MAPEDIT_FLAG_TILEPICKER;
-        engine->controls.keymap &= ~MAPEDIT_BIT_TILEPICKER;
+        editor->flags           |= ME_FLAG_TILEPICKER;
+        engine->controls.keymap &= ~ME_BIT_TILEPICKER;
     }
 
     if(rvInsideRect(&engine->controls.pointer, &editor->close_b.area))
     {
-        rvChangeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+        rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_HOVER]);
 
         float length = editor->close_b.area.lowRight.x -
                        editor->close_b.area.upLeft.x;
 
-        comp.src        = &engine->planes[MAPEDIT_PLANE_HIGHLIGHT];
+        comp.src        = &engine->planes[ME_PLANE_HIGHLIGHT];
         comp.offsetSrcX = 0;
         comp.offsetSrcY = 0;
         comp.offsetDstX = (uint32_t)(editor->close_b.area.upLeft.x * fX);
@@ -849,15 +849,15 @@ f_internal void pollTilePicker
 
         rvCompositeImage(engine, &comp);
 
-        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
+        if(engine->controls.buttonmap & ME_BIT_LEFTM)
         {
-            editor->flags              &= ~MAPEDIT_FLAG_TILEPICKER;
-            engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
+            editor->flags              &= ~ME_FLAG_TILEPICKER;
+            engine->controls.buttonmap &= ~ME_BIT_LEFTM;
         }
     }
     else if(rvInsideRect(&engine->controls.pointer, &tiles))
     {
-        rvChangeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_NULL]);
+        rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_NULL]);
 
         float    deltaX = engine->controls.pointer.x - tiles.upLeft.x;
         float    deltaY = engine->controls.pointer.y - tiles.upLeft.y;
@@ -875,15 +875,15 @@ f_internal void pollTilePicker
             tileY = (uint8_t)(sheetY - editor->selectMult);
         }
 
-        if(engine->controls.keymap & MAPEDIT_BIT_DECREASE)
+        if(engine->controls.keymap & ME_BIT_DECREASE)
         {
             mapedit_updateSelectSize(editor, false);
-            engine->controls.keymap &= ~MAPEDIT_BIT_DECREASE;
+            engine->controls.keymap &= ~ME_BIT_DECREASE;
         }
-        if(engine->controls.keymap & MAPEDIT_BIT_INCREASE)
+        if(engine->controls.keymap & ME_BIT_INCREASE)
         {
             mapedit_updateSelectSize(editor, true);
-            engine->controls.keymap &= ~MAPEDIT_BIT_INCREASE;
+            engine->controls.keymap &= ~ME_BIT_INCREASE;
         }
 
         uint32_t tileLocX = (uint32_t)(fX * (tiles.upLeft.x + 0.0055f) +
@@ -893,30 +893,30 @@ f_internal void pollTilePicker
 
         comp.offsetDstX = tileLocX;
         comp.offsetDstY = tileLocY;
-        comp.src        = &engine->planes[MAPEDIT_PLANE_HIGHLIGHT];
+        comp.src        = &engine->planes[ME_PLANE_HIGHLIGHT];
         comp.cropWidth  = editor->tilesize * editor->selectMult;
         comp.cropHeight = editor->tilesize * editor->selectMult;
 
         rvCompositeImage(engine, &comp);
 
-        if(engine->controls.buttonmap & MAPEDIT_BIT_RIGHTM)
+        if(engine->controls.buttonmap & ME_BIT_RIGHTM)
         {
             editor->selectedX           =  tileX;
             editor->selectedY           =  tileY + editor->viewScroll;
-            editor->flags              |= MAPEDIT_FLAG_CONTEXTMENU;
-            engine->controls.buttonmap &= ~MAPEDIT_BIT_RIGHTM;
+            editor->flags              |= ME_FLAG_CONTEXTMENU;
+            engine->controls.buttonmap &= ~ME_BIT_RIGHTM;
         }
-        else if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
+        else if(engine->controls.buttonmap & ME_BIT_LEFTM)
         {
             editor->selectedX           = tileX;
             editor->selectedY           = tileY + editor->viewScroll;
-            editor->flags              &= ~MAPEDIT_FLAG_TILEPICKER;
-            engine->controls.buttonmap &= ~MAPEDIT_BIT_LEFTM;
+            editor->flags              &= ~ME_FLAG_TILEPICKER;
+            engine->controls.buttonmap &= ~ME_BIT_LEFTM;
         }
     }
     else
     {
-        rvChangeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_DEFAULT]);
+        rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_DEFAULT]);
     }
 }
 
@@ -936,18 +936,18 @@ void mapedit_pollEditor
     uint32_t sheet_height = 0;
     getSheetDims(engine, editor, &sheet_width, &sheet_height);
 
-    bool control = engine->controls.keymap & MAPEDIT_BIT_LCTRL ||
-                   engine->controls.keymap & MAPEDIT_BIT_RCTRL;
+    bool control = engine->controls.keymap & ME_BIT_LCTRL ||
+                   engine->controls.keymap & ME_BIT_RCTRL;
 
-    if(control && engine->controls.keymap & MAPEDIT_BIT_WIREFRAME)
+    if(control && engine->controls.keymap & ME_BIT_WIREFRAME)
     {
-        editor->flags           ^= MAPEDIT_FLAG_WIREFRAME;
-        engine->controls.keymap &= ~MAPEDIT_BIT_WIREFRAME;
+        editor->flags           ^= ME_FLAG_WIREFRAME;
+        engine->controls.keymap &= ~ME_BIT_WIREFRAME;
     }
 
-    if(editor->flags & MAPEDIT_FLAG_TILEPICKER)
+    if(editor->flags & ME_FLAG_TILEPICKER)
     {
-        if(editor->flags & MAPEDIT_FLAG_CONTEXTMENU)
+        if(editor->flags & ME_FLAG_CONTEXTMENU)
         {
             pollContextMenu(engine, editor);
         }
@@ -958,43 +958,43 @@ void mapedit_pollEditor
         return;
     }
 
-    if(engine->controls.keymap & MAPEDIT_BIT_TILEPICKER)
+    if(engine->controls.keymap & ME_BIT_TILEPICKER)
     {
-        editor->flags           |= MAPEDIT_FLAG_TILEPICKER;
-        engine->controls.keymap &= ~MAPEDIT_BIT_TILEPICKER;
+        editor->flags           |= ME_FLAG_TILEPICKER;
+        engine->controls.keymap &= ~ME_BIT_TILEPICKER;
     }
 
-    if(control &&engine->controls.keymap & MAPEDIT_BIT_UNDO)
+    if(control &&engine->controls.keymap & ME_BIT_UNDO)
     {
         mapedit_undo(editor);
-        engine->controls.keymap &= ~MAPEDIT_BIT_UNDO;
+        engine->controls.keymap &= ~ME_BIT_UNDO;
         return;
     }
-    else if(control && engine->controls.keymap & MAPEDIT_BIT_REDO)
+    else if(control && engine->controls.keymap & ME_BIT_REDO)
     {
         mapedit_redo(editor);
-        engine->controls.keymap &= ~MAPEDIT_BIT_REDO;
+        engine->controls.keymap &= ~ME_BIT_REDO;
         return;
     }
-    else if(engine->controls.keymap & MAPEDIT_BIT_MENU)
+    else if(engine->controls.keymap & ME_BIT_MENU)
     {
-        mapedit_changeState(editor, MAPEDIT_STATE_MENU);
-        engine->controls.keymap &= ~MAPEDIT_BIT_MENU;
+        mapedit_changeState(editor, ME_STATE_MENU);
+        engine->controls.keymap &= ~ME_BIT_MENU;
         return;
     }
-    else if((engine->controls.keymap & MAPEDIT_BIT_LSHIFT  ||
-             engine->controls.keymap & MAPEDIT_BIT_RSHIFT) &&
-             engine->controls.keymap & MAPEDIT_BIT_LCTRL   &&
-             engine->controls.keymap & MAPEDIT_BIT_SAVE
+    else if((engine->controls.keymap & ME_BIT_LSHIFT  ||
+             engine->controls.keymap & ME_BIT_RSHIFT) &&
+             engine->controls.keymap & ME_BIT_LCTRL   &&
+             engine->controls.keymap & ME_BIT_SAVE
     ){
         engine->controls.ascii = 0x00;
-        mapedit_changeState(editor, MAPEDIT_STATE_SAVEAS);
+        mapedit_changeState(editor, ME_STATE_SAVEAS);
     }
-    else if(engine->controls.keymap & MAPEDIT_BIT_LCTRL &&
-            engine->controls.keymap & MAPEDIT_BIT_SAVE
+    else if(engine->controls.keymap & ME_BIT_LCTRL &&
+            engine->controls.keymap & ME_BIT_SAVE
     ){
         mapedit_saveProject(engine, editor);
-        engine->controls.keymap &= ~MAPEDIT_BIT_SAVE;
+        engine->controls.keymap &= ~ME_BIT_SAVE;
         return;
     }
 
@@ -1004,13 +1004,13 @@ void mapedit_pollEditor
 
     //if(rvInsideRect(&engine->controls.pointer, &editor->button))
     // {
-    //     rvChangeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_HOVER]);
+    //     rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_HOVER]);
     // }
     // else
     {
-        rvChangeCursor(engine, &engine->planes[MAPEDIT_PLANE_CURSOR_PLACE]);
+        rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_PLACE]);
 
-        if(engine->controls.buttonmap & MAPEDIT_BIT_LEFTM)
+        if(engine->controls.buttonmap & ME_BIT_LEFTM)
         {
             mapedit_placeSelectedTiles(engine, editor, tileX, tileY);
         }
@@ -1022,19 +1022,19 @@ void mapedit_drawFilePicker
     EngineData *engine
 ){
     rvCompositeSettings comp = {0};
-    comp.src        = &engine->planes[MAPEDIT_PLANE_BACKGROUND];
+    comp.src        = &engine->planes[ME_PLANE_BACKGROUND];
     comp.dst        = &engine->backbuffer;
     comp.pictop     = RV_PICTOP_OVER;
-    comp.cropWidth  = engine->planes[MAPEDIT_PLANE_BACKGROUND].width;
-    comp.cropHeight = engine->planes[MAPEDIT_PLANE_BACKGROUND].height;
+    comp.cropWidth  = engine->planes[ME_PLANE_BACKGROUND].width;
+    comp.cropHeight = engine->planes[ME_PLANE_BACKGROUND].height;
 
     rvCompositeImage(engine, &comp);
 
-    comp.src = &engine->planes[MAPEDIT_PLANE_CURRENTFILE];
+    comp.src = &engine->planes[ME_PLANE_CURRENTFILE];
     comp.offsetDstX = (uint32_t)(0.025f * (float)engine->backbuffer.width);
     comp.offsetDstY = (uint32_t)(0.4f * (float)engine->backbuffer.height);
-    comp.cropWidth  = engine->planes[MAPEDIT_PLANE_CURRENTFILE].width;
-    comp.cropHeight = engine->planes[MAPEDIT_PLANE_CURRENTFILE].height;
+    comp.cropWidth  = engine->planes[ME_PLANE_CURRENTFILE].width;
+    comp.cropHeight = engine->planes[ME_PLANE_CURRENTFILE].height;
 
     rvCompositeImage(engine, &comp);
 }
@@ -1070,10 +1070,10 @@ f_internal void pollInput
 ){
     editor->inputBuffer.data[editor->cursor] = RV_ASCII_CURSOR;
 
-    if(engine->controls.keymap & MAPEDIT_BIT_MENU)
+    if(engine->controls.keymap & ME_BIT_MENU)
     {
-        mapedit_changeState(editor, MAPEDIT_STATE_MENU);
-        engine->controls.keymap &= ~MAPEDIT_BIT_MENU;
+        mapedit_changeState(editor, ME_STATE_MENU);
+        engine->controls.keymap &= ~ME_BIT_MENU;
         return;
     }
 
@@ -1085,21 +1085,21 @@ f_internal void pollInput
         increaseCursor(editor);
     }
 
-    if(engine->controls.keymap & MAPEDIT_BIT_BACKSPACE)
+    if(engine->controls.keymap & ME_BIT_BACKSPACE)
     {
         editor->inputBuffer.data[editor->cursor] = '\0';
 
         decreaseCursor(editor);
 
-        engine->controls.keymap &= ~MAPEDIT_BIT_BACKSPACE;
+        engine->controls.keymap &= ~ME_BIT_BACKSPACE;
     }
 
-    if(engine->controls.keymap & MAPEDIT_BIT_ENTER)
+    if(engine->controls.keymap & ME_BIT_ENTER)
     {
         editor->inputBuffer.data[editor->cursor] = '\0';
 
         editor->confirmed = true;
-        engine->controls.keymap &= ~MAPEDIT_BIT_ENTER;
+        engine->controls.keymap &= ~ME_BIT_ENTER;
     }
 }
 
@@ -1109,9 +1109,9 @@ f_internal void drawTextBuffer
     EditorData *editor
 ){
     rvLoadTextSettings set = {0};
-    set.image    = &engine->planes[MAPEDIT_PLANE_CURRENTFILE];
+    set.image    = &engine->planes[ME_PLANE_CURRENTFILE];
     set.sv       = (StringView*)&editor->inputBuffer;
-    set.font     = MAPEDIT_PLANE_FONT16,
+    set.font     = ME_PLANE_FONT16,
     set.charsize = 16;
     set.spacing  = 1;
 
@@ -1128,7 +1128,7 @@ void mapedit_pollLoadFile
     if(editor->confirmed)
     {
         mapedit_loadProject(engine, editor);
-        mapedit_changeState(editor, MAPEDIT_STATE_EDIT);
+        mapedit_changeState(editor, ME_STATE_EDIT);
         editor->confirmed = false;
         return;
     }
@@ -1146,7 +1146,7 @@ void mapedit_pollSaveFile
     if(editor->confirmed)
     {
         mapedit_saveProject(engine, editor);
-        mapedit_changeState(editor, MAPEDIT_STATE_EDIT);
+        mapedit_changeState(editor, ME_STATE_EDIT);
         editor->confirmed = false;
         return;
     }

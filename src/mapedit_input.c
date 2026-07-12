@@ -60,7 +60,7 @@ void mapedit_processButtons
     uint32_t      button,
     bool          isDown
 ){
-    if(processButton(MAPEDIT_BUTTON_LEFTM, MAPEDIT_BIT_LEFTM))
+    if(processButton(ME_BUTTON_LEFTM, ME_BIT_LEFTM))
     {
         if(isDown)
         {
@@ -69,8 +69,8 @@ void mapedit_processButtons
 
         return;
     }
-    if(processButton(MAPEDIT_BUTTON_MIDDLEM, MAPEDIT_BIT_MIDDLEM)){ return; }
-    if(processButton(MAPEDIT_BUTTON_RIGHTM,  MAPEDIT_BIT_RIGHTM )){ return; }
+    if(processButton(ME_BUTTON_MIDDLEM, ME_BIT_MIDDLEM)){ return; }
+    if(processButton(ME_BUTTON_RIGHTM,  ME_BIT_RIGHTM )){ return; }
 
 #ifdef DEBUG
     fprintf(stderr, "button pressed: %" PRIx32 "\n", button);
@@ -92,37 +92,37 @@ void mapedit_processKeys
         }
     }
 
-    processKey(MAPEDIT_KEY_LSHIFT,     MAPEDIT_BIT_LSHIFT    );
-    processKey(MAPEDIT_KEY_RSHIFT,     MAPEDIT_BIT_RSHIFT    );
-    processKey(MAPEDIT_KEY_LCTRL,      MAPEDIT_BIT_LCTRL     );
-    processKey(MAPEDIT_KEY_RCTRL,      MAPEDIT_BIT_RCTRL     );
-    processKey(MAPEDIT_KEY_MENU,       MAPEDIT_BIT_MENU      );
-    processKey(MAPEDIT_KEY_ENTER,      MAPEDIT_BIT_ENTER     );
-    processKey(MAPEDIT_KEY_HOTBAR,     MAPEDIT_BIT_HOTBAR    );
-    processKey(MAPEDIT_KEY_BACKSPACE,  MAPEDIT_BIT_BACKSPACE );
-    processKey(MAPEDIT_KEY_DELETE,     MAPEDIT_BIT_DELETE    );
-    processKey(MAPEDIT_KEY_LAYER0,     MAPEDIT_BIT_LAYER0    );
-    processKey(MAPEDIT_KEY_LAYER1,     MAPEDIT_BIT_LAYER1    );
-    processKey(MAPEDIT_KEY_LAYER2,     MAPEDIT_BIT_LAYER2    );
-    processKey(MAPEDIT_KEY_LAYER3,     MAPEDIT_BIT_LAYER3    );
-    processKey(MAPEDIT_KEY_LAYER4,     MAPEDIT_BIT_LAYER4    );
-    processKey(MAPEDIT_KEY_LAYER5,     MAPEDIT_BIT_LAYER5    );
-    processKey(MAPEDIT_KEY_LAYER6,     MAPEDIT_BIT_LAYER6    );
-    processKey(MAPEDIT_KEY_LAYER7,     MAPEDIT_BIT_LAYER7    );
-    processKey(MAPEDIT_KEY_LAYER8,     MAPEDIT_BIT_LAYER8    );
-    processKey(MAPEDIT_KEY_LAYER9,     MAPEDIT_BIT_LAYER9    );
-    processKey(MAPEDIT_KEY_REDO,       MAPEDIT_BIT_REDO      );
-    processKey(MAPEDIT_KEY_UNDO,       MAPEDIT_BIT_UNDO      );
-    processKey(MAPEDIT_KEY_DECREASE,   MAPEDIT_BIT_DECREASE  );
-    processKey(MAPEDIT_KEY_INCREASE,   MAPEDIT_BIT_INCREASE  );
-    processKey(MAPEDIT_KEY_SAVE,       MAPEDIT_BIT_SAVE      );
-    processKey(MAPEDIT_KEY_QUIT,       MAPEDIT_BIT_QUIT      );
-    processKey(MAPEDIT_KEY_TILEPICKER, MAPEDIT_BIT_TILEPICKER);
-    processKey(MAPEDIT_KEY_WIREFRAME,  MAPEDIT_BIT_WIREFRAME );
-    processKey(MAPEDIT_KEY_UP,         MAPEDIT_BIT_UP        );
-    processKey(MAPEDIT_KEY_DOWN,       MAPEDIT_BIT_DOWN      );
-    processKey(MAPEDIT_KEY_LEFT,       MAPEDIT_BIT_LEFT      );
-    processKey(MAPEDIT_KEY_RIGHT,      MAPEDIT_BIT_RIGHT     );
+    processKey(ME_KEY_LSHIFT,     ME_BIT_LSHIFT    );
+    processKey(ME_KEY_RSHIFT,     ME_BIT_RSHIFT    );
+    processKey(ME_KEY_LCTRL,      ME_BIT_LCTRL     );
+    processKey(ME_KEY_RCTRL,      ME_BIT_RCTRL     );
+    processKey(ME_KEY_MENU,       ME_BIT_MENU      );
+    processKey(ME_KEY_ENTER,      ME_BIT_ENTER     );
+    processKey(ME_KEY_HOTBAR,     ME_BIT_HOTBAR    );
+    processKey(ME_KEY_BACKSPACE,  ME_BIT_BACKSPACE );
+    processKey(ME_KEY_DELETE,     ME_BIT_DELETE    );
+    processKey(ME_KEY_LAYER0,     ME_BIT_LAYER0    );
+    processKey(ME_KEY_LAYER1,     ME_BIT_LAYER1    );
+    processKey(ME_KEY_LAYER2,     ME_BIT_LAYER2    );
+    processKey(ME_KEY_LAYER3,     ME_BIT_LAYER3    );
+    processKey(ME_KEY_LAYER4,     ME_BIT_LAYER4    );
+    processKey(ME_KEY_LAYER5,     ME_BIT_LAYER5    );
+    processKey(ME_KEY_LAYER6,     ME_BIT_LAYER6    );
+    processKey(ME_KEY_LAYER7,     ME_BIT_LAYER7    );
+    processKey(ME_KEY_LAYER8,     ME_BIT_LAYER8    );
+    processKey(ME_KEY_LAYER9,     ME_BIT_LAYER9    );
+    processKey(ME_KEY_REDO,       ME_BIT_REDO      );
+    processKey(ME_KEY_UNDO,       ME_BIT_UNDO      );
+    processKey(ME_KEY_DECREASE,   ME_BIT_DECREASE  );
+    processKey(ME_KEY_INCREASE,   ME_BIT_INCREASE  );
+    processKey(ME_KEY_SAVE,       ME_BIT_SAVE      );
+    processKey(ME_KEY_QUIT,       ME_BIT_QUIT      );
+    processKey(ME_KEY_TILEPICKER, ME_BIT_TILEPICKER);
+    processKey(ME_KEY_WIREFRAME,  ME_BIT_WIREFRAME );
+    processKey(ME_KEY_UP,         ME_BIT_UP        );
+    processKey(ME_KEY_DOWN,       ME_BIT_DOWN      );
+    processKey(ME_KEY_LEFT,       ME_BIT_LEFT      );
+    processKey(ME_KEY_RIGHT,      ME_BIT_RIGHT     );
 
 #ifdef DEBUG
     fprintf(stderr, "key: %x\n", key.key);
@@ -156,7 +156,7 @@ void mapedit_scroll
     EditorData *editor,
     bool       down
 ){
-    if(editor->currentState != MAPEDIT_STATE_EDIT)
+    if(editor->currentState != ME_STATE_EDIT)
     {
         return;
     }

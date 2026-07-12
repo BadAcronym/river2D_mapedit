@@ -43,7 +43,7 @@ void mapedit_loadProject
     {
         fprintf(stderr, "\033[31;1;7mERROR: could not open file "
                 "named \""PRI_SV"\".\033[0m\n", ARG_SV(editor->inputBuffer));
-        mapedit_changeState(editor, MAPEDIT_STATE_MENU);
+        mapedit_changeState(editor, ME_STATE_MENU);
         return;
     }
 
@@ -53,7 +53,7 @@ void mapedit_loadProject
     set.mapWidth  = &editor->mapWidth;
     set.mapHeight = &editor->mapHeight;
     set.mapLayers = &editor->mapLayers;
-    set.tilesheet = &engine->planes[MAPEDIT_PLANE_TILESHEET];
+    set.tilesheet = &engine->planes[ME_PLANE_TILESHEET];
 
     TileMap map = rvLoadTilemap(engine, &set);
     if(set.errorcode)
@@ -91,11 +91,11 @@ void mapedit_saveProject
     EditorData *editor
 ){
     rvCompositeSettings comp = {0};
-    comp.src        = &engine->planes[MAPEDIT_PLANE_ICON_SAVING];
+    comp.src        = &engine->planes[ME_PLANE_ICON_SAVING];
     comp.dst        = &engine->backbuffer;
     comp.pictop     = RV_PICTOP_OVER;
-    comp.cropWidth  = engine->planes[MAPEDIT_PLANE_ICON_SAVING].width;
-    comp.cropHeight = engine->planes[MAPEDIT_PLANE_ICON_SAVING].height;
+    comp.cropWidth  = engine->planes[ME_PLANE_ICON_SAVING].width;
+    comp.cropHeight = engine->planes[ME_PLANE_ICON_SAVING].height;
     comp.offsetDstX = 16;
     comp.offsetDstY = 16;
 
@@ -146,7 +146,7 @@ void mapedit_saveProject
     set.mapLayers = editor->mapLayers;
     set.metadata  = editor->tileData;
     set.indices   = editor->placedTiles;
-    set.tilesheet = &engine->planes[MAPEDIT_PLANE_TILESHEET];
+    set.tilesheet = &engine->planes[ME_PLANE_TILESHEET];
 
     rvSaveTilemap(engine, &set);
     if(set.errorcode)

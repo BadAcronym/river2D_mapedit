@@ -6,7 +6,7 @@ f_internal void incrementAction
 (
     EditorData *editor
 ){
-    if(++editor->currentAction > MAPEDIT_MAX_ACTIONS - 1)
+    if(++editor->currentAction > ME_MAX_ACTIONS - 1)
     {
         editor->currentAction = 0;
     }
@@ -18,7 +18,7 @@ f_internal void decrementAction
 ){
     if(editor->currentAction == 0)
     {
-        editor->currentAction = MAPEDIT_MAX_ACTIONS - 1;
+        editor->currentAction = ME_MAX_ACTIONS - 1;
     }
     else
     {
@@ -103,7 +103,7 @@ void mapedit_placeSelectedTiles
             uint32_t prev = editor->currentAction - 1;
             if(editor->currentAction == 0)
             {
-                prev = MAPEDIT_MAX_ACTIONS - 1;
+                prev = ME_MAX_ACTIONS - 1;
             }
             Action prev_action = editor->actions[prev];
 
@@ -133,7 +133,7 @@ void mapedit_placeSelectedTiles
             // we need to jump far enough back in the action history for that,
             // selectMult * selectMult. 1^2 is still 1, but for a stencil of 2^2
             // we need to jump back 4.
-            if(engine->controls.keymap & MAPEDIT_BIT_LSHIFT)
+            if(engine->controls.keymap & ME_BIT_LSHIFT)
             {
                 goto skipFill;
             }
@@ -211,7 +211,7 @@ void mapedit_undo
 
     if(editor->currentAction == 0)
     {
-        prevAction = editor->actions[MAPEDIT_MAX_ACTIONS - 1];
+        prevAction = editor->actions[ME_MAX_ACTIONS - 1];
     }
     else
     {
@@ -224,13 +224,13 @@ void mapedit_undo
         return;
     }
 
-    for(uint32_t undoCount = 0; undoCount < MAPEDIT_MAX_ACTIONS; ++undoCount)
+    for(uint32_t undoCount = 0; undoCount < ME_MAX_ACTIONS; ++undoCount)
     {
         decrementAction(editor);
         currentAction = editor->actions[editor->currentAction];
         if(editor->currentAction == 0)
         {
-            prevAction = editor->actions[MAPEDIT_MAX_ACTIONS - 1];
+            prevAction = editor->actions[ME_MAX_ACTIONS - 1];
         }
         else
         {
@@ -265,7 +265,7 @@ void mapedit_redo
     Action prevAction;
     if(editor->currentAction == 0)
     {
-        prevAction = editor->actions[MAPEDIT_MAX_ACTIONS - 1];
+        prevAction = editor->actions[ME_MAX_ACTIONS - 1];
     }
     else
     {
@@ -280,10 +280,10 @@ void mapedit_redo
     }
 
     Action nextAction;
-    for(uint32_t undoCount = 0; undoCount < MAPEDIT_MAX_ACTIONS; ++undoCount)
+    for(uint32_t undoCount = 0; undoCount < ME_MAX_ACTIONS; ++undoCount)
     {
         currentAction = editor->actions[editor->currentAction];
-        if(editor->currentAction >= MAPEDIT_MAX_ACTIONS - 1)
+        if(editor->currentAction >= ME_MAX_ACTIONS - 1)
         {
             nextAction = editor->actions[0];
         }
