@@ -1,6 +1,6 @@
 #include "mapedit_main.h"
 
-void mapedit_loadProject
+void meLoadProject
 (
     EngineData *engine,
     EditorData *editor
@@ -43,7 +43,7 @@ void mapedit_loadProject
     {
         fprintf(stderr, "\033[31;1;7mERROR: could not open file "
                 "named \""PRI_SV"\".\033[0m\n", ARG_SV(editor->inputBuffer));
-        mapedit_changeState(editor, ME_STATE_MENU);
+        meChangeState(editor, ME_STATE_MENU);
         return;
     }
 
@@ -85,7 +85,7 @@ void mapedit_loadProject
     fclose(file);
 }
 
-void mapedit_saveProject
+void meSaveProject
 (
     EngineData *engine,
     EditorData *editor

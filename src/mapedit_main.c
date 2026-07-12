@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <memory.h>
 
-void mapedit_init
+void meInit
 (
     EngineData *engine,
     EditorData *editor
@@ -344,7 +344,7 @@ void mapedit_init
     editor->currentState = ME_STATE_MENU;
 }
 
-int32_t mapedit_shutdown
+int32_t meShutdown
 (
     EditorData *editor
 ){
@@ -359,7 +359,7 @@ int32_t mapedit_shutdown
     return 0;
 }
 
-void mapedit_changeState
+void meChangeState
 (
     EditorData *editor,
     uint8_t    nextState
@@ -380,30 +380,30 @@ void mapedit_changeState
     editor->currentState  = nextState;
 }
 
-void mapedit_update
+void meUpdate
 (
     EngineData *engine,
     EditorData *editor
 ){
     if(editor->currentState == ME_STATE_MENU)
     {
-        mapedit_drawMainMenu(engine, editor);
-        mapedit_pollMainMenu(engine, editor);
+        meDrawMainMenu(engine, editor);
+        mePollMainMenu(engine, editor);
     }
     else if(editor->currentState == ME_STATE_EDIT)
     {
-        mapedit_drawEditor(engine, editor);
-        mapedit_pollEditor(engine, editor);
+        meDrawEditor(engine, editor);
+        mePollEditor(engine, editor);
     }
     else if(editor->currentState == ME_STATE_LOAD)
     {
-        mapedit_drawFilePicker(engine);
-        mapedit_pollLoadFile(engine, editor);
+        meDrawFilePicker(engine);
+        mePollLoadFile(engine, editor);
     }
     else if(editor->currentState == ME_STATE_SAVEAS)
     {
-        mapedit_drawFilePicker(engine);
-        mapedit_pollSaveFile(engine, editor);
+        meDrawFilePicker(engine);
+        mePollSaveFile(engine, editor);
     }
     else
     {
@@ -414,7 +414,7 @@ void mapedit_update
     ++editor->runningFrames;
 }
 
-void mapedit_present
+void mePresent
 (
     EngineData *engine,
     EditorData *editor

@@ -57,7 +57,7 @@ f_internal void writeAction
     editor->actions[editor->currentAction].new_tile     = new_tile;
 }
 
-void mapedit_placeSelectedTiles
+void mePlaceSelectedTiles
 (
     EngineData *engine,
     EditorData *editor,
@@ -202,7 +202,7 @@ skipFill:
     }
 }
 
-void mapedit_undo
+void meUndo
 (
     EditorData *editor
 ){
@@ -251,7 +251,7 @@ void mapedit_undo
     }
 }
 
-void mapedit_redo
+void meRedo
 (
     EditorData *editor
 ){

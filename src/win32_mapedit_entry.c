@@ -76,42 +76,42 @@ LRESULT CALLBACK win32WindowCallback
                 break;
             }
 
-            mapedit_processKeys(&global_engine->controls, wParam, isKeyDown);
+            meProcessKeys(&global_engine->controls, wParam, isKeyDown);
             break;
         }
         case WM_MOUSEMOVE:
         {
-            mapedit_processPointer(global_engine, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            meProcessPointer(global_engine, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
             break;
         }
         case WM_LBUTTONDOWN:
         {
-            mapedit_processButtons(global_editor, &global_engine->controls, RV_MOUSE1, true);
+            meProcessButtons(global_editor, &global_engine->controls, RV_MOUSE1, true);
             break;
         }
         case WM_LBUTTONUP:
         {
-            mapedit_processButtons(global_editor, &global_engine->controls, RV_MOUSE1, false);
+            meProcessButtons(global_editor, &global_engine->controls, RV_MOUSE1, false);
             break;
         }
         case WM_RBUTTONDOWN:
         {
-            mapedit_processButtons(global_editor, &global_engine->controls, RV_MOUSE2, true);
+            meProcessButtons(global_editor, &global_engine->controls, RV_MOUSE2, true);
             break;
         }
         case WM_RBUTTONUP:
         {
-            mapedit_processButtons(global_editor, &global_engine->controls, RV_MOUSE2, false);
+            meProcessButtons(global_editor, &global_engine->controls, RV_MOUSE2, false);
             break;
         }
         case WM_MBUTTONDOWN:
         {
-            mapedit_processButtons(global_editor, &global_engine->controls, RV_MOUSE3, true);
+            meProcessButtons(global_editor, &global_engine->controls, RV_MOUSE3, true);
             break;
         }
         case WM_MBUTTONUP:
         {
-            mapedit_processButtons(global_editor, &global_engine->controls, RV_MOUSE3, false);
+            meProcessButtons(global_editor, &global_engine->controls, RV_MOUSE3, false);
             break;
         }
         case WM_MOUSEWHEEL:
@@ -119,12 +119,12 @@ LRESULT CALLBACK win32WindowCallback
             int32_t scrollAmount = GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
             if(scrollAmount > 0)
             {
-                mapedit_scroll(global_editor, false);
+                meScroll(global_editor, false);
                 break;
             }
             else if(scrollAmount < 0)
             {
-                mapedit_scroll(global_editor, true);
+                meScroll(global_editor, true);
                 break;
             }
             break;

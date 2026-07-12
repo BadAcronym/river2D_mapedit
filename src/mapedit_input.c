@@ -53,7 +53,7 @@ f_internal void processKey_function
 #define processKey(kmacro, bitmacro) \
 processKey_function(controls, kmacro, key, bitmacro, isDown)
 
-void mapedit_processButtons
+void meProcessButtons
 (
     EditorData    *editor,
     RiverControls *controls,
@@ -77,7 +77,7 @@ void mapedit_processButtons
 #endif
 }
 
-void mapedit_processKeys
+void meProcessKeys
 (
     RiverControls *controls,
     AsciiKey      key,
@@ -130,7 +130,7 @@ void mapedit_processKeys
 #endif
 }
 
-void mapedit_processPointer
+void meProcessPointer
 (
     EngineData *engine,
     uint32_t   x,
@@ -151,7 +151,7 @@ void mapedit_processPointer
     engine->controls.pointer.y = (float)y / (float)dim.height;
 }
 
-void mapedit_scroll
+void meScroll
 (
     EditorData *editor,
     bool       down
@@ -171,7 +171,7 @@ void mapedit_scroll
     }
 }
 
-void mapedit_updateSelectSize
+void meUpdateSelectSize
 (
     EditorData *editor,
     bool       increase

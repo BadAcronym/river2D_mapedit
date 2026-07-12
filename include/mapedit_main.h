@@ -162,42 +162,42 @@ typedef struct EditorData
 }
 EditorData;
 
-extern void mapedit_init
+extern void meInit
 (
     EngineData *engine,
     EditorData *editor
 );
 
-int32_t mapedit_shutdown
+int32_t meShutdown
 (
     EditorData *editor
 );
 
-extern void mapedit_update
-(
-    EngineData *engine,
-    EditorData *editor
-);
-
-extern void mapedit_present
+extern void meUpdate
 (
     EngineData *engine,
     EditorData *editor
 );
 
-extern void mapedit_scroll
+extern void mePresent
+(
+    EngineData *engine,
+    EditorData *editor
+);
+
+extern void meScroll
 (
     EditorData *editor,
     bool       increase
 );
 
-extern void mapedit_updateSelectSize
+extern void meUpdateSelectSize
 (
     EditorData *editor,
     bool       increase
 );
 
-extern void mapedit_processButtons
+extern void meProcessButtons
 (
     EditorData    *editor,
     RiverControls *controls,
@@ -205,21 +205,21 @@ extern void mapedit_processButtons
     bool          isDown
 );
 
-extern void mapedit_processKeys
+extern void meProcessKeys
 (
     RiverControls *controls,
     AsciiKey      key,
     bool          isDown
 );
 
-extern void mapedit_processPointer
+extern void meProcessPointer
 (
     EngineData *engine,
     uint32_t   x,
     uint32_t   y
 );
 
-extern void mapedit_placeSelectedTiles
+extern void mePlaceSelectedTiles
 (
     EngineData *engine,
     EditorData *editor,
@@ -227,70 +227,70 @@ extern void mapedit_placeSelectedTiles
     uint16_t   tileY
 );
 
-extern void mapedit_changeState
+extern void meChangeState
 (
     EditorData *editor,
     uint8_t    nextState
 );
 
-extern void mapedit_saveProject
+extern void meSaveProject
 (
     EngineData *engine,
     EditorData *editor
 );
 
-extern void mapedit_loadProject
+extern void meLoadProject
 (
     EngineData *engine,
     EditorData *editor
 );
 
-extern void mapedit_undo
+extern void meUndo
 (
     EditorData *editor
 );
 
-extern void mapedit_redo
+extern void meRedo
 (
     EditorData *editor
 );
 
-extern void mapedit_drawMainMenu
-(
-    EngineData *engine,
-    EditorData *editor
-);
-
-extern void mapedit_pollMainMenu
+extern void meDrawMainMenu
 (
     EngineData *engine,
     EditorData *editor
 );
 
-extern void mapedit_drawEditor
+extern void mePollMainMenu
 (
     EngineData *engine,
     EditorData *editor
 );
 
-extern void mapedit_pollEditor
+extern void meDrawEditor
 (
     EngineData *engine,
     EditorData *editor
 );
 
-extern void mapedit_drawFilePicker
+extern void mePollEditor
+(
+    EngineData *engine,
+    EditorData *editor
+);
+
+extern void meDrawFilePicker
 (
     EngineData *engine
 );
 
-extern void mapedit_pollLoadFile
+extern void mePollLoadFile
 (
     EngineData *engine,
     EditorData *editor
 );
 
-extern void mapedit_pollSaveFile
+extern void mePollSaveFile
 (
     EngineData *engine,
     EditorData *editor

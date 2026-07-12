@@ -30,7 +30,7 @@ f_internal void updateFPS
     editor->runningFrames = 0;
 }
 
-void mapedit_drawMainMenu
+void meDrawMainMenu
 (
     EngineData *engine,
     EditorData *editor
@@ -229,7 +229,7 @@ f_internal void pollHovers
     }
 }
 
-void mapedit_pollMainMenu
+void mePollMainMenu
 (
     EngineData *engine,
     EditorData *editor
@@ -247,7 +247,7 @@ void mapedit_pollMainMenu
 
     if(editor->previousState && engine->controls.keymap & ME_BIT_MENU)
     {
-        mapedit_changeState(editor, editor->previousState);
+        meChangeState(editor, editor->previousState);
         engine->controls.keymap &= ~ME_BIT_MENU;
         return;
     }
@@ -295,7 +295,7 @@ void mapedit_pollMainMenu
                 }
             }
 
-            mapedit_changeState(editor, ME_STATE_EDIT);
+            meChangeState(editor, ME_STATE_EDIT);
             engine->controls.buttonmap &= ~ME_BIT_LEFTM;
         }
     }
@@ -321,7 +321,7 @@ void mapedit_pollMainMenu
             engine->controls.ascii = 0x00;
             engine->controls.buttonmap &= ~ME_BIT_LEFTM;
             engine->controls.keymap    &= ~ME_BIT_ENTER;
-            mapedit_changeState(editor, ME_STATE_LOAD);
+            meChangeState(editor, ME_STATE_LOAD);
         }
     }
     else if(editor->quit_b.status & RV_BIT_HOVER)
@@ -367,7 +367,7 @@ void mapedit_pollMainMenu
         ){
             engine->controls.buttonmap &= ~ME_BIT_LEFTM;
             engine->controls.keymap    &= ~ME_BIT_ENTER;
-            mapedit_saveProject(engine, editor);
+            meSaveProject(engine, editor);
         }
     }
     else if(editor->previousState && editor->saveas_b.status & RV_BIT_HOVER)
@@ -390,7 +390,7 @@ void mapedit_pollMainMenu
         {
             engine->controls.buttonmap &= ~ME_BIT_LEFTM;
             engine->controls.keymap    &= ~ME_BIT_ENTER;
-            mapedit_changeState(editor, ME_STATE_SAVEAS);
+            meChangeState(editor, ME_STATE_SAVEAS);
         }
     }
     else if(!editor->i_button)
@@ -533,7 +533,7 @@ f_internal void getTileXY
     }
 }
 
-void mapedit_drawEditor
+void meDrawEditor
 (
     EngineData *engine,
     EditorData *editor
@@ -877,12 +877,12 @@ f_internal void pollTilePicker
 
         if(engine->controls.keymap & ME_BIT_DECREASE)
         {
-            mapedit_updateSelectSize(editor, false);
+            meUpdateSelectSize(editor, false);
             engine->controls.keymap &= ~ME_BIT_DECREASE;
         }
         if(engine->controls.keymap & ME_BIT_INCREASE)
         {
-            mapedit_updateSelectSize(editor, true);
+            meUpdateSelectSize(editor, true);
             engine->controls.keymap &= ~ME_BIT_INCREASE;
         }
 
@@ -920,7 +920,7 @@ f_internal void pollTilePicker
     }
 }
 
-void mapedit_pollEditor
+void mePollEditor
 (
     EngineData *engine,
     EditorData *editor
@@ -966,19 +966,19 @@ void mapedit_pollEditor
 
     if(control &&engine->controls.keymap & ME_BIT_UNDO)
     {
-        mapedit_undo(editor);
+        meUndo(editor);
         engine->controls.keymap &= ~ME_BIT_UNDO;
         return;
     }
     else if(control && engine->controls.keymap & ME_BIT_REDO)
     {
-        mapedit_redo(editor);
+        meRedo(editor);
         engine->controls.keymap &= ~ME_BIT_REDO;
         return;
     }
     else if(engine->controls.keymap & ME_BIT_MENU)
     {
-        mapedit_changeState(editor, ME_STATE_MENU);
+        meChangeState(editor, ME_STATE_MENU);
         engine->controls.keymap &= ~ME_BIT_MENU;
         return;
     }
@@ -988,12 +988,12 @@ void mapedit_pollEditor
              engine->controls.keymap & ME_BIT_SAVE
     ){
         engine->controls.ascii = 0x00;
-        mapedit_changeState(editor, ME_STATE_SAVEAS);
+        meChangeState(editor, ME_STATE_SAVEAS);
     }
     else if(engine->controls.keymap & ME_BIT_LCTRL &&
             engine->controls.keymap & ME_BIT_SAVE
     ){
-        mapedit_saveProject(engine, editor);
+        meSaveProject(engine, editor);
         engine->controls.keymap &= ~ME_BIT_SAVE;
         return;
     }
@@ -1012,12 +1012,12 @@ void mapedit_pollEditor
 
         if(engine->controls.buttonmap & ME_BIT_LEFTM)
         {
-            mapedit_placeSelectedTiles(engine, editor, tileX, tileY);
+            mePlaceSelectedTiles(engine, editor, tileX, tileY);
         }
     }
 }
 
-void mapedit_drawFilePicker
+void meDrawFilePicker
 (
     EngineData *engine
 ){
@@ -1072,7 +1072,7 @@ f_internal void pollInput
 
     if(engine->controls.keymap & ME_BIT_MENU)
     {
-        mapedit_changeState(editor, ME_STATE_MENU);
+        meChangeState(editor, ME_STATE_MENU);
         engine->controls.keymap &= ~ME_BIT_MENU;
         return;
     }
@@ -1118,7 +1118,7 @@ f_internal void drawTextBuffer
     rvLoadText(engine, &set);
 }
 
-void mapedit_pollLoadFile
+void mePollLoadFile
 (
     EngineData *engine,
     EditorData *editor
@@ -1127,8 +1127,8 @@ void mapedit_pollLoadFile
 
     if(editor->confirmed)
     {
-        mapedit_loadProject(engine, editor);
-        mapedit_changeState(editor, ME_STATE_EDIT);
+        meLoadProject(engine, editor);
+        meChangeState(editor, ME_STATE_EDIT);
         editor->confirmed = false;
         return;
     }
@@ -1136,7 +1136,7 @@ void mapedit_pollLoadFile
     drawTextBuffer(engine, editor);
 }
 
-void mapedit_pollSaveFile
+void mePollSaveFile
 (
     EngineData *engine,
     EditorData *editor
@@ -1145,8 +1145,8 @@ void mapedit_pollSaveFile
 
     if(editor->confirmed)
     {
-        mapedit_saveProject(engine, editor);
-        mapedit_changeState(editor, ME_STATE_EDIT);
+        meSaveProject(engine, editor);
+        meChangeState(editor, ME_STATE_EDIT);
         editor->confirmed = false;
         return;
     }

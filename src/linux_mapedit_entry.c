@@ -26,7 +26,7 @@ int main
     engine.windowName = "River2D Map Editor";
 
     rvInit(&engine, planes);
-    mapedit_init(&engine, &editor);
+    meInit(&engine, &editor);
 
     Atom WM_DELETE = XInternAtom(engine.display, "WM_DELETE_WINDOW", false);
     XSetWMProtocols(engine.display, engine.window, &WM_DELETE, 1);
@@ -47,41 +47,41 @@ int main
                 case KeyPress:
                 {
                     AsciiKey ascii = rvProcessXKey(&engine, &event);
-                    mapedit_processKeys(&engine.controls, ascii, true);
+                    meProcessKeys(&engine.controls, ascii, true);
                     break;
                 }
                 case KeyRelease:
                 {
                     AsciiKey ascii = rvProcessXKey(&engine, &event);
-                    mapedit_processKeys(&engine.controls, ascii, false);
+                    meProcessKeys(&engine.controls, ascii, false);
                     break;
                 }
                 case ButtonPress:
                 {
                     if(event.xbutton.button == RV_MOUSE4)
                     {
-                        mapedit_scroll(&editor, false);
+                        meScroll(&editor, false);
                         break;
                     }
                     else if(event.xbutton.button == RV_MOUSE5)
                     {
-                        mapedit_scroll(&editor, true);
+                        meScroll(&editor, true);
                         break;
                     }
 
-                    mapedit_processButtons(&editor, &engine.controls,
+                    meProcessButtons(&editor, &engine.controls,
                                            event.xbutton.button, true);
                     break;
                 }
                 case ButtonRelease:
                 {
-                    mapedit_processButtons(&editor, &engine.controls,
+                    meProcessButtons(&editor, &engine.controls,
                                            event.xbutton.button, false);
                     break;
                 }
                 case MotionNotify:
                 {
-                    mapedit_processPointer(&engine,
+                    meProcessPointer(&engine,
                                            (uint32_t)event.xmotion.x,
                                            (uint32_t)event.xmotion.y);
                     break;
@@ -122,7 +122,7 @@ int main
 
         if(mapped)
         {
-            mapedit_update(&engine, &editor);
+            meUpdate(&engine, &editor);
 
             // 243 -> 240 for the same rounding error reasons as islescape right now :p
             uint32_t desiredFPS   = 243;
@@ -136,10 +136,10 @@ int main
                 nanosleep(&duration, NULL);
             }
 
-            mapedit_present(&engine, &editor);
+            mePresent(&engine, &editor);
         }
     }
 
     rvShutdown(&engine);
-    return mapedit_shutdown(&editor);
+    return meShutdown(&editor);
 }
