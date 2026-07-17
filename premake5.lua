@@ -49,7 +49,8 @@ project("mapedit binary")
         files({"./src/linux_mapedit*",
                "./include/linux_mapedit*",
                "./src/mapedit_*",
-               "./include/mapedit_*"})
+               "./include/mapedit_*",
+               "./vendor/river2D/vendor/imgsurf/vendor/puddle/src/linux*"})
         links({"river2Dcommon:static", "imgsurf:static"})
         linkoptions({"-lX11", "-lXrender", "-lXcursor", "-lm", "-fuse-ld=mold"})
         buildoptions({"-Wextra", "-Wall", "-Wpedantic", "-Wconversion", "-Wshadow",
@@ -64,7 +65,8 @@ project("mapedit binary")
         files({"./src/win32_mapedit*",
                "./include/win32_mapedit*",
                "./src/mapedit_*",
-               "./include/mapedit_*"})
+               "./include/mapedit_*",
+               "./vendor/river2D/vendor/imgsurf/vendor/puddle/src/win32*"})
         links({"river2Dcommon.lib", "river2Dmap.lib", "imgsurf.lib"})
         buildoptions{"/wd4068", "/wd4100"}
 

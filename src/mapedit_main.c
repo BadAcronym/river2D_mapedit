@@ -227,9 +227,10 @@ void meInit
     set.button  = &editor->animation_b;
     rvCreateButton(engine, &set);
 
-    StringView dir = cstr_sv("assets/custom/");
-    StringView ls  = rvListFiles(dir);
+    char listed[4096 * 12];
 
+    StringView dir    = cstr_sv("assets/custom/");
+    StringView ls     = pdListFiles(dir, listed);
     StringView folder = cstr_sv("assets/custom/");
 
     for(uint16_t i = 0; i < dir.size; ++i)
@@ -260,8 +261,6 @@ void meInit
         rvDestroyImage(&tmp);
         free((void*)expanded.data);
     }
-
-    free((void*)ls.data);
 
     // NOTE: next subject to change, no? need be able to vary these two
     editor->mapWidth  = engine->config.canvas_width  / editor->tilesize;
