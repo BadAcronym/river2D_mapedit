@@ -3,4 +3,4 @@
 ./clean
 ./run debug --compile-only
 
-gf2 ./bin/mapedit/debug/mapedit
+nnd ./bin/mapedit/debug/mapedit
