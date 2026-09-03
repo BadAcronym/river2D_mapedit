@@ -1,7 +1,7 @@
 param
 (
-    $build = "release",
-    [switch]$compile_only = $false
+    [Parameter(Position = 0)][string]$build,
+    [Parameter(Position = 1)][string]$compile_only
 )
 
 if(-Not(Test-Path ".\obj\"))
@@ -19,79 +19,55 @@ if(-Not(Test-Path ".\bin\"))
     &mkdir .\bin\
 }
 
-function Get-CompiledEngine()
+if($build -eq $null -or $build -eq "")
 {
-    if(Test-Path ".\vendor\river2D\run.ps1")
+    $build = "release"
+}
+
+if($build -eq "asan" -or $build -eq "debug" -or $build -eq "release")
+{
+
+    if(Test-Path "./vendor/river2D/run.ps1")
     {
-        pushd ".\vendor\river2D\"
-        .\run.ps1 $build
-        if(0 -ne $LASTEXITCODE)
+        pushd "./vendor/river2D/"
+        &./run.ps1 $build --compile-only
+        if($LASTEXITCODE -ne 0)
         {
-            exit -1
+            popd
+            exit -3;
         }
         popd
     }
     else
     {
-        Write-Host "\033[31m\nERROR: can't find river2D run script.\033[0m"
+        Write-Host "ERROR: can't find river2D's run script." -ForegroundColor Red
     }
-}
 
-function Get-Compileprep()
-{
-    Write-Host ""
-    Write-Host "\033[36mcompiling river2D...\033[0m"
-    Write-Host ""
-    premake5 vs2022
-}
+    Write-Host "`ncompiling mapedit...`n" -Fore Cyan
 
-if($build -eq "debug")
-{
-    Get-CompiledEngine
-    Get-Compileprep
-    pushd ".\build\"
-    &MSBuild mapedit.sln -p:Configuration=$build -p:Platform=windows
-    popd
-}
-elseif($build -eq "release")
-{
-    Get-CompiledEngine
-    Get-Compileprep
-    pushd ".\build\"
-    &MSBuild mapedit.sln -p:Configuration=$build -p:Platform=windows
-    popd
-}
-elseif($build -eq "asan")
-{
-    Get-CompiledEngine
-    Get-Compileprep
-    pushd ".\build\"
-    &MSBuild mapedit.sln -p:Configuration=$build -p:Platform=windows
+    premake5 gmake
+    pushd "./build/"
+    make config=$build`_windows
     popd
 }
 else
 {
-    Write-Host "\033[31m\nERROR: invalid make config: $build.\033[0m"
+    Write-Host "ERROR: invalid make config: '$build'." -ForegroundColor Red
     exit -2;
 }
 
-if(0 -ne $LASTEXITCODE)
+if($LASTEXITCODE -ne 0)
 {
-    Write-Host "\033[31m\nERROR: failed to compile.\n\033[0m"
-    popd
-    exit -1
+    Write-Host "`nERROR: failed to compile mapedit.`n" -ForegroundColor Red
+    exit -1;
 }
 
 Write-Host "`n"
 
-popd
-
-if($compile_only)
+if($compile_only -eq "--compile-only")
 {
-    exit 0
+    exit 0;
 }
-
-popd
 
 if(0 -eq $LASTEXITCODE)
 {
