@@ -36,8 +36,8 @@ project("mapedit")
         runtime("debug")
         symbols("On")
         optimize("Off")
-        buildoptions({"-gfull", "-O1"})
-        linkoptions({"-gfull", "-O1"})
+        buildoptions({"-g", "-O0"})
+        linkoptions({"-g", "-O0"})
 
     filter("configurations:release")
         defines{"NDEBUG"}
@@ -68,9 +68,14 @@ project("mapedit")
                "./src/mapedit_*",
                "./include/mapedit_*",
                "./vendor/river2D/vendor/imgsurf/vendor/puddle/src/win32*"})
+        linkoptions({"-lriver2Dcommon", "-lgdi32", "-luser32"})
 
     filter({"platforms:windows", "configurations:release"})
         kind("WindowedApp")
+
+    filter({"platforms:linux", "configurations:debug or asan"})
+        buildoptions({"-gfull"})
+        linkoptions({"-gfull"})
 
     filter({"platforms:windows", "configurations:debug or asan"})
         buildoptions({"-gcodeview"})
