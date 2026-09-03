@@ -1,12 +1,13 @@
+#include "mapedit_main.h"
+
+#include "river2D_main.h"
+
 #include <Windows.h>
 #include <Windowsx.h>
 #include <stdio.h>
 
-#include "river2D_main.h"
-#include "mapedit_main.h"
-
-s_global EngineData *global_engine;
-s_global EditorData *global_editor;
+s_global EngineData *_engine;
+s_global EditorData *_editor;
 
 #ifdef ASAN
         #define LIBPATH "./vendor/river2D/bin/asan/"
@@ -44,7 +45,7 @@ LRESULT CALLBACK win32WindowCallback
         case WM_CLOSE:
         {
             printf("WM_CLOSE\n");
-            global_engine->running = false;
+            _engine->running = false;
             break;
         }
         case WM_ACTIVATEAPP:
@@ -55,12 +56,12 @@ LRESULT CALLBACK win32WindowCallback
         case WM_PAINT:
         {
             PAINTSTRUCT paintStruct;
-            global_engine->context = BeginPaint(window, &paintStruct);
+            _engine->context = BeginPaint(window, &paintStruct);
 
-            global_engine->bltBuffer(global_engine);
+            _engine->bltBuffer(_engine);
 
             EndPaint(window, &paintStruct);
-            ReleaseDC(global_engine->window, global_engine->context);
+            ReleaseDC(_engine->window, _engine->context);
             break;
         }
         case WM_KEYDOWN:
@@ -76,42 +77,52 @@ LRESULT CALLBACK win32WindowCallback
                 break;
             }
 
-            meProcessKeys(&global_engine->controls, wParam, isKeyDown);
+            AsciiKey key = {0};
+            key.key = (uint8_t)wParam;
+            key.raw = (uint8_t)wParam;
+
+            if(key.key > 0x40 && key.key < 0x5B)
+            {
+                key.key += 0x20;
+            }
+
+            meProcessKeys(&_engine->controls, key, isKeyDown);
             break;
         }
         case WM_MOUSEMOVE:
         {
-            meProcessPointer(global_engine, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            meProcessPointer(_engine, (uint32_t)GET_X_LPARAM(lParam),
+                                      (uint32_t)GET_Y_LPARAM(lParam));
             break;
         }
         case WM_LBUTTONDOWN:
         {
-            meProcessButtons(global_editor, &global_engine->controls, RV_MOUSE1, true);
+            meProcessButtons(_editor, &_engine->controls, RV_MOUSE1, true);
             break;
         }
         case WM_LBUTTONUP:
         {
-            meProcessButtons(global_editor, &global_engine->controls, RV_MOUSE1, false);
+            meProcessButtons(_editor, &_engine->controls, RV_MOUSE1, false);
             break;
         }
         case WM_RBUTTONDOWN:
         {
-            meProcessButtons(global_editor, &global_engine->controls, RV_MOUSE2, true);
+            meProcessButtons(_editor, &_engine->controls, RV_MOUSE2, true);
             break;
         }
         case WM_RBUTTONUP:
         {
-            meProcessButtons(global_editor, &global_engine->controls, RV_MOUSE2, false);
+            meProcessButtons(_editor, &_engine->controls, RV_MOUSE2, false);
             break;
         }
         case WM_MBUTTONDOWN:
         {
-            meProcessButtons(global_editor, &global_engine->controls, RV_MOUSE3, true);
+            meProcessButtons(_editor, &_engine->controls, RV_MOUSE3, true);
             break;
         }
         case WM_MBUTTONUP:
         {
-            meProcessButtons(global_editor, &global_engine->controls, RV_MOUSE3, false);
+            meProcessButtons(_editor, &_engine->controls, RV_MOUSE3, false);
             break;
         }
         case WM_MOUSEWHEEL:
@@ -119,12 +130,12 @@ LRESULT CALLBACK win32WindowCallback
             int32_t scrollAmount = GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
             if(scrollAmount > 0)
             {
-                meScroll(global_editor, false);
+                meScroll(_editor, false);
                 break;
             }
             else if(scrollAmount < 0)
             {
-                meScroll(global_editor, true);
+                meScroll(_editor, true);
                 break;
             }
             break;
@@ -133,7 +144,7 @@ LRESULT CALLBACK win32WindowCallback
         {
             if(LOWORD(lParam) == HTCLIENT)
             {
-                global_engine->currentCursor = 0;
+                _engine->currentCursor = 0;
                 return 1;
             }
         }
@@ -157,11 +168,12 @@ int CALLBACK WinMain
     (void)cmdline;
     (void)prevInstance;
 
-    EditorData    editor = {0};
-    EngineData    engine = {0};
-    River2D_Image planes[RV_MAX_PLANES] = {0};
+    EditorData editor = {0};
+    EngineData engine = {0};
+    RiverImage planes[RV_MAX_PLANES] = {0};
 
-    rvResolveRenderer(&engine, LIBPATH, RV_RENDERER_SOFTWARE);
+    StringView libpath = cstr_sv(LIBPATH);
+    rvResolveRenderer(&engine, libpath, RV_RENDERER_SOFTWARE);
 
     rvLoadConfig(&engine.config);
     engine.config.choices |= RV_CHOICE_STATIC_CANVAS_BIT;
@@ -169,10 +181,10 @@ int CALLBACK WinMain
     engine.instance       =  instance;
 
     rvInit(&engine, planes);
-    mapedit_init(&engine, &editor);
+    meInit(&engine, &editor);
 
-    global_engine = &engine;
-    global_editor = &editor;
+    _engine = &engine;
+    _editor = &editor;
 
     WNDCLASSA wc     = {0};
     LPCSTR className = "MapeditClass";
@@ -196,6 +208,15 @@ int CALLBACK WinMain
                                     WS_OVERLAPPEDWINDOW | WS_VISIBLE,
                                     x, y, width, height,
                                     0, 0, instance, 0);
+
+    // int64_t ns_threshold = (int64_t)(1e9f / (float)editor.desiredFPS);
+    // for now, specify below
+    int64_t ns_threshold = (int64_t)(1e9f / 240.0f);
+    if(ns_threshold < 0)
+    {
+        ns_threshold = 0;
+    }
+
     while(engine.running)
     {
         MSG message;
@@ -212,24 +233,25 @@ int CALLBACK WinMain
             DispatchMessageA(&message);
         }
 
-        uint16_t desiredFPS = 144;
+        int64_t delta = (int64_t)(rvDeltaTime_now_ns(&editor.lastPresentTime));
 
-        River2D_Time now          = rvQueryTime();
-        int64_t      deltaMS      = rvDeltaTime_ms(&editor.lastPresentTime, &now);
-        double       ms_threshold = 1000 / (double)(desiredFPS);
-
-        if(deltaMS < ms_threshold)
+        if(delta < ns_threshold)
         {
-            // struct timespec duration = {0, ns_threshold - deltaNS};
+            // sleep...
+            // int64_t durationNS = ns_threshold - delta;
+            // struct timespec duration = {0};
+            // duration.tv_sec  = durationNS / BILLION;
+            // duration.tv_nsec = durationNS % BILLION;
             // nanosleep(&duration, NULL);
         }
 
-        mapedit_update(&engine, &editor);
         engine.context = GetDC(engine.window);
-        river2D_bltBuffer(&engine);
-        editor.lastPresentTime = now;
+
+        meUpdate(&engine, &editor);
+        mePresent(&engine, &editor);
+
         ReleaseDC(engine.window, engine.context);
     }
 
-    return river2D_shutdown(&engine);
+    return rvShutdown(&engine);
 }
