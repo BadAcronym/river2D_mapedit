@@ -1,15 +1,5 @@
 #!/bin/bash
 
-if [[ ! -d "./obj/" ]]
-then
-    mkdir ./obj/
-fi
-
-if [[ ! -d "./build/" ]]
-then
-    mkdir ./build/
-fi
-
 if [[ ! -d "./bin/" ]]
 then
     mkdir ./bin/
@@ -22,39 +12,110 @@ else
     build=$1
 fi
 
-if [[ $build = "asan" ]] || [[ $build = "debug" ]] || [[ $build = "release" ]]
-then
+args_always="-DBUILD_LINUX \
+src/linux_mapedit_entry.c \
+src/mapedit_input.c \
+src/mapedit_main.c \
+src/mapedit_menus.c \
+src/mapedit_saving.c \
+src/mapedit_tiles.c \
+./vendor/river2D/vendor/imgsurf/src/imgsurf_main.c \
+./vendor/river2D/vendor/imgsurf/src/imgsurf_format_bmp.c \
+./vendor/river2D/vendor/imgsurf/src/imgsurf_format_qoi.c \
+./vendor/river2D/vendor/imgsurf/src/imgsurf_format_png.c \
+./vendor/river2D/vendor/imgsurf/vendor/puddle/src/linux_pd_path.c \
+./vendor/river2D/vendor/imgsurf/vendor/puddle/src/string_view.c \
+-Iinclude/ \
+-Ivendor/river2D/include/ \
+-Ivendor/river2D/vendor/imgsurf/include/ \
+-Ivendor/river2D/vendor/imgsurf/vendor/puddle/include/ \
+-Lvendor/river2D/bin/$build \
+-Wextra -Wall -Wpedantic -Wconversion -Wshadow -Wsign-compare -Wtype-limits -Wunused \
+-fuse-ld=mold \
+-lriver2Dcommon
+-lm"
 
-    if [[ -f "./vendor/river2D/run" ]]
+args_release="-O2"
+
+args_debug="-DDEBUG -g -O0"
+
+args_asan="$args_debug -DASAN \
+-fsanitize=address,leak,undefined \
+-fno-omit-frame-pointer \
+-static-libasan \
+-O0"
+
+function compile_engine()
+{
+    if [[ ! -f "./vendor/river2D/run" ]]
     then
-        pushd ./vendor/river2D/ > /dev/null
-        ./run $build --compile-only
-        if [[ $? != 0 ]]
-        then
-            echo -e "\033[31m\nERROR: failed to compile river2D.\033[0m"
-            exit -1
-        fi
-        popd > /dev/null
+        echo -e "\033[31m\nERROR: can't find river2D's run script.\n\033[0m"
+        exit 5;
+    fi
+
+    pushd "./vendor/river2D/" > /dev/null
+    ./run
+    popd > /dev/null
+}
+
+function compile()
+{
+    echo "identifying a compiler..."
+
+    clang --version > /dev/null
+    if [[ $? = 0 ]]
+    then
+        echo "found clang."
+        compiler="clang"
     else
-        echo -e "\033[31m\nERROR: can't find river2D's run script.\033[0m"
+        gcc --version > /dev/null
+        if [[ $? = 0 ]]
+        then
+            compiler="gcc"
+        else
+            echo -e "\033[31m\nERROR: no suitable compiler found.\n\033[0m"
+        fi
     fi
 
     echo ""
-    echo -e "\033[36mcompiling river2D_mapedit...\033[0m"
+    echo -e "\033[36mcompiling mapedit...\033[0m"
     echo ""
-    premake5 gmake
 
-    pushd ./build/ > /dev/null
-    make config=$build\_linux
+    if [[ ! -d ./bin/$build ]]
+    then
+        mkdir ./bin/$build
+    fi
+
+    echo "compiling $build build with the following command:"
+    echo "$compiler $1"
+    $compiler $1
+    if [[ $? != 0 ]]
+    then
+        echo -e "\033[31m\nERROR: $compiler failed to compile mapedit.\n\033[0m"
+        exit -1
+    fi
+    mv ./a.out ./bin/$build/mapedit
+}
+
+if [[ $build = "release" ]]
+then
+    compile_engine $build
+    compile "$args_always $args_release"
+else
+if [[ $build = "debug" ]]
+then
+    compile_engine $build
+    compile "$args_always $args_debug"
+else
+if [[ $build = "asan" ]]
+then
+    compile_engine $build
+    compile "$args_always $args_asan"
 else
     echo -e "\033[31m\nERROR: invalid make config: $build.\033[0m"
-    exit -2;
+    exit 3;
 fi
-
-if [[ $? != 0 ]]
-then
-    echo -e "\033[31m\nERROR: failed to compile mapedit.\n\033[0m"
-    exit -1
+fi
 fi
 
 echo -e "\n"
@@ -63,8 +124,6 @@ if [[ $2 = "--compile-only" ]]
 then
     exit 0
 fi
-
-popd > /dev/null
 
 chmod +x ./bin/$build/mapedit
 ./bin/$build/mapedit
