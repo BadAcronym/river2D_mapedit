@@ -124,11 +124,11 @@ Action;
 typedef struct EditorData
 {
     uint16_t     runningFrames;
-    RiverTime lastFPSTime;
-    RiverTime lastUpdateTime;
-    RiverTime lastPresentTime;
-    RiverTime lastSaveTime;
-    RiverTime lastActionStart;
+    RiverTime    lastFPSTime;
+    RiverTime    lastUpdateTime;
+    RiverTime    lastPresentTime;
+    RiverTime    lastSaveTime;
+    RiverTime    lastActionStart;
     uint8_t      currentState;
     uint8_t      previousState;
     uint8_t      currentLayer;
