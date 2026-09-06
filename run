@@ -23,8 +23,6 @@ src/mapedit_tiles.c \
 ./vendor/river2D/vendor/imgsurf/src/imgsurf_format_bmp.c \
 ./vendor/river2D/vendor/imgsurf/src/imgsurf_format_qoi.c \
 ./vendor/river2D/vendor/imgsurf/src/imgsurf_format_png.c \
-./vendor/river2D/vendor/imgsurf/vendor/puddle/src/linux_pd_path.c \
-./vendor/river2D/vendor/imgsurf/vendor/puddle/src/string_view.c \
 -Iinclude/ \
 -Ivendor/river2D/include/ \
 -Ivendor/river2D/vendor/imgsurf/include/ \
