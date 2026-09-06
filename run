@@ -55,6 +55,10 @@ function compile_engine()
 
     pushd "./vendor/river2D/" > /dev/null
     ./run
+    if [[ $? != 0 ]]
+    then
+        exit 3;
+    fi
     popd > /dev/null
 }
 
