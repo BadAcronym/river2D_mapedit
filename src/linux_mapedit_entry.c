@@ -19,7 +19,7 @@ int main
     RiverImage planes[RV_MAX_PLANES] = {0};
 
     StringView libpath = cstr_sv(LIBPATH);
-    rvResolveRenderer(&engine, libpath, RV_RENDERER_SOFTWARE);
+    rvResolveFunctions(&engine, libpath, RV_RENDERER_SOFTWARE);
 
     rvLoadConfig(&engine.config);
     engine.config.choices |= RV_CHOICE_STATIC_CANVAS_BIT;
@@ -28,8 +28,8 @@ int main
     rvInit(&engine, planes);
     meInit(&engine, &editor);
 
-    Atom WM_DELETE = XInternAtom(engine.display, "WM_DELETE_WINDOW", false);
-    XSetWMProtocols(engine.display, engine.window, &WM_DELETE, 1);
+    Atom WM_DELETE = engine.xInternAtom(engine.display, "WM_DELETE_WINDOW", false);
+    engine.xSetWMProtocols(engine.display, engine.window, &WM_DELETE, 1);
 
     bool mapped = false;
 
@@ -38,10 +38,10 @@ int main
 
     while(engine.running)
     {
-        while(XPending(engine.display) > 0)
+        while(engine.xPending(engine.display) > 0)
         {
             XEvent event = {0};
-            XNextEvent(engine.display, &event);
+            engine.xNextEvent(engine.display, &event);
             switch(event.type)
             {
                 case KeyPress:
