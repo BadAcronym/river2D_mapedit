@@ -54,7 +54,7 @@ function compile_engine()
     fi
 
     pushd "./vendor/river2D/" > /dev/null
-    ./run
+    ./run $build
     if [[ $? != 0 ]]
     then
         exit 3;
