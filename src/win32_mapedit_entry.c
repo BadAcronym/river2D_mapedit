@@ -77,16 +77,7 @@ LRESULT CALLBACK win32WindowCallback
                 break;
             }
 
-            AsciiKey key = {0};
-            key.key = (uint8_t)wParam;
-            key.raw = (uint8_t)wParam;
-
-            if(key.key > 0x40 && key.key < 0x5B)
-            {
-                key.key += 0x20;
-            }
-
-            meProcessKeys(&_engine->controls, key, isKeyDown);
+            meProcessKeys(&_engine->controls, rvProcessWParam(wParam), isKeyDown);
             break;
         }
         case WM_MOUSEMOVE:
