@@ -173,7 +173,7 @@ int CALLBACK WinMain
     RiverImage planes[RV_MAX_PLANES] = {0};
 
     StringView libpath = cstr_sv(LIBPATH);
-    rvResolveRenderer(&engine, libpath, RV_RENDERER_SOFTWARE);
+    rvResolveFunctions(&engine, libpath, RV_RENDERER_SOFTWARE);
 
     rvLoadConfig(&engine.config);
     engine.config.choices |= RV_CHOICE_STATIC_CANVAS_BIT;
