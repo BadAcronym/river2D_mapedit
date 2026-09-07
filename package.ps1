@@ -3,21 +3,20 @@ param
     $tag = ""
 )
 
-.\clean
-
-if($LASTEXITCODE -ne 0)
-{
-    Write-Host "\033[31m\nERROR: failed to package linux build.\n\033[0m"
-    exit -1
-}
+&.\clean
 
 if($tag -eq "")
 {
-    Write-Host "\033[31m\nERROR: no tag specified. Try: 'package v0.0.1'\n\033[0m"
+    Write-Host "`nERROR: no tag specified. Try: 'package v0.0.1'`n" -Fore Red
     exit -2
 }
 
-.\run release -compile_only
+&.\run release --compile-only
+if($LASTEXITCODE -ne 0)
+{
+    Write-Host "`nERROR: failed to package windows build.`n" -Fore Red
+    exit -1
+}
 
 $dir=".\build\mapedit_$tag`_win64"
 
@@ -27,15 +26,14 @@ mkdir $dir
 
 if(-Not(Test-Path $dir))
 {
-    Write-Host "\033[31m\nERROR: could not create package folder.\n\033[0m"
+    Write-Host "`nnERROR: could not create package folder: '$dir'.`n"
     exit -2
 }
 
-mkdir -p "$dir\vendor\river2D\bin\release\"
 mkdir -p "$dir\bin\release\"
 mkdir -p "$dir\assets\"
 
-cp ".\vendor\river2D\bin\release\river2Dsoftware.dll" "$dir\vendor\river2D\bin\release\river2Dsoftware.dll"
+cp ".\vendor\river2D\bin\release\river2Dsoftware.dll" "$dir\bin\release\river2Dsoftware.dll"
 cp ".\bin\release\mapedit.exe"                        "$dir\bin\release\mapedit.exe"
 cp ".\river2D.ini"                                    "$dir\river2D.ini"
 cp ".\assets\*"                                       "$dir\assets\"
