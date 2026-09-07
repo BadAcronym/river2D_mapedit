@@ -1,6 +1,7 @@
 #include "mapedit_main.h"
 
 #include "river2D_main.h"
+#include "pd_print_macros.h"
 
 #include <Windows.h>
 #include <Windowsx.h>
@@ -77,7 +78,15 @@ LRESULT CALLBACK win32WindowCallback
                 break;
             }
 
-            meProcessKeys(&_engine->controls, rvProcessWParam(wParam), isKeyDown);
+            uint8_t  keyboardState[256];
+            uint16_t asciiChar[2];
+
+            GetKeyboardState(keyboardState);
+
+            uint8_t scanCode = ((lParam >> 16) & 0xFF);
+            ToAscii((UINT)wParam, scanCode, keyboardState, asciiChar, 0);
+            meProcessKeys(&_engine->controls,
+                          rvProcessWin32Key(wParam, (uint8_t)asciiChar[0]), isKeyDown);
             break;
         }
         case WM_MOUSEMOVE:
