@@ -1,24 +1,55 @@
 if(Test-Path "./vendor/river2D/clean.ps1")
 {
-    Push-Location "./vendor/river2D"
+    pushd "./vendor/river2D/"
     &./clean.ps1
-    Pop-Location
+    popd
 }
 
-$toDelete =
-    "./build/",
-    "./bin/",
-    "./obj/",
-    "./log/"
+Write-Host "cleaning up mapedit builds..." -Fore Yellow
 
-Write-Host "cleaning the build..."
-
-foreach($folder in $toDelete)
+if(Test-Path "./bin")
 {
-    if(Test-Path $folder)
+    rm "./bin/" -Recurse -Force
+}
+
+foreach($file in (gci *.o))
+{
+    if(Test-Path $file)
     {
-        Remove-Item $folder -Recurse -Force
+        Remove-Item $file
     }
 }
 
-Write-Host "all clean!" -ForegroundColor Green
+foreach($file in (gci *.obj))
+{
+    if(Test-Path $file)
+    {
+        Remove-Item $file
+    }
+}
+
+foreach($file in (gci *.exe))
+{
+    if(Test-Path $file)
+    {
+        Remove-Item $file
+    }
+}
+
+foreach($file in (gci *.lib))
+{
+    if(Test-Path $file)
+    {
+        Remove-Item $file
+    }
+}
+
+foreach($file in (gci *.pdb))
+{
+    if(Test-Path $file)
+    {
+        Remove-Item $file
+    }
+}
+
+Write-Host "cleaned mapedit!`n" -Fore Green
