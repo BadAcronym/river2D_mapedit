@@ -19,16 +19,17 @@ src/mapedit_main.c \
 src/mapedit_menus.c \
 src/mapedit_saving.c \
 src/mapedit_tiles.c \
-./vendor/river2D/vendor/imgsurf/src/imgsurf_main.c \
-./vendor/river2D/vendor/imgsurf/src/imgsurf_format_bmp.c \
-./vendor/river2D/vendor/imgsurf/src/imgsurf_format_qoi.c \
-./vendor/river2D/vendor/imgsurf/src/imgsurf_format_png.c \
+vendor/river2D/vendor/imgsurf/src/imgsurf_main.c \
+vendor/river2D/vendor/imgsurf/src/imgsurf_format_bmp.c \
+vendor/river2D/vendor/imgsurf/src/imgsurf_format_qoi.c \
+vendor/river2D/vendor/imgsurf/src/imgsurf_format_png.c \
 -Iinclude/ \
 -Ivendor/river2D/include/ \
 -Ivendor/river2D/vendor/imgsurf/include/ \
--Ivendor/river2D/vendor/imgsurf/vendor/puddle/include/ \
+-Ivendor/river2D/vendor/imgsurf/vendor/datasurf/vendor/puddle/include/ \
 -Lvendor/river2D/bin/$build \
 -Wextra -Wall -Wpedantic -Wconversion -Wshadow -Wsign-compare -Wtype-limits -Wunused \
+-std=c99 \
 -fuse-ld=mold \
 -lriver2Dcommon
 -lm"
