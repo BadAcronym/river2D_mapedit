@@ -4,19 +4,9 @@ param
     [Parameter(Position = 1)][string]$compile_only
 )
 
-if(-Not(Test-Path ".\obj\"))
+if(-Not(Test-Path "./bin/" -PathType Container))
 {
-    &mkdir .\obj\
-}
-
-if(-Not(Test-Path ".\build\"))
-{
-    &mkdir .\build\
-}
-
-if(-Not(Test-Path ".\bin\"))
-{
-    &mkdir .\bin\
+    mkdir "./bin/"
 }
 
 if($build -eq $null -or $build -eq "")
@@ -24,54 +14,136 @@ if($build -eq $null -or $build -eq "")
     $build = "release"
 }
 
-if($build -eq "asan" -or $build -eq "debug" -or $build -eq "release")
-{
+$args_always=@("-DBUILD_WINDOWS",
+"src/win32_mapedit_entry.c",
+"src/mapedit_input.c",
+"src/mapedit_main.c",
+"src/mapedit_menus.c",
+"src/mapedit_saving.c",
+"src/mapedit_tiles.c",
+"vendor/river2D/vendor/imgsurf/src/imgsurf_main.c",
+"vendor/river2D/vendor/imgsurf/src/imgsurf_format_bmp.c",
+"vendor/river2D/vendor/imgsurf/src/imgsurf_format_qoi.c",
+"vendor/river2D/vendor/imgsurf/src/imgsurf_format_png.c",
+"-Iinclude/",
+"-Ivendor/river2D/include/",
+"-Ivendor/river2D/vendor/imgsurf/include/",
+"-Ivendor/river2D/vendor/imgsurf/vendor/datasurf/include/",
+"-Ivendor/river2D/vendor/imgsurf/vendor/datasurf/vendor/puddle/include/",
+"-Lvendor/river2D/bin/$build",
+"-std=c99",
+"-Wextra", "-Wall", "-Wpedantic", "-Wconversion", "-Wshadow", "-Wsign-compare",
+"-Wtype-limits", "-Wunused",
+"-Wno-unsafe-buffer-usage", "-Wno-declaration-after-statement", "-Wno-vla",
+"-Wno-implicit-void-ptr-cast")
 
-    if(Test-Path "./vendor/river2D/run.ps1")
+$args_release=@("-O2")
+
+$args_debug=@("-DDEBUG", "-gcodeview", "-O0")
+$args_debug_cl=@("/DDEBUG", "/Zi", "/Od")
+
+$args_asan=$args_debug_cl+@("-oa.exe", "/clang:-std=c99", "/DASAN",
+"/fsanitize=address", "/MD",
+"/link", "/SUBSYSTEM:CONSOLE")
+
+function compile_engine
+{
+    param($1)
+
+    if(-Not(Test-Path "./vendor/river2D/run.ps1" -PathType Leaf))
     {
-        pushd "./vendor/river2D/"
-        &./run.ps1 $build --compile-only
-        if($LASTEXITCODE -ne 0)
+        Write-Host"`nERROR: can't find river2D's run script.`n" -Fore Red
+    }
+
+    pushd "./vendor/river2D/"
+    &./run.ps1 $build
+    if($LASTEXITCODE -ne 0)
+    {
+        exit 3;
+    }
+    popd
+}
+
+function compile
+{
+    param( [string[]]$1 )
+
+    Write-Host "identifying a compiler..."
+
+    if($build -eq "asan")
+    {
+        if(-Not(Get-Command clang -ErrorAction SilentlyContinue))
         {
-            popd
-            exit -3;
+            Write-Host "ERROR: clang-cl needed for address sanitization." -Fore Red
         }
-        popd
+        $script:compiler="clang-cl"
+    }
+    elseif(Get-Command clang -ErrorAction SilentlyContinue)
+    {
+        Write-Host "found clang."
+        $script:compiler="clang"
+    }
+    elseif(Get-Command gcc -ErrorAction SilentlyContinue)
+    {
+        Write-Host "found gcc."
+        $script:compiler="gcc"
     }
     else
     {
-        Write-Host "ERROR: can't find river2D's run script." -ForegroundColor Red
+        Write-Host "ERROR: no suitable compiler found." -Fore Red
     }
 
-    Write-Host "`ncompiling mapedit...`n" -Fore Cyan
+    Write-Host ""
+    Write-Host "compiling mapedit..." -Fore Cyan
+    Write-Host ""
 
-    premake5 gmake
-    pushd "./build/"
-    make config=$build`_windows
-    popd
+    if(-Not (Test-Path "./bin/$build/" -PathType Container))
+    {
+        mkdir "./bin/$build/"
+    }
+
+    Write-Host "compiling $build build with the following command:"
+    Write-Host "$script:compiler $1"
+    &$script:compiler @1
+    if($LASTEXITCODE -ne 0)
+    {
+        Write-Host "`nERROR: $script:compiler failed to compile mapedit.`n" -Fore Red
+        exit -1
+    }
+    Move-Item ./a.exe ./bin/$build/mapedit.exe -Force
+    if($build -eq "release")
+    {
+        return;
+    }
+    Move-Item ./a.pdb ./bin/$build/mapedit.pdb -Force
+}
+
+if($build -eq "release")
+{
+    compile_engine $build
+    compile ($args_always + $args_release)
+}
+elseif($build -eq "debug")
+{
+    compile_engine $build
+    compile ($args_always + $args_debug)
+}
+elseif($build -eq "asan")
+{
+    compile_engine $build
+    compile ($args_always + $args_asan)
 }
 else
 {
-    Write-Host "ERROR: invalid make config: '$build'." -ForegroundColor Red
-    exit -2;
-}
-
-if($LASTEXITCODE -ne 0)
-{
-    Write-Host "`nERROR: failed to compile mapedit.`n" -ForegroundColor Red
-    exit -1;
+    Write-Host "`nERROR: invalid make config: $build." -Fore Red
+    exit 3;
 }
 
 Write-Host "`n"
 
 if($compile_only -eq "--compile-only")
 {
-    exit 0;
+    exit 0
 }
 
-if(0 -eq $LASTEXITCODE)
-{
-    $target = ".\bin\$build\mapedit.exe"
-    Write-Host "`nrunning $target..."
-    Invoke-Expression $target
-}
+&./bin/$build/mapedit
