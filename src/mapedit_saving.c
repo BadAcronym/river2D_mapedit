@@ -1,4 +1,5 @@
 #include "mapedit_main.h"
+#include "pd_print_macros.h"
 
 void meLoadProject
 (
@@ -32,17 +33,14 @@ void meLoadProject
         editor->filename = sv_filename;
     }
 
-#ifdef DEBUG
-    fprintf(stderr, "\nloading file: "PRI_SV"\n", ARG_SV(editor->filename));
-#endif
+    PD_DEBUG("loading file: " PRI_SV"\n", ARG_SV(editor->filename));
 
     char cstr_filename[4096] = {0};
     sv_cstr(editor->filename, cstr_filename);
     FILE *file = fopen(cstr_filename, "rb");
     if(!file)
     {
-        fprintf(stderr, "\033[31;1;7mERROR: could not open file "
-                "named \""PRI_SV"\".\033[0m\n", ARG_SV(editor->inputBuffer));
+        PD_ERROR("could not open file named '"PRI_SV"'.", ARG_SV(editor->inputBuffer));
         meChangeState(editor, ME_STATE_MENU);
         return;
     }
@@ -58,17 +56,15 @@ void meLoadProject
     TileMap map = rvLoadTilemap(engine, &set);
     if(set.errorcode)
     {
-        fprintf(stderr, "\033[31;1;7mERROR: failed to load project file: %s. Code: %u"
-                "\033[0m\n", cstr_filename, set.errorcode);
+        PD_ERROR("failed to load project file: '%s'. Code: %u",
+                 cstr_filename, set.errorcode);
         fclose(file);
         return;
     }
 
-    #ifdef DEBUG
-    fprintf(stderr, "mapWidth: %u\n",  editor->mapWidth);
-    fprintf(stderr, "mapHeight: %u\n", editor->mapHeight);
-    fprintf(stderr, "mapLayers: %u\n", editor->mapLayers);
-    #endif
+    PD_DEBUG("mapWidth: %u",  editor->mapWidth);
+    PD_DEBUG("mapHeight: %u", editor->mapHeight);
+    PD_DEBUG("mapLayers: %u", editor->mapLayers);
 
     if(editor->tileData)
     {
@@ -133,8 +129,8 @@ void meSaveProject
     FILE *file = fopen(cstr_filename, "wb");
     if(!file)
     {
-        fprintf(stderr, "\n\033[31;1;7mERROR: could not open file for saving: "
-                PRI_SV".\033[0m\n", ARG_SV(editor->filename));
+        PD_ERROR("could not open file for saving: '"PRI_SV"'",
+                 ARG_SV(editor->filename));
         return;
     }
 
@@ -151,13 +147,12 @@ void meSaveProject
     rvSaveTilemap(engine, &set);
     if(set.errorcode)
     {
-        fprintf(stderr, "\n\033[31;1;7mERROR: failed to write savefile. Code: %u"
-                "\033[0m\n", set.errorcode);
+        PD_ERROR("failed to write savefile. Code: %u", set.errorcode);
         fclose(file);
         return;
     }
 
     editor->lastSaveTime = rvQueryTime();
-    fprintf(stdout, "\nProject saved successfully.\n");
+    PD_DEBUG("project saved successfully.");
     fclose(file);
 }
