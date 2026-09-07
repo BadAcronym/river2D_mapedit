@@ -55,6 +55,13 @@ function compile_engine
 {
     param($1)
 
+    if((Test-Path "./vendor/river2D/bin/$build/river2Dcommon.lib")   -and
+       (Test-Path "./vendor/river2D/bin/$build/river2Dsoftware.dll") -and
+       (Test-Path "./vendor/river2D/bin/$build/river2Dsoftware.lib")
+    ){
+        return;
+    }
+
     if(-Not(Test-Path "./vendor/river2D/run.ps1" -PathType Leaf))
     {
         Write-Host"`nERROR: can't find river2D's run script.`n" -Fore Red
