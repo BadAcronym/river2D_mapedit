@@ -301,8 +301,8 @@ void meInit
     editor->inputBuffer.size = 256;
 
     engine->controls.buttoncodes[ME_BUTTON_LEFTM]   = RV_MOUSE1;
-    engine->controls.buttoncodes[ME_BUTTON_MIDDLEM] = RV_MOUSE2;
-    engine->controls.buttoncodes[ME_BUTTON_RIGHTM]  = RV_MOUSE3;
+    engine->controls.buttoncodes[ME_BUTTON_RIGHTM]  = RV_MOUSE2;
+    engine->controls.buttoncodes[ME_BUTTON_MIDDLEM] = RV_MOUSE3;
 
     engine->controls.keycodes[ME_KEY_LSHIFT]     = RV_ASCII_LSHIFT;
     engine->controls.keycodes[ME_KEY_RSHIFT]     = RV_ASCII_RSHIFT;
