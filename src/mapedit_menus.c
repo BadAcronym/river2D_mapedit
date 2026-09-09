@@ -1,4 +1,5 @@
 #include "mapedit_main.h"
+#include "pd_print_macros.h"
 
 f_internal void updateFPS
 (
@@ -832,6 +833,17 @@ f_internal void pollTilePicker
         engine->controls.keymap &= ~ME_BIT_TILEPICKER;
     }
 
+    if(engine->controls.keymap & ME_BIT_DECREASE)
+    {
+        meUpdateSelectSize(editor, false);
+        engine->controls.keymap &= ~ME_BIT_DECREASE;
+    }
+    if(engine->controls.keymap & ME_BIT_INCREASE)
+    {
+        meUpdateSelectSize(editor, true);
+        engine->controls.keymap &= ~ME_BIT_INCREASE;
+    }
+
     if(rvInsideRect(&engine->controls.pointer, &editor->close_b.area))
     {
         rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_HOVER]);
@@ -873,17 +885,6 @@ f_internal void pollTilePicker
         if(tileY + editor->selectMult > sheetY)
         {
             tileY = (uint8_t)(sheetY - editor->selectMult);
-        }
-
-        if(engine->controls.keymap & ME_BIT_DECREASE)
-        {
-            meUpdateSelectSize(editor, false);
-            engine->controls.keymap &= ~ME_BIT_DECREASE;
-        }
-        if(engine->controls.keymap & ME_BIT_INCREASE)
-        {
-            meUpdateSelectSize(editor, true);
-            engine->controls.keymap &= ~ME_BIT_INCREASE;
         }
 
         uint32_t tileLocX = (uint32_t)(fX * (tiles.upLeft.x + 0.0055f) +
