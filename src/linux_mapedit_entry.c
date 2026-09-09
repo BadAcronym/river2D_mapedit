@@ -69,15 +69,6 @@ int main
                         break;
                     }
 
-                    if(event.xbutton.button == RV_MOUSE3)
-                    {
-                        event.xbutton.button = RV_MOUSE2;
-                    }
-                    else if(event.xbutton.button == RV_MOUSE2)
-                    {
-                        event.xbutton.button = RV_MOUSE3;
-                    }
-
                     meProcessButtons(&editor, &engine.controls,
                                            event.xbutton.button, true);
                     break;
