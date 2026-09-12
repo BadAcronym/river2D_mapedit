@@ -398,14 +398,12 @@ void mePollMainMenu
     {
         rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_DEFAULT]);
 
-        #ifdef DEBUG
         if(engine->controls.buttonmap & ME_BIT_LEFTM)
         {
-            fprintf(stderr, "clicked @ X: %f Y: %f\n",
-                    engine->controls.pointer.x, engine->controls.pointer.y);
+            PD_DEBUG("clicked @ X: %f Y: %f",
+                     engine->controls.pointer.x, engine->controls.pointer.y);
             engine->controls.buttonmap &= ~ME_BIT_LEFTM;
         }
-        #endif
     }
 }
 
