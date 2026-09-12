@@ -196,7 +196,7 @@ int CALLBACK WinMain
 
     if(!RegisterClassA(&wc))
     {
-        fprintf(stderr, "\n\033[31;1;7mERROR: Unable to register window class!\033[0m\n");
+        PD_ERROR("unable to register window class.");
     };
 
     int x      = CW_USEDEFAULT;

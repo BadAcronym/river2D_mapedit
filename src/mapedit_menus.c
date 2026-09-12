@@ -785,7 +785,7 @@ f_internal void pollContextMenu
             uint32_t index = sheetIndex(engine, editor);
             editor->tileData[index].flags ^= RV_TILE_BIT_ANIMATED;
 
-            fprintf(stderr, "TODO: edit tile animation: (%u,%u)\n",
+            PD_WARN("TODO: edit tile animation: (%u,%u)",
                     editor->selectedX, editor->selectedY);
 
             editor->flags &= ~ME_FLAG_CONTEXTMENU;
