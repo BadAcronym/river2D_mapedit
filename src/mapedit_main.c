@@ -261,8 +261,8 @@ void meInit
     }
 
     // NOTE: next subject to change, no? need be able to vary these two
-    editor->mapWidth  = engine->config.canvas_width  / editor->tilesize;
-    editor->mapHeight = engine->config.canvas_height / editor->tilesize;
+    editor->mapWidth  = engine->config.canvasWidth  / editor->tilesize;
+    editor->mapHeight = engine->config.canvasHeight / editor->tilesize;
 
     uint64_t tilecount  = editor->mapLayers * editor->mapWidth * editor->mapHeight;
     editor->placedTiles = malloc(tilecount * sizeof(TileIndex));

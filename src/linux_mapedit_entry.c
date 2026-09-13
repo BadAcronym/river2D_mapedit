@@ -99,11 +99,11 @@ int main
                     resizeWidth  = (uint32_t)event.xconfigure.width;
                     resizeHeight = (uint32_t)event.xconfigure.height;
 
-                    if(resizeWidth  != engine.config.window_width  ||
-                       resizeHeight != engine.config.window_height
+                    if(resizeWidth  != engine.config.windowWidth  ||
+                       resizeHeight != engine.config.windowHeight
                     ){
-                        engine.config.window_width  = resizeWidth;
-                        engine.config.window_height = resizeHeight;
+                        engine.config.windowWidth  = resizeWidth;
+                        engine.config.windowHeight = resizeHeight;
                     }
                     break;
                 }
