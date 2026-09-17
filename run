@@ -24,6 +24,7 @@ vendor/river2D/vendor/imgsurf/src/imgsurf_format_bmp.c \
 vendor/river2D/vendor/imgsurf/src/imgsurf_format_qoi.c \
 vendor/river2D/vendor/imgsurf/src/imgsurf_format_png.c \
 vendor/river2D/vendor/imgsurf/vendor/datasurf/src/datasurf_formats.c \
+vendor/river2D/vendor/imgsurf/vendor/datasurf/src/datasurf_huffman.c \
 vendor/river2D/vendor/imgsurf/vendor/datasurf/src/datasurf_algo_deflate.c \
 -Iinclude/ \
 -Ivendor/river2D/include/ \
