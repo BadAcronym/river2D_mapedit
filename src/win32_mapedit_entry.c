@@ -1,7 +1,7 @@
 #include "mapedit_main.h"
+#include "me_print_macros.h"
 
 #include "river2D_main.h"
-#include "pd_print_macros.h"
 
 #include <Windows.h>
 #include <Windowsx.h>
@@ -196,7 +196,7 @@ int CALLBACK WinMain
 
     if(!RegisterClassA(&wc))
     {
-        PD_ERROR("unable to register window class.");
+        ME_ERROR("unable to register window class.");
     };
 
     int x      = CW_USEDEFAULT;

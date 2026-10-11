@@ -1,5 +1,5 @@
 #include "mapedit_main.h"
-#include "pd_print_macros.h"
+#include "me_print_macros.h"
 
 void meLoadProject
 (
@@ -33,14 +33,14 @@ void meLoadProject
         editor->filename = sv_filename;
     }
 
-    PD_DEBUG("loading file: " PRI_SV"\n", ARG_SV(editor->filename));
+    ME_DEBUG("loading file: " PRI_SV"\n", ARG_SV(editor->filename));
 
     char cstr_filename[4096] = {0};
     sv_cstr(editor->filename, cstr_filename);
     FILE *file = fopen(cstr_filename, "rb");
     if(!file)
     {
-        PD_ERROR("could not open file named '"PRI_SV"'.", ARG_SV(editor->inputBuffer));
+        ME_ERROR("could not open file named '"PRI_SV"'.", ARG_SV(editor->inputBuffer));
         meChangeState(editor, ME_STATE_MENU);
         return;
     }
@@ -56,15 +56,15 @@ void meLoadProject
     TileMap map = rvLoadTilemap(engine, &set);
     if(set.errorcode)
     {
-        PD_ERROR("failed to load project file: '%s'. Code: %u",
+        ME_ERROR("failed to load project file: '%s'. Code: %u",
                  cstr_filename, set.errorcode);
         fclose(file);
         return;
     }
 
-    PD_DEBUG("mapWidth: %u",  editor->mapWidth);
-    PD_DEBUG("mapHeight: %u", editor->mapHeight);
-    PD_DEBUG("mapLayers: %u", editor->mapLayers);
+    ME_DEBUG("mapWidth: %u",  editor->mapWidth);
+    ME_DEBUG("mapHeight: %u", editor->mapHeight);
+    ME_DEBUG("mapLayers: %u", editor->mapLayers);
 
     if(editor->tileData)
     {
@@ -129,7 +129,7 @@ void meSaveProject
     FILE *file = fopen(cstr_filename, "wb");
     if(!file)
     {
-        PD_ERROR("could not open file for saving: '"PRI_SV"'",
+        ME_ERROR("could not open file for saving: '"PRI_SV"'",
                  ARG_SV(editor->filename));
         return;
     }
@@ -147,12 +147,12 @@ void meSaveProject
     rvSaveTilemap(engine, &set);
     if(set.errorcode)
     {
-        PD_ERROR("failed to write savefile. Code: %u", set.errorcode);
+        ME_ERROR("failed to write savefile. Code: %u", set.errorcode);
         fclose(file);
         return;
     }
 
     editor->lastSaveTime = rvQueryTime();
-    PD_DEBUG("project saved successfully.");
+    ME_DEBUG("project saved successfully.");
     fclose(file);
 }

@@ -1,5 +1,5 @@
 #include "mapedit_main.h"
-#include "pd_print_macros.h"
+#include "me_print_macros.h"
 
 f_internal void updateFPS
 (
@@ -400,7 +400,7 @@ void mePollMainMenu
 
         if(engine->controls.buttonmap & ME_BIT_LEFTM)
         {
-            PD_DEBUG("clicked @ X: %f Y: %f",
+            ME_DEBUG("clicked @ X: %f Y: %f",
                      engine->controls.pointer.x, engine->controls.pointer.y);
             engine->controls.buttonmap &= ~ME_BIT_LEFTM;
         }
@@ -785,7 +785,7 @@ f_internal void pollContextMenu
             uint32_t index = sheetIndex(engine, editor);
             editor->tileData[index].flags ^= RV_TILE_BIT_ANIMATED;
 
-            PD_WARN("TODO: edit tile animation: (%u,%u)",
+            ME_WARN("TODO: edit tile animation: (%u,%u)",
                     editor->selectedX, editor->selectedY);
 
             editor->flags &= ~ME_FLAG_CONTEXTMENU;

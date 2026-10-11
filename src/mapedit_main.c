@@ -1,7 +1,7 @@
 #include "mapedit_main.h"
+#include "me_print_macros.h"
 
 #include "pd_string_view.h"
-#include "pd_print_macros.h"
 
 #include <stdio.h>
 #include <inttypes.h>
@@ -18,7 +18,7 @@ void meInit
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_BACKGROUND].data)
     {
-        PD_ERROR("unable to load background image.");
+        ME_ERROR("unable to load background image.");
     }
 
     rvLoadImage_file(engine, cstr_sv("assets/black.qoi"),
@@ -26,7 +26,7 @@ void meInit
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_VOID].data)
     {
-        PD_ERROR("unable to load black image.");
+        ME_ERROR("unable to load black image.");
     }
 
     rvLoadImage_file(engine, cstr_sv("assets/collision.qoi"),
@@ -34,7 +34,7 @@ void meInit
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_COLLISION].data)
     {
-        PD_ERROR("unable to load darken image.");
+        ME_ERROR("unable to load darken image.");
     }
 
     rvLoadImage_file(engine, cstr_sv("assets/highlight.qoi"),
@@ -42,7 +42,7 @@ void meInit
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_HIGHLIGHT].data)
     {
-        PD_ERROR("unable to load highlight image.");
+        ME_ERROR("unable to load highlight image.");
     }
 
     rvLoadImage_file(engine, cstr_sv("assets/highlight_solid.qoi"),
@@ -50,7 +50,7 @@ void meInit
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_HIGHLIGHT_SOLID].data)
     {
-        PD_ERROR("unable to load solid highlight image.");
+        ME_ERROR("unable to load solid highlight image.");
     }
 
     rvLoadImage_file(engine, cstr_sv("assets/saving.qoi"),
@@ -58,14 +58,14 @@ void meInit
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_ICON_SAVING].data)
     {
-        PD_ERROR("unable to load saving icon.");
+        ME_ERROR("unable to load saving icon.");
     }
     rvLoadImage_file(engine, cstr_sv("assets/saved.qoi"),
                            &engine->planes[ME_PLANE_ICON_SAVED],
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_ICON_SAVED].data)
     {
-        PD_ERROR("unable to load saved icon.");
+        ME_ERROR("unable to load saved icon.");
     }
 
     rvLoadImage_file(engine, cstr_sv("assets/cursor_default.qoi"),
@@ -73,21 +73,21 @@ void meInit
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_CURSOR_DEFAULT].data)
     {
-        PD_ERROR("unable to load default cursor.");
+        ME_ERROR("unable to load default cursor.");
     }
     rvLoadImage_file(engine, cstr_sv("assets/cursor_hover.qoi"),
                            &engine->planes[ME_PLANE_CURSOR_HOVER],
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_CURSOR_HOVER].data)
     {
-        PD_ERROR("unable to load hover cursor.");
+        ME_ERROR("unable to load hover cursor.");
     }
     rvLoadImage_file(engine, cstr_sv("assets/cursor_place.qoi"),
                            &engine->planes[ME_PLANE_CURSOR_PLACE],
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_CURSOR_PLACE].data)
     {
-        PD_ERROR("unable to load place cursor.");
+        ME_ERROR("unable to load place cursor.");
     }
 
     rvLoadImage_file(engine, cstr_sv("assets/font_default_16.qoi"),
@@ -95,7 +95,7 @@ void meInit
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_FONT16].data)
     {
-        PD_ERROR("unable to load font image.");
+        ME_ERROR("unable to load font image.");
     }
 
     editor->tilesize     = 32;
@@ -364,7 +364,7 @@ void meChangeState
 ){
     if(editor->currentState == nextState)
     {
-        PD_WARN("trying to change state to the same state: %u.", editor->currentState);
+        ME_WARN("trying to change state to the same state: %u.", editor->currentState);
         return;
     }
 
@@ -404,7 +404,7 @@ void meUpdate
     }
     else
     {
-        PD_ERROR("invalid state: %u, previous: %u.",
+        ME_ERROR("invalid state: %u, previous: %u.",
                  editor->currentState, editor->previousState);
     }
 

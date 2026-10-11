@@ -33,13 +33,15 @@ src/mapedit_tiles.c \
 
 args_release="-O2"
 
-args_debug="-DDEBUG -g -O0"
+args_debug="-DDEBUG -DME_PRI_DEBUG -g -O0"
 
 args_asan="$args_debug -DASAN \
 -fsanitize=address,leak,undefined \
 -fno-omit-frame-pointer \
 -static-libasan \
 -O0"
+
+args_trace="$args_debug -DME_PRI_TRACE"
 
 function compile_engine()
 {
@@ -112,8 +114,13 @@ then
     compile_engine $build
     compile "$args_always $args_asan"
 else
+if [[ $build = "trace" ]]
+then
+    compile "$args_always $args_trace"
+else
     echo -e "\033[31m\nERROR: invalid make config: $build.\033[0m"
     exit 3;
+fi
 fi
 fi
 fi

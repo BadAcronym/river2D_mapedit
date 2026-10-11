@@ -1,5 +1,5 @@
 #include "mapedit_main.h"
-#include "pd_print_macros.h"
+#include "me_print_macros.h"
 
 #include <inttypes.h>
 
@@ -73,7 +73,7 @@ void meProcessButtons
     if(processButton(ME_BUTTON_MIDDLEM, ME_BIT_MIDDLEM)){ return; }
     if(processButton(ME_BUTTON_RIGHTM,  ME_BIT_RIGHTM )){ return; }
 
-    PD_DEBUG("button pressed: %" PRIx32, button);
+    ME_DEBUG("button pressed: %" PRIx32, button);
 }
 
 void meProcessKeys
@@ -123,8 +123,8 @@ void meProcessKeys
     processKey(ME_KEY_LEFT,       ME_BIT_LEFT      );
     processKey(ME_KEY_RIGHT,      ME_BIT_RIGHT     );
 
-    PD_DEBUG("key: 0x%x", key.key);
-    PD_DEBUG("raw: %c",   key.raw);
+    ME_DEBUG("key: 0x%x", key.key);
+    ME_DEBUG("raw: %c",   key.raw);
 }
 
 void meProcessPointer
