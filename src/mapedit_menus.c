@@ -16,7 +16,7 @@ f_internal void updateFPS
 
     char fpsStr[14];
     snprintf(fpsStr, 14, "FPS: %.1f", lastFPS);
-    StringView fps_sv = cstr_sv(fpsStr);
+    StringView fps_sv = pdCstrSV(fpsStr);
 
     rvLoadTextSettings textSet = {0};
     textSet.image    = &engine->planes[ME_PLANE_FPS];
@@ -606,7 +606,7 @@ void meDrawEditor
     char layerStr[2];
     snprintf(layerStr, 2, "%hhu", editor->currentLayer);
 
-    StringView layer_sv = cstr_sv(layerStr);
+    StringView layer_sv = pdCstrSV(layerStr);
 
     rvLoadTextSettings set = {0};
     set.sv       = &layer_sv;

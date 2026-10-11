@@ -172,7 +172,7 @@ int CALLBACK WinMain
     EngineData engine = {0};
     RiverImage planes[RV_MAX_PLANES] = {0};
 
-    StringView libpath = cstr_sv(LIBPATH);
+    StringView libpath = pdCstrSV(LIBPATH);
     rvResolveFunctions(&engine, libpath, RV_RENDERER_SOFTWARE);
 
     rvLoadConfig(&engine.config);

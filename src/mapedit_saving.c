@@ -19,14 +19,14 @@ void meLoadProject
         ++sv_filename.size;
     }
 
-    StringView  ext = cstr_sv(".rte");
+    StringView  ext = pdCstrSV(".rte");
     const char* pos = sv_filename.data + sv_filename.size - 4;
     char appended[4096] = {0};
 
-    if(sv_find(ext, sv_filename) != pos)
+    if(pdSVFind(ext, sv_filename) != pos)
     {
-        sv_concat(sv_filename, ext, appended);
-        editor->filename = cstr_sv(appended);
+        pdSVConcat(sv_filename, ext, appended);
+        editor->filename = pdCstrSV(appended);
     }
     else
     {
@@ -36,7 +36,7 @@ void meLoadProject
     ME_DEBUG("loading file: " PRI_SV"\n", ARG_SV(editor->filename));
 
     char cstr_filename[4096] = {0};
-    sv_cstr(editor->filename, cstr_filename);
+    pdSVCstr(editor->filename, cstr_filename);
     FILE *file = fopen(cstr_filename, "rb");
     if(!file)
     {
@@ -110,14 +110,14 @@ void meSaveProject
         ++sv_filename.size;
     }
 
-    StringView  ext = cstr_sv(".rte");
+    StringView  ext = pdCstrSV(".rte");
     const char* pos = sv_filename.data + sv_filename.size - 4;
     char appended[4096] = {0};
 
-    if(sv_find(ext, sv_filename) != pos)
+    if(pdSVFind(ext, sv_filename) != pos)
     {
-        sv_concat(sv_filename, ext, appended);
-        editor->filename = cstr_sv(appended);
+        pdSVConcat(sv_filename, ext, appended);
+        editor->filename = pdCstrSV(appended);
     }
     else
     {
@@ -125,7 +125,7 @@ void meSaveProject
     }
 
     char cstr_filename[4096] = {0};
-    sv_cstr(editor->filename, cstr_filename);
+    pdSVCstr(editor->filename, cstr_filename);
     FILE *file = fopen(cstr_filename, "wb");
     if(!file)
     {

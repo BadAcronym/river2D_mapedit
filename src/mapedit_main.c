@@ -13,7 +13,7 @@ void meInit
     EngineData *engine,
     EditorData *editor
 ){
-    rvLoadImage_file(engine, cstr_sv("assets/background.qoi"),
+    rvLoadImage_file(engine, pdCstrSV("assets/background.qoi"),
                            &engine->planes[ME_PLANE_BACKGROUND],
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_BACKGROUND].data)
@@ -21,7 +21,7 @@ void meInit
         ME_ERROR("unable to load background image.");
     }
 
-    rvLoadImage_file(engine, cstr_sv("assets/black.qoi"),
+    rvLoadImage_file(engine, pdCstrSV("assets/black.qoi"),
                            &engine->planes[ME_PLANE_VOID],
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_VOID].data)
@@ -29,7 +29,7 @@ void meInit
         ME_ERROR("unable to load black image.");
     }
 
-    rvLoadImage_file(engine, cstr_sv("assets/collision.qoi"),
+    rvLoadImage_file(engine, pdCstrSV("assets/collision.qoi"),
                            &engine->planes[ME_PLANE_COLLISION],
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_COLLISION].data)
@@ -37,7 +37,7 @@ void meInit
         ME_ERROR("unable to load darken image.");
     }
 
-    rvLoadImage_file(engine, cstr_sv("assets/highlight.qoi"),
+    rvLoadImage_file(engine, pdCstrSV("assets/highlight.qoi"),
                            &engine->planes[ME_PLANE_HIGHLIGHT],
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_HIGHLIGHT].data)
@@ -45,7 +45,7 @@ void meInit
         ME_ERROR("unable to load highlight image.");
     }
 
-    rvLoadImage_file(engine, cstr_sv("assets/highlight_solid.qoi"),
+    rvLoadImage_file(engine, pdCstrSV("assets/highlight_solid.qoi"),
                            &engine->planes[ME_PLANE_HIGHLIGHT_SOLID],
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_HIGHLIGHT_SOLID].data)
@@ -53,14 +53,14 @@ void meInit
         ME_ERROR("unable to load solid highlight image.");
     }
 
-    rvLoadImage_file(engine, cstr_sv("assets/saving.qoi"),
+    rvLoadImage_file(engine, pdCstrSV("assets/saving.qoi"),
                            &engine->planes[ME_PLANE_ICON_SAVING],
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_ICON_SAVING].data)
     {
         ME_ERROR("unable to load saving icon.");
     }
-    rvLoadImage_file(engine, cstr_sv("assets/saved.qoi"),
+    rvLoadImage_file(engine, pdCstrSV("assets/saved.qoi"),
                            &engine->planes[ME_PLANE_ICON_SAVED],
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_ICON_SAVED].data)
@@ -68,21 +68,21 @@ void meInit
         ME_ERROR("unable to load saved icon.");
     }
 
-    rvLoadImage_file(engine, cstr_sv("assets/cursor_default.qoi"),
+    rvLoadImage_file(engine, pdCstrSV("assets/cursor_default.qoi"),
                            &engine->planes[ME_PLANE_CURSOR_DEFAULT],
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_CURSOR_DEFAULT].data)
     {
         ME_ERROR("unable to load default cursor.");
     }
-    rvLoadImage_file(engine, cstr_sv("assets/cursor_hover.qoi"),
+    rvLoadImage_file(engine, pdCstrSV("assets/cursor_hover.qoi"),
                            &engine->planes[ME_PLANE_CURSOR_HOVER],
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_CURSOR_HOVER].data)
     {
         ME_ERROR("unable to load hover cursor.");
     }
-    rvLoadImage_file(engine, cstr_sv("assets/cursor_place.qoi"),
+    rvLoadImage_file(engine, pdCstrSV("assets/cursor_place.qoi"),
                            &engine->planes[ME_PLANE_CURSOR_PLACE],
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_CURSOR_PLACE].data)
@@ -90,7 +90,7 @@ void meInit
         ME_ERROR("unable to load place cursor.");
     }
 
-    rvLoadImage_file(engine, cstr_sv("assets/font_default_16.qoi"),
+    rvLoadImage_file(engine, pdCstrSV("assets/font_default_16.qoi"),
                            &engine->planes[ME_PLANE_FONT16],
                            RV_CHANNELS_BGRA, 8);
     if(!engine->planes[ME_PLANE_FONT16].data)
@@ -103,16 +103,16 @@ void meInit
     editor->mapLayers    = 10;
     editor->currentLayer = 1;
 
-    StringView title_sv  = cstr_sv("RV MAP EDITOR");
-    StringView new_sv    = cstr_sv("NEW PROJECT");
-    StringView load_sv   = cstr_sv("LOAD PROJECT");
-    StringView save_sv   = cstr_sv("SAVE PROJECT");
-    StringView saveas_sv = cstr_sv("SAVE AS");
-    StringView quit_sv   = cstr_sv("QUIT");
-    StringView close_sv  = cstr_sv("CLOSE");
+    StringView title_sv  = pdCstrSV("RV MAP EDITOR");
+    StringView new_sv    = pdCstrSV("NEW PROJECT");
+    StringView load_sv   = pdCstrSV("LOAD PROJECT");
+    StringView save_sv   = pdCstrSV("SAVE PROJECT");
+    StringView saveas_sv = pdCstrSV("SAVE AS");
+    StringView quit_sv   = pdCstrSV("QUIT");
+    StringView close_sv  = pdCstrSV("CLOSE");
 
-    StringView collision_sv = cstr_sv("TOGGLE COLLISION");
-    StringView animation_sv = cstr_sv("EDIT ANIMATION FRAMES");
+    StringView collision_sv = pdCstrSV("TOGGLE COLLISION");
+    StringView animation_sv = pdCstrSV("EDIT ANIMATION FRAMES");
 
     rvCreateImage(engine, &engine->planes[ME_PLANE_CURSOR_NULL], 32, 32);
     rvCreateImage(engine, &engine->planes[ME_PLANE_CURRENTFILE], 32, 32);
@@ -137,7 +137,7 @@ void meInit
 
     if(engine->config.choices & ME_CHOICE_SHOW_FPS_BIT)
     {
-        StringView initial = cstr_sv("FPS: ????");
+        StringView initial = pdCstrSV("FPS: ????");
 
         rvLoadTextSettings textSet = {0};
         textSet.image    = &engine->planes[ME_PLANE_FPS];
@@ -228,24 +228,24 @@ void meInit
 
     char listed[4096 * 12];
 
-    StringView dir    = cstr_sv("assets/custom/");
+    StringView dir    = pdCstrSV("assets/custom/");
     StringView ls     = pdListFiles(dir, listed);
-    StringView folder = cstr_sv("assets/custom/");
+    StringView folder = pdCstrSV("assets/custom/");
 
     for(uint16_t i = 0; i < dir.size; ++i)
     {
-        StringView file = sv_find_by_delim(ls, ';', i);
+        StringView file = pdSVFindByDelim(ls, ';', i);
         if(!file.data || !file.size)
         {
             break;
         }
 
         char *expanded_cstr = calloc(4096, 1);
-        sv_concat(folder, file, expanded_cstr);
+        pdSVConcat(folder, file, expanded_cstr);
 
-        StringView expanded = cstr_sv(expanded_cstr);
+        StringView expanded = pdCstrSV(expanded_cstr);
 
-        if(!sv_find(cstr_sv(".qoi"), expanded))
+        if(!pdSVFind(pdCstrSV(".qoi"), expanded))
         {
             free((void*)expanded.data);
             continue;
@@ -288,7 +288,7 @@ void meInit
 
     if(!editor->inputBuffer.data)
     {
-        editor->inputBuffer = cstr_str("unnamed_project");
+        editor->inputBuffer = pdCstrStr("unnamed_project");
     }
 
     RiverTime now = rvQueryTime();
