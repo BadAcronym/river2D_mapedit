@@ -114,7 +114,7 @@ int main
                 }
                 case MapNotify:
                 {
-                    mapped  = true;
+                    mapped = true;
                     break;
                 }
             }
