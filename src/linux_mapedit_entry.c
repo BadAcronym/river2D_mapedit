@@ -70,20 +70,20 @@ int main
                     }
 
                     meProcessButtons(&editor, &engine.controls,
-                                           event.xbutton.button, true);
+                                     event.xbutton.button, true);
                     break;
                 }
                 case ButtonRelease:
                 {
                     meProcessButtons(&editor, &engine.controls,
-                                           event.xbutton.button, false);
+                                     event.xbutton.button, false);
                     break;
                 }
                 case MotionNotify:
                 {
                     meProcessPointer(&engine,
-                                           (uint32_t)event.xmotion.x,
-                                           (uint32_t)event.xmotion.y);
+                                     (uint32_t)event.xmotion.x,
+                                     (uint32_t)event.xmotion.y);
                     break;
                 }
                 case ClientMessage:
