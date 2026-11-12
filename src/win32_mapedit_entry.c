@@ -78,21 +78,21 @@ LRESULT CALLBACK win32WindowCallback
                 break;
             }
 
-            uint8_t  keyboardState[256];
-            uint16_t asciiChar[2];
+            u08 keyboardState[256];
+            u16 asciiChar[2];
 
             GetKeyboardState(keyboardState);
 
-            uint8_t scanCode = ((lParam >> 16) & 0xFF);
+            u08 scanCode = ((lParam >> 16) & 0xFF);
             ToAscii((UINT)wParam, scanCode, keyboardState, asciiChar, 0);
             meProcessKeys(&_engine->controls,
-                          rvProcessWin32Key(wParam, (uint8_t)asciiChar[0]), isKeyDown);
+                          rvProcessWin32Key(wParam, (u08)asciiChar[0]), isKeyDown);
             break;
         }
         case WM_MOUSEMOVE:
         {
-            meProcessPointer(_engine, (uint32_t)GET_X_LPARAM(lParam),
-                                      (uint32_t)GET_Y_LPARAM(lParam));
+            meProcessPointer(_engine, (u32)GET_X_LPARAM(lParam),
+                                      (u32)GET_Y_LPARAM(lParam));
             break;
         }
         case WM_LBUTTONDOWN:
@@ -199,19 +199,19 @@ int CALLBACK WinMain
         ME_ERROR("unable to register window class.");
     };
 
-    int x      = CW_USEDEFAULT;
-    int y      = CW_USEDEFAULT;
-    int width  = CW_USEDEFAULT;
-    int height = CW_USEDEFAULT;
+    i32 x      = CW_USEDEFAULT;
+    i32 y      = CW_USEDEFAULT;
+    i32 width  = CW_USEDEFAULT;
+    i32 height = CW_USEDEFAULT;
 
     engine.window = CreateWindowExA(0, wc.lpszClassName, engine.windowName,
                                     WS_OVERLAPPEDWINDOW | WS_VISIBLE,
                                     x, y, width, height,
                                     0, 0, instance, 0);
 
-    // int64_t ns_threshold = (int64_t)(1e9f / (float)editor.desiredFPS);
+    // i64 ns_threshold = (i64)(1e9f / (f32)editor.desiredFPS);
     // for now, specify below
-    int64_t ns_threshold = (int64_t)(1e9f / 240.0f);
+    i64 ns_threshold = (i64)(1e9f / 240.0f);
     if(ns_threshold < 0)
     {
         ns_threshold = 0;
@@ -233,12 +233,12 @@ int CALLBACK WinMain
             DispatchMessageA(&message);
         }
 
-        int64_t delta = (int64_t)(rvDeltaTime_now_ns(&editor.lastPresentTime));
+        i64 delta = (i64)(rvDeltaTime_now_ns(&editor.lastPresentTime));
 
         if(delta < ns_threshold)
         {
             // sleep...
-            // int64_t durationNS = ns_threshold - delta;
+            // i64 durationNS = ns_threshold - delta;
             // struct timespec duration = {0};
             // duration.tv_sec  = durationNS / BILLION;
             // duration.tv_nsec = durationNS % BILLION;

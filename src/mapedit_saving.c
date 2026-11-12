@@ -9,7 +9,7 @@ void meLoadProject
     StringView sv_filename = {0};
     sv_filename.data       = editor->inputBuffer.data;
 
-    for(size_t i = 0; editor->inputBuffer.size; ++i)
+    for(size i = 0; editor->inputBuffer.size; ++i)
     {
         if(editor->inputBuffer.data[i] == '\0')
         {
@@ -100,7 +100,7 @@ void meSaveProject
     StringView sv_filename = {0};
     sv_filename.data       = editor->inputBuffer.data;
 
-    for(size_t i = 0; editor->inputBuffer.size; ++i)
+    for(size i = 0; editor->inputBuffer.size; ++i)
     {
         if(editor->inputBuffer.data[i] == '\0')
         {

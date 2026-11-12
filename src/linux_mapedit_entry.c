@@ -33,8 +33,8 @@ int main
 
     bool mapped = false;
 
-    uint32_t resizeWidth  = engine.backbuffer.width;
-    uint32_t resizeHeight = engine.backbuffer.height;
+    u32 resizeWidth  = engine.backbuffer.width;
+    u32 resizeHeight = engine.backbuffer.height;
 
     while(engine.running)
     {
@@ -81,9 +81,8 @@ int main
                 }
                 case MotionNotify:
                 {
-                    meProcessPointer(&engine,
-                                     (uint32_t)event.xmotion.x,
-                                     (uint32_t)event.xmotion.y);
+                    meProcessPointer(&engine, (u32)event.xmotion.x,
+                                     (u32)event.xmotion.y);
                     break;
                 }
                 case ClientMessage:
@@ -96,8 +95,8 @@ int main
                 }
                 case ConfigureNotify:
                 {
-                    resizeWidth  = (uint32_t)event.xconfigure.width;
-                    resizeHeight = (uint32_t)event.xconfigure.height;
+                    resizeWidth  = (u32)event.xconfigure.width;
+                    resizeHeight = (u32)event.xconfigure.height;
 
                     if(resizeWidth  != engine.config.windowWidth  ||
                        resizeHeight != engine.config.windowHeight
@@ -125,10 +124,10 @@ int main
             meUpdate(&engine, &editor);
 
             // 243 -> 240 for the same rounding error reasons as islescape right now :p
-            uint32_t desiredFPS   = 243;
-            int64_t  ns_threshold = (int64_t)(1e9f / (double)(desiredFPS));
+            u32 desiredFPS   = 243;
+            i64 ns_threshold = (i64)(1e9f / (f64)(desiredFPS));
 
-            int64_t delta = (int64_t)rvDeltaTime_now_ns(&editor.lastPresentTime);
+            i64 delta = (i64)rvDeltaTime_now_ns(&editor.lastPresentTime);
 
             if(delta < ns_threshold)
             {

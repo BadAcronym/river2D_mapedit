@@ -45,7 +45,7 @@ f_internal void readAction_redo
 f_internal void writeAction
 (
     EditorData *editor,
-    uint64_t   map_index,
+    u64        map_index,
     TileIndex  new_tile
 ){
     TileIndex prev_tile = editor->placedTiles[map_index];
@@ -61,35 +61,35 @@ void mePlaceSelectedTiles
 (
     EngineData *engine,
     EditorData *editor,
-    uint16_t   tileX,
-    uint16_t   tileY
+    u16        tileX,
+    u16        tileY
 ){
-    bool     break_outer = false;
-    uint64_t sliceSize   = editor->mapWidth * editor->mapHeight;
-    uint64_t topLeft     = editor->currentLayer * sliceSize +
-                           tileY * editor->mapWidth + tileX;
-    uint64_t maxCurIndex = sliceSize + editor->currentLayer * sliceSize - 1;
+    bool break_outer = false;
+    u64  sliceSize   = editor->mapWidth * editor->mapHeight;
+    u64  topLeft     = editor->currentLayer * sliceSize +
+                       tileY * editor->mapWidth + tileX;
+    u64 maxCurIndex  = sliceSize + editor->currentLayer * sliceSize - 1;
 
     if(topLeft > maxCurIndex)
     {
         topLeft = maxCurIndex;
     }
 
-    for(uint8_t y = 0; y < editor->selectMult && !break_outer; ++y)
+    for(u08 y = 0; y < editor->selectMult && !break_outer; ++y)
     {
         if(tileY + y > editor->mapHeight - 1)
         {
             break;
         }
 
-        for(uint8_t x = 0; x < editor->selectMult; ++x)
+        for(u08 x = 0; x < editor->selectMult; ++x)
         {
             if(tileX + x > editor->mapWidth - 1)
             {
                 break;
             }
 
-            uint64_t index = topLeft + y * editor->mapWidth + x;
+            u64 index = topLeft + y * editor->mapWidth + x;
             if(index > maxCurIndex)
             {
                 break_outer = true;
@@ -100,19 +100,19 @@ void mePlaceSelectedTiles
             new_tile.x = editor->selectedX + x;
             new_tile.y = editor->selectedY + y;
 
-            uint32_t prev = editor->currentAction - 1;
+            u32 prev = editor->currentAction - 1;
             if(editor->currentAction == 0)
             {
                 prev = ME_MAX_ACTIONS - 1;
             }
             Action prev_action = editor->actions[prev];
 
-            int64_t delta = rvDeltaTime_ns(&prev_action.stroke_start,
+            i64 delta = rvDeltaTime_ns(&prev_action.stroke_start,
                                                  &editor->lastActionStart);
 
-            uint64_t diff  = index - prev_action.map_index;
-            uint64_t diffY = diff / editor->mapHeight;
-            uint64_t diffX = diff % editor->mapWidth;
+            u64 diff  = index - prev_action.map_index;
+            u64 diffY = diff / editor->mapHeight;
+            u64 diffX = diff % editor->mapWidth;
             bool backwards = false;
 
             if(prev_action.map_index > index)
@@ -138,39 +138,39 @@ void mePlaceSelectedTiles
                 goto skipFill;
             }
 
-            uint64_t layerSize = editor->mapWidth * editor->mapHeight;
+            u64 layerSize = editor->mapWidth * editor->mapHeight;
 
             if(backwards && !diffY && diffX > 1)
             {
-                for(uint64_t i = diffX - 1; i > 0; --i)
+                for(u64 i = diffX - 1; i > 0; --i)
                 {
-                    uint64_t fillIndex = index + i;
+                    u64 fillIndex = index + i;
                     writeAction(editor, fillIndex, new_tile);
                     incrementAction(editor);
                 }
             }
             else if(!diffY && diffX > 1)
             {
-                for(uint64_t i = diffX - 1; i > 0; --i)
+                for(u64 i = diffX - 1; i > 0; --i)
                 {
-                    uint64_t fillIndex = index - i;
+                    u64 fillIndex = index - i;
                     writeAction(editor, fillIndex, new_tile);
                     incrementAction(editor);
                 }
             }
             else if(backwards && !diffX && diffY > 1)
             {
-                for(uint64_t i = diffY - 1; i > 0; --i)
+                for(u64 i = diffY - 1; i > 0; --i)
                 {
-                    uint64_t rows          = i * editor->mapWidth;
-                    uint64_t curLayerIndex = index % layerSize;
+                    u64 rows          = i * editor->mapWidth;
+                    u64 curLayerIndex = index % layerSize;
 
                     if(rows > curLayerIndex)
                     {
                         continue;
                     }
 
-                    uint64_t fillIndex = index + rows;
+                    u64 fillIndex = index + rows;
 
                     writeAction(editor, fillIndex, new_tile);
                     incrementAction(editor);
@@ -178,17 +178,17 @@ void mePlaceSelectedTiles
             }
             else if(!diffX && diffY > 1)
             {
-                for(uint64_t i = diffY - 1; i > 0; --i)
+                for(u64 i = diffY - 1; i > 0; --i)
                 {
-                    uint64_t rows          = i * editor->mapWidth;
-                    uint64_t curLayerIndex = index % layerSize;
+                    u64 rows          = i * editor->mapWidth;
+                    u64 curLayerIndex = index % layerSize;
 
                     if(rows > layerSize - curLayerIndex)
                     {
                         continue;
                     }
 
-                    uint64_t fillIndex = index - rows;
+                    u64 fillIndex = index - rows;
 
                     writeAction(editor, fillIndex, new_tile);
                     incrementAction(editor);
@@ -224,7 +224,7 @@ void meUndo
         return;
     }
 
-    for(uint32_t undoCount = 0; undoCount < ME_MAX_ACTIONS; ++undoCount)
+    for(u32 undoCount = 0; undoCount < ME_MAX_ACTIONS; ++undoCount)
     {
         decrementAction(editor);
         currentAction = editor->actions[editor->currentAction];
@@ -239,10 +239,10 @@ void meUndo
 
         readAction_undo(editor);
 
-        editor->currentLayer = (uint8_t)floor((double)currentAction.map_index /
+        editor->currentLayer = (u08)floor((f64)currentAction.map_index /
                                               (editor->mapWidth * editor->mapHeight));
 
-        int64_t deltaNS = rvDeltaTime_ns(&prevAction.stroke_start,
+        i64 deltaNS = rvDeltaTime_ns(&prevAction.stroke_start,
                                                &currentAction.stroke_start);
         if(deltaNS != 0)
         {
@@ -279,8 +279,8 @@ void meRedo
         return;
     }
 
-    Action nextAction;
-    for(uint32_t undoCount = 0; undoCount < ME_MAX_ACTIONS; ++undoCount)
+    Action nextAction = {0};
+    for(u32 undoCount = 0; undoCount < ME_MAX_ACTIONS; ++undoCount)
     {
         currentAction = editor->actions[editor->currentAction];
         if(editor->currentAction >= ME_MAX_ACTIONS - 1)
@@ -293,11 +293,11 @@ void meRedo
         }
 
         readAction_redo(editor);
-        editor->currentLayer = (uint8_t)floor((double)currentAction.map_index /
-                                              (editor->mapWidth * editor->mapHeight));
+        editor->currentLayer = (u08)floor((f64)currentAction.map_index /
+                                          (editor->mapWidth * editor->mapHeight));
         incrementAction(editor);
 
-        int64_t deltaNS = rvDeltaTime_ns(&nextAction.stroke_start,
+        i64 deltaNS = rvDeltaTime_ns(&nextAction.stroke_start,
                                          &currentAction.stroke_start);
         if(deltaNS != 0)
         {

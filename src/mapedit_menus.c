@@ -6,13 +6,13 @@ f_internal void updateFPS
     EngineData *engine,
     EditorData *editor
 ){
-    uint64_t deltaNS = rvDeltaTime_now_ns(&editor->lastFPSTime);
+    u64 deltaNS = rvDeltaTime_now_ns(&editor->lastFPSTime);
     if(deltaNS < 320000000UL)
     {
         return;
     }
 
-    float lastFPS = (float)editor->runningFrames * 1e9f / (float)deltaNS;
+    f32 lastFPS = (f32)editor->runningFrames * 1e9f / (f32)deltaNS;
 
     char fpsStr[14];
     snprintf(fpsStr, 14, "FPS: %.1f", lastFPS);
@@ -62,7 +62,7 @@ void meDrawMainMenu
         rvCompositeImage(engine, &comp);
     }
 
-    float deltaMS = rvDeltaTime_now_ms(&editor->lastSaveTime);
+    f32 deltaMS = rvDeltaTime_now_ms(&editor->lastSaveTime);
     if(deltaMS < 250)
     {
         comp.src        = &engine->planes[ME_PLANE_ICON_SAVED];
@@ -270,14 +270,14 @@ void mePollMainMenu
     {
         rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_HOVER]);
 
-        float length = editor->new_b.area.lowRight.x - editor->new_b.area.upLeft.x;
-        float fX     = (float)(engine->backbuffer.width);
-        float fY     = (float)(engine->backbuffer.height);
+        f32 length = editor->new_b.area.lowRight.x - editor->new_b.area.upLeft.x;
+        f32 fX     = (f32)(engine->backbuffer.width);
+        f32 fY     = (f32)(engine->backbuffer.height);
 
         comp.src        = &engine->planes[ME_PLANE_HIGHLIGHT];
-        comp.offsetDstX = (uint32_t)(editor->new_b.area.upLeft.x * fX);
-        comp.offsetDstY = (uint32_t)(editor->new_b.area.upLeft.y * fY + 20);
-        comp.cropWidth  = (uint32_t)(length * fX);
+        comp.offsetDstX = (u32)(editor->new_b.area.upLeft.x * fX);
+        comp.offsetDstY = (u32)(editor->new_b.area.upLeft.y * fY + 20);
+        comp.cropWidth  = (u32)(length * fX);
         comp.cropHeight = 5;
 
         rvCompositeImage(engine, &comp);
@@ -287,12 +287,12 @@ void mePollMainMenu
         ){
             if(editor->previousState && editor->placedTiles)
             {
-                uint64_t tilecount = editor->mapLayers *
+                u64 tilecount = editor->mapLayers *
                                      editor->mapHeight * editor->mapWidth;
 
-                for(uint64_t i = 0; i < tilecount; ++i)
+                for(u64 i = 0; i < tilecount; ++i)
                 {
-                    editor->placedTiles[i].x = UINT16_MAX;
+                    editor->placedTiles[i].x = U16MAX;
                 }
             }
 
@@ -304,14 +304,14 @@ void mePollMainMenu
     {
         rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_HOVER]);
 
-        float length = editor->load_b.area.lowRight.x - editor->load_b.area.upLeft.x;
-        float fX     = (float)(engine->backbuffer.width);
-        float fY     = (float)(engine->backbuffer.height);
+        f32 length = editor->load_b.area.lowRight.x - editor->load_b.area.upLeft.x;
+        f32 fX     = (f32)(engine->backbuffer.width);
+        f32 fY     = (f32)(engine->backbuffer.height);
 
         comp.src        = &engine->planes[ME_PLANE_HIGHLIGHT];
-        comp.offsetDstX = (uint32_t)(editor->load_b.area.upLeft.x * fX);
-        comp.offsetDstY = (uint32_t)(editor->load_b.area.upLeft.y * fY + 20);
-        comp.cropWidth  = (uint32_t)(length * fX);
+        comp.offsetDstX = (u32)(editor->load_b.area.upLeft.x * fX);
+        comp.offsetDstY = (u32)(editor->load_b.area.upLeft.y * fY + 20);
+        comp.cropWidth  = (u32)(length * fX);
         comp.cropHeight = 5;
 
         rvCompositeImage(engine, &comp);
@@ -329,14 +329,14 @@ void mePollMainMenu
     {
         rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_HOVER]);
 
-        float length = editor->quit_b.area.lowRight.x - editor->quit_b.area.upLeft.x;
-        float fX     = (float)(engine->backbuffer.width);
-        float fY     = (float)(engine->backbuffer.height);
+        f32 length = editor->quit_b.area.lowRight.x - editor->quit_b.area.upLeft.x;
+        f32 fX     = (f32)(engine->backbuffer.width);
+        f32 fY     = (f32)(engine->backbuffer.height);
 
         comp.src        = &engine->planes[ME_PLANE_HIGHLIGHT];
-        comp.offsetDstX = (uint32_t)(editor->quit_b.area.upLeft.x * fX);
-        comp.offsetDstY = (uint32_t)(editor->quit_b.area.upLeft.y * fY + 20);
-        comp.cropWidth  = (uint32_t)(length * fX);
+        comp.offsetDstX = (u32)(editor->quit_b.area.upLeft.x * fX);
+        comp.offsetDstY = (u32)(editor->quit_b.area.upLeft.y * fY + 20);
+        comp.cropWidth  = (u32)(length * fX);
         comp.cropHeight = 5;
 
         rvCompositeImage(engine, &comp);
@@ -351,14 +351,14 @@ void mePollMainMenu
     {
         rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_HOVER]);
 
-        float length = editor->save_b.area.lowRight.x - editor->save_b.area.upLeft.x;
-        float fX     = (float)(engine->backbuffer.width);
-        float fY     = (float)(engine->backbuffer.height);
+        f32 length = editor->save_b.area.lowRight.x - editor->save_b.area.upLeft.x;
+        f32 fX     = (f32)(engine->backbuffer.width);
+        f32 fY     = (f32)(engine->backbuffer.height);
 
         comp.src        = &engine->planes[ME_PLANE_HIGHLIGHT];
-        comp.offsetDstX = (uint32_t)(editor->save_b.area.upLeft.x * fX);
-        comp.offsetDstY = (uint32_t)(editor->save_b.area.upLeft.y * fY + 20);
-        comp.cropWidth  = (uint32_t)(length * fX);
+        comp.offsetDstX = (u32)(editor->save_b.area.upLeft.x * fX);
+        comp.offsetDstY = (u32)(editor->save_b.area.upLeft.y * fY + 20);
+        comp.cropWidth  = (u32)(length * fX);
         comp.cropHeight = 5;
 
         rvCompositeImage(engine, &comp);
@@ -375,14 +375,14 @@ void mePollMainMenu
     {
         rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_HOVER]);
 
-        float length = editor->saveas_b.area.lowRight.x - editor->saveas_b.area.upLeft.x;
-        float fX     = (float)(engine->backbuffer.width);
-        float fY     = (float)(engine->backbuffer.height);
+        f32 length = editor->saveas_b.area.lowRight.x - editor->saveas_b.area.upLeft.x;
+        f32 fX     = (f32)(engine->backbuffer.width);
+        f32 fY     = (f32)(engine->backbuffer.height);
 
         comp.src        = &engine->planes[ME_PLANE_HIGHLIGHT];
-        comp.offsetDstX = (uint32_t)(editor->saveas_b.area.upLeft.x * fX);
-        comp.offsetDstY = (uint32_t)(editor->saveas_b.area.upLeft.y * fY + 20);
-        comp.cropWidth  = (uint32_t)(length * fX);
+        comp.offsetDstX = (u32)(editor->saveas_b.area.upLeft.x * fX);
+        comp.offsetDstY = (u32)(editor->saveas_b.area.upLeft.y * fY + 20);
+        comp.cropWidth  = (u32)(length * fX);
         comp.cropHeight = 5;
 
         rvCompositeImage(engine, &comp);
@@ -411,20 +411,20 @@ f_internal void getSheetDims
 (
     EngineData *engine,
     EditorData *editor,
-    uint32_t   *sheet_width,
-    uint32_t   *sheet_height
+    u32        *sheet_width,
+    u32        *sheet_height
 ){
     *sheet_width  = engine->planes[ME_PLANE_TILESHEET].width;
     *sheet_height = engine->planes[ME_PLANE_TILESHEET].height;
-    float max_w = (float)engine->backbuffer.width  * 0.8f - 2 * editor->tilesize;
-    float max_h = (float)engine->backbuffer.height * 0.8f - 3 * editor->tilesize;
-    if((float)*sheet_width > max_w)
+    f32 max_w = (f32)engine->backbuffer.width  * 0.8f - 2 * editor->tilesize;
+    f32 max_h = (f32)engine->backbuffer.height * 0.8f - 3 * editor->tilesize;
+    if((f32)*sheet_width > max_w)
     {
-        *sheet_width = (uint32_t)max_w;
+        *sheet_width = (u32)max_w;
     }
-    if((float)*sheet_height > max_h)
+    if((f32)*sheet_height > max_h)
     {
-        *sheet_height = (uint32_t)max_h;
+        *sheet_height = (u32)max_h;
     }
 }
 
@@ -432,8 +432,8 @@ f_internal void drawTilePicker
 (
     EngineData *engine,
     EditorData *editor,
-    uint32_t   sheet_width,
-    uint32_t   sheet_height
+    u32   sheet_width,
+    u32   sheet_height
 ){
     rvCompositeSettings comp = {0};
     comp.dst        = &engine->backbuffer;
@@ -441,8 +441,8 @@ f_internal void drawTilePicker
     comp.src        = &engine->planes[ME_PLANE_BACKGROUND];
     comp.offsetDstX = engine->backbuffer.width  / 10;
     comp.offsetDstY = engine->backbuffer.height / 10;
-    comp.cropWidth  = (uint32_t)((float)engine->backbuffer.width  / 1.25f);
-    comp.cropHeight = (uint32_t)((float)engine->backbuffer.height / 1.25f);
+    comp.cropWidth  = (u32)((f32)engine->backbuffer.width  / 1.25f);
+    comp.cropHeight = (u32)((f32)engine->backbuffer.height / 1.25f);
 
     rvCompositeImage(engine, &comp);
 
@@ -469,37 +469,37 @@ f_internal void drawContextMenu
 (
     EngineData *engine,
     EditorData *editor,
-    uint32_t   tileLocX,
-    uint32_t   tileLocY
+    u32   tileLocX,
+    u32   tileLocY
 ){
-    uint32_t scrollHeight = editor->viewScroll * editor->tilesize;
+    u32 scrollHeight = editor->viewScroll * editor->tilesize;
 
     rvCompositeSettings comp = {0};
     comp.dst        = &engine->backbuffer;
     comp.pictop     = RV_PICTOP_OVER;
     comp.src        = &engine->planes[ME_PLANE_HIGHLIGHT_SOLID];
-    comp.offsetDstX = tileLocX + (uint32_t)(editor->tilesize * 0.60f);
-    comp.offsetDstY = tileLocY + (uint32_t)(editor->tilesize * 0.60f) - scrollHeight;
+    comp.offsetDstX = tileLocX + (u32)(editor->tilesize * 0.60f);
+    comp.offsetDstY = tileLocY + (u32)(editor->tilesize * 0.60f) - scrollHeight;
     comp.cropWidth  = engine->planes[ME_PLANE_CONTEXTMENU].width;
     comp.cropHeight = engine->planes[ME_PLANE_CONTEXTMENU].height;
     rvCompositeImage(engine, &comp);
 
-    float fX = (float)engine->backbuffer.width;
-    float fY = (float)engine->backbuffer.height;
+    f32 fX = (f32)engine->backbuffer.width;
+    f32 fY = (f32)engine->backbuffer.height;
 
-    float    fPad    = 0.003f;
-    uint32_t padding = (uint32_t)(fX * fPad);
+    f32    fPad    = 0.003f;
+    u32 padding = (u32)(fX * fPad);
 
-    float fOffsetX = (float)comp.offsetDstX / fX;
-    float fOffsetY = (float)comp.offsetDstY / fY;
+    f32 fOffsetX = (f32)comp.offsetDstX / fX;
+    f32 fOffsetY = (f32)comp.offsetDstY / fY;
 
-    float collision_length = (float)editor->collision_b.name.size * (17.0f) / fX + fPad;
+    f32 collision_length = (f32)editor->collision_b.name.size * (17.0f) / fX + fPad;
     editor->collision_b.area.upLeft.x   = fOffsetX + fPad;
     editor->collision_b.area.upLeft.y   = fOffsetY;
     editor->collision_b.area.lowRight.x = fOffsetX + collision_length;
     editor->collision_b.area.lowRight.y = fOffsetY + 16.0f / fY + fPad / 2;
 
-    float animation_length = (float)editor->animation_b.name.size * 17.0f / fX + fPad;
+    f32 animation_length = (f32)editor->animation_b.name.size * 17.0f / fX + fPad;
     editor->animation_b.area.upLeft.x   = fOffsetX + fPad;
     editor->animation_b.area.upLeft.y   = fOffsetY + 16.0f / fY + fPad;
     editor->animation_b.area.lowRight.x = fOffsetX + animation_length;
@@ -515,16 +515,16 @@ f_internal void getTileXY
 (
     EngineData *engine,
     EditorData *editor,
-    uint16_t   *tileX,
-    uint16_t   *tileY,
-    float      fX,
-    float      fY
+    u16        *tileX,
+    u16        *tileY,
+    f32        fX,
+    f32        fY
 ){
-    *tileX = (uint16_t)(engine->controls.pointer.x * fX / editor->tilesize);
-    *tileY = (uint16_t)(engine->controls.pointer.y * fY / editor->tilesize);
+    *tileX = (u16)(engine->controls.pointer.x * fX / editor->tilesize);
+    *tileY = (u16)(engine->controls.pointer.y * fY / editor->tilesize);
 
-    uint8_t  modX  = *tileX % editor->selectMult;
-    uint8_t  modY  = *tileY % editor->selectMult;
+    u08 modX = *tileX % editor->selectMult;
+    u08 modY = *tileY % editor->selectMult;
     if(engine->controls.keymap & ME_BIT_LSHIFT)
     {
         *tileX -= modX;
@@ -546,7 +546,7 @@ void meDrawEditor
 
     rvCompositeImage(engine, &comp);
 
-    for(uint8_t i = 0; i < editor->mapLayers; ++i)
+    for(u08 i = 0; i < editor->mapLayers; ++i)
     {
         if(engine->controls.keymap & (ME_BIT_LAYER0 << i))
         {
@@ -555,22 +555,22 @@ void meDrawEditor
         }
     }
 
-    uint8_t startLayer = editor->isolate ? editor->currentLayer : 0;
-    uint8_t endLayer   = editor->isolate ? editor->currentLayer + 1 : editor->mapLayers;
+    u08 startLayer = editor->isolate ? editor->currentLayer : 0;
+    u08 endLayer   = editor->isolate ? editor->currentLayer + 1 : editor->mapLayers;
 
     comp.cropWidth  = editor->tilesize;
     comp.cropHeight = editor->tilesize;
 
-    for(uint8_t z = startLayer; z < endLayer; ++z)
+    for(u08 z = startLayer; z < endLayer; ++z)
     {
-        for(uint32_t y = 0; y < editor->mapHeight; ++y)
+        for(u32 y = 0; y < editor->mapHeight; ++y)
         {
-            for(uint32_t x = 0; x < editor->mapWidth; ++x)
+            for(u32 x = 0; x < editor->mapWidth; ++x)
             {
-                uint64_t index = z * editor->mapWidth * editor->mapHeight +
-                                 y * editor->mapWidth + x;
+                u64 index = z * editor->mapWidth * editor->mapHeight +
+                            y * editor->mapWidth + x;
 
-                if(editor->placedTiles[index].x == UINT16_MAX)
+                if(editor->placedTiles[index].x == U16MAX)
                 {
                     continue;
                 }
@@ -588,11 +588,11 @@ void meDrawEditor
                     continue;
                 }
 
-                uint64_t sheetW = engine->planes[ME_PLANE_TILESHEET].width /
-                                  editor->tilesize;
+                u64 sheetW = engine->planes[ME_PLANE_TILESHEET].width /
+                             editor->tilesize;
 
-                uint64_t dataIndex = editor->placedTiles[index].y * sheetW +
-                                     editor->placedTiles[index].x;
+                u64 dataIndex = editor->placedTiles[index].y * sheetW +
+                                editor->placedTiles[index].x;
 
                 if(editor->tileData[dataIndex].flags & RV_TILE_BIT_COLLISION)
                 {
@@ -620,14 +620,14 @@ void meDrawEditor
     comp.src        = &engine->planes[ME_PLANE_CURRENTLAYER];
     comp.offsetSrcX = 0;
     comp.offsetSrcY = 0;
-    comp.offsetDstX = (uint32_t)(0.95f * (float)engine->backbuffer.width);
-    comp.offsetDstY = (uint32_t)(0.025f * (float)engine->backbuffer.width);
+    comp.offsetDstX = (u32)(0.95f * (f32)engine->backbuffer.width);
+    comp.offsetDstY = (u32)(0.025f * (f32)engine->backbuffer.width);
     comp.cropWidth  = engine->planes[ME_PLANE_CURRENTLAYER].width;
     comp.cropHeight = engine->planes[ME_PLANE_CURRENTLAYER].height;
 
     rvCompositeImage(engine, &comp);
 
-    float deltaMS = rvDeltaTime_now_ms(&editor->lastSaveTime);
+    f32 deltaMS = rvDeltaTime_now_ms(&editor->lastSaveTime);
     if(deltaMS < 250)
     {
         comp.src        = &engine->planes[ME_PLANE_ICON_SAVED];
@@ -639,11 +639,11 @@ void meDrawEditor
         rvCompositeImage(engine, &comp);
     }
 
-    float fX = (float)engine->backbuffer.width;
-    float fY = (float)engine->backbuffer.height;
+    f32 fX = (f32)engine->backbuffer.width;
+    f32 fY = (f32)engine->backbuffer.height;
 
-    uint16_t tileX = 0;
-    uint16_t tileY = 0;
+    u16 tileX = 0;
+    u16 tileY = 0;
     getTileXY(engine, editor, &tileX, &tileY, fX, fY);
 
     comp.src        = &engine->planes[ME_PLANE_TILESHEET];
@@ -657,8 +657,8 @@ void meDrawEditor
 
     rvCompositeImage(engine, &comp);
 
-    uint32_t sheet_width  = 0;
-    uint32_t sheet_height = 0;
+    u32 sheet_width  = 0;
+    u32 sheet_height = 0;
     getSheetDims(engine, editor, &sheet_width, &sheet_height);
 
     if(editor->flags & ME_FLAG_TILEPICKER)
@@ -666,11 +666,11 @@ void meDrawEditor
         drawTilePicker(engine, editor, sheet_width, sheet_height);
         if(editor->flags & ME_FLAG_CONTEXTMENU)
         {
-            float tileCornerX = 0.095f + (float)((float)editor->tilesize / fX);
-            float tileCornerY = 0.095f + (float)((float)editor->tilesize / fY);
-            uint32_t tileLocX = (uint32_t)(fX * (tileCornerX + 0.0055f) +
+            f32 tileCornerX = 0.095f + (f32)((f32)editor->tilesize / fX);
+            f32 tileCornerY = 0.095f + (f32)((f32)editor->tilesize / fY);
+            u32 tileLocX = (u32)(fX * (tileCornerX + 0.0055f) +
                                            editor->selectedX * editor->tilesize);
-            uint32_t tileLocY = (uint32_t)(fY * (tileCornerY + 0.006f) +
+            u32 tileLocY = (u32)(fY * (tileCornerY + 0.006f) +
                                            editor->selectedY * editor->tilesize);
             drawContextMenu(engine, editor, tileLocX, tileLocY);
         }
@@ -692,12 +692,12 @@ void meDrawEditor
     }
 }
 
-f_internal uint32_t sheetIndex
+f_internal u32 sheetIndex
 (
     EngineData *engine,
     EditorData *editor
 ){
-    uint32_t tileW = engine->planes[ME_PLANE_TILESHEET].width /
+    u32 tileW = engine->planes[ME_PLANE_TILESHEET].width /
                      editor->tilesize;
     return editor->selectedY * tileW + editor->selectedX;
 }
@@ -736,8 +736,8 @@ f_internal void pollContextMenu
         editor->animation_b.status &= ~RV_BIT_HOVER;
     }
 
-    float fX = (float)(engine->backbuffer.width);
-    float fY = (float)(engine->backbuffer.height);
+    f32 fX = (f32)(engine->backbuffer.width);
+    f32 fY = (f32)(engine->backbuffer.height);
 
     bool confirmed = engine->controls.buttonmap & ME_BIT_LEFTM ||
                      engine->controls.keymap    & ME_BIT_ENTER;
@@ -749,18 +749,18 @@ f_internal void pollContextMenu
 
     if(editor->collision_b.status & RV_BIT_HOVER)
     {
-        float length = editor->collision_b.area.lowRight.x -
+        f32 length = editor->collision_b.area.lowRight.x -
                        editor->collision_b.area.upLeft.x;
 
-        comp.offsetDstX = (uint32_t)(editor->collision_b.area.upLeft.x * fX);
-        comp.offsetDstY = (uint32_t)(editor->collision_b.area.upLeft.y * fY) + 20;
-        comp.cropWidth  = (uint32_t)(length * fX);
+        comp.offsetDstX = (u32)(editor->collision_b.area.upLeft.x * fX);
+        comp.offsetDstY = (u32)(editor->collision_b.area.upLeft.y * fY) + 20;
+        comp.cropWidth  = (u32)(length * fX);
         comp.cropHeight = 5;
         rvCompositeImage(engine, &comp);
 
         if(confirmed)
         {
-            uint32_t index = sheetIndex(engine, editor);
+            u32 index = sheetIndex(engine, editor);
             editor->tileData[index].flags ^= RV_TILE_BIT_COLLISION;
 
             editor->flags &= ~ME_FLAG_CONTEXTMENU;
@@ -771,18 +771,18 @@ f_internal void pollContextMenu
     }
     else if(editor->animation_b.status & RV_BIT_HOVER)
     {
-        float length = editor->animation_b.area.lowRight.x -
+        f32 length = editor->animation_b.area.lowRight.x -
                        editor->animation_b.area.upLeft.x;
 
-        comp.offsetDstX = (uint32_t)(editor->animation_b.area.upLeft.x * fX);
-        comp.offsetDstY = (uint32_t)(editor->animation_b.area.upLeft.y * fY) + 20;
-        comp.cropWidth  = (uint32_t)(length * fX);
+        comp.offsetDstX = (u32)(editor->animation_b.area.upLeft.x * fX);
+        comp.offsetDstY = (u32)(editor->animation_b.area.upLeft.y * fY) + 20;
+        comp.cropWidth  = (u32)(length * fX);
         comp.cropHeight = 5;
         rvCompositeImage(engine, &comp);
 
         if(confirmed)
         {
-            uint32_t index = sheetIndex(engine, editor);
+            u32 index = sheetIndex(engine, editor);
             editor->tileData[index].flags ^= RV_TILE_BIT_ANIMATED;
 
             ME_WARN("TODO: edit tile animation: (%u,%u)",
@@ -800,17 +800,17 @@ f_internal void pollTilePicker
 (
     EngineData *engine,
     EditorData *editor,
-    uint32_t   sheet_width,
-    uint32_t   sheet_height
+    u32        sheet_width,
+    u32        sheet_height
 ){
-    float fX = (float)(engine->backbuffer.width);
-    float fY = (float)(engine->backbuffer.height);
+    f32 fX = (f32)(engine->backbuffer.width);
+    f32 fY = (f32)(engine->backbuffer.height);
 
     Rect tiles = {0};
-    tiles.upLeft.x   = 0.095f + (float)((float)editor->tilesize / fX);
-    tiles.upLeft.y   = 0.095f + (float)((float)editor->tilesize / fY);
-    tiles.lowRight.x = tiles.upLeft.x + (float)sheet_width  / fX;
-    tiles.lowRight.y = tiles.upLeft.y + (float)sheet_height / fY;
+    tiles.upLeft.x   = 0.095f + (f32)((f32)editor->tilesize / fX);
+    tiles.upLeft.y   = 0.095f + (f32)((f32)editor->tilesize / fY);
+    tiles.lowRight.x = tiles.upLeft.x + (f32)sheet_width  / fX;
+    tiles.lowRight.y = tiles.upLeft.y + (f32)sheet_height / fY;
 
     rvCompositeSettings comp = {0};
     comp.dst    = &engine->backbuffer;
@@ -846,15 +846,15 @@ f_internal void pollTilePicker
     {
         rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_HOVER]);
 
-        float length = editor->close_b.area.lowRight.x -
+        f32 length = editor->close_b.area.lowRight.x -
                        editor->close_b.area.upLeft.x;
 
         comp.src        = &engine->planes[ME_PLANE_HIGHLIGHT];
         comp.offsetSrcX = 0;
         comp.offsetSrcY = 0;
-        comp.offsetDstX = (uint32_t)(editor->close_b.area.upLeft.x * fX);
-        comp.offsetDstY = (uint32_t)(editor->close_b.area.upLeft.y * fY + 20);
-        comp.cropWidth  = (uint32_t)(length * fX);
+        comp.offsetDstX = (u32)(editor->close_b.area.upLeft.x * fX);
+        comp.offsetDstY = (u32)(editor->close_b.area.upLeft.y * fY + 20);
+        comp.cropWidth  = (u32)(length * fX);
         comp.cropHeight = 5;
 
         rvCompositeImage(engine, &comp);
@@ -869,26 +869,26 @@ f_internal void pollTilePicker
     {
         rvChangeCursor(engine, &engine->planes[ME_PLANE_CURSOR_NULL]);
 
-        float    deltaX = engine->controls.pointer.x - tiles.upLeft.x;
-        float    deltaY = engine->controls.pointer.y - tiles.upLeft.y;
-        uint16_t tileX  = (uint16_t)(deltaX * fX / editor->tilesize);
-        uint16_t tileY  = (uint16_t)(deltaY * fY / editor->tilesize);
-        uint16_t sheetX = (uint16_t)(sheet_width  / editor->tilesize);
-        uint16_t sheetY = (uint16_t)(sheet_height / editor->tilesize);
+        f32 deltaX = engine->controls.pointer.x - tiles.upLeft.x;
+        f32 deltaY = engine->controls.pointer.y - tiles.upLeft.y;
+        u16 tileX  = (u16)(deltaX * fX / editor->tilesize);
+        u16 tileY  = (u16)(deltaY * fY / editor->tilesize);
+        u16 sheetX = (u16)(sheet_width  / editor->tilesize);
+        u16 sheetY = (u16)(sheet_height / editor->tilesize);
 
         if(tileX + editor->selectMult > sheetX)
         {
-            tileX = (uint8_t)(sheetX - editor->selectMult);
+            tileX = (u08)(sheetX - editor->selectMult);
         }
         if(tileY + editor->selectMult > sheetY)
         {
-            tileY = (uint8_t)(sheetY - editor->selectMult);
+            tileY = (u08)(sheetY - editor->selectMult);
         }
 
-        uint32_t tileLocX = (uint32_t)(fX * (tiles.upLeft.x + 0.0055f) +
-                                       tileX * editor->tilesize);
-        uint32_t tileLocY = (uint32_t)(fY * (tiles.upLeft.y + 0.006f) +
-                                       tileY * editor->tilesize);
+        u32 tileLocX = (u32)(fX * (tiles.upLeft.x + 0.0055f) +
+                             tileX * editor->tilesize);
+        u32 tileLocY = (u32)(fY * (tiles.upLeft.y + 0.006f) +
+                             tileY * editor->tilesize);
 
         comp.offsetDstX = tileLocX;
         comp.offsetDstY = tileLocY;
@@ -928,11 +928,11 @@ void mePollEditor
     comp.dst    = &engine->backbuffer;
     comp.pictop = RV_PICTOP_OVER;
 
-    float fX = (float)engine->backbuffer.width;
-    float fY = (float)engine->backbuffer.height;
+    f32 fX = (f32)engine->backbuffer.width;
+    f32 fY = (f32)engine->backbuffer.height;
 
-    uint32_t sheet_width  = 0;
-    uint32_t sheet_height = 0;
+    u32 sheet_width  = 0;
+    u32 sheet_height = 0;
     getSheetDims(engine, editor, &sheet_width, &sheet_height);
 
     bool control = engine->controls.keymap & ME_BIT_LCTRL ||
@@ -997,8 +997,8 @@ void mePollEditor
         return;
     }
 
-    uint16_t tileX = 0;
-    uint16_t tileY = 0;
+    u16 tileX = 0;
+    u16 tileY = 0;
     getTileXY(engine, editor, &tileX, &tileY, fX, fY);
 
     //if(rvInsideRect(&engine->controls.pointer, &editor->button))
@@ -1030,8 +1030,8 @@ void meDrawFilePicker
     rvCompositeImage(engine, &comp);
 
     comp.src = &engine->planes[ME_PLANE_CURRENTFILE];
-    comp.offsetDstX = (uint32_t)(0.025f * (float)engine->backbuffer.width);
-    comp.offsetDstY = (uint32_t)(0.4f * (float)engine->backbuffer.height);
+    comp.offsetDstX = (u32)(0.025f * (f32)engine->backbuffer.width);
+    comp.offsetDstY = (u32)(0.4f * (f32)engine->backbuffer.height);
     comp.cropWidth  = engine->planes[ME_PLANE_CURRENTFILE].width;
     comp.cropHeight = engine->planes[ME_PLANE_CURRENTFILE].height;
 

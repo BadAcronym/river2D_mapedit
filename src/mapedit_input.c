@@ -1,14 +1,12 @@
 #include "mapedit_main.h"
 #include "me_print_macros.h"
 
-#include <inttypes.h>
-
 f_internal bool processButton_function
 (
     RiverControls *controls,
-    uint64_t      desired,
-    uint64_t      button,
-    uint64_t      bit,
+    u64           desired,
+    u64           button,
+    u64           bit,
     bool          isDown
 ){
     if(button == controls->buttoncodes[desired])
@@ -34,9 +32,9 @@ processButton_function(controls, bmacro, button, bitmacro, isDown)
 f_internal void processKey_function
 (
     RiverControls *controls,
-    uint8_t       desired,
+    u08           desired,
     AsciiKey      key,
-    uint64_t      bit,
+    u64           bit,
     bool          isDown
 ){
     if(isDown && key.key == controls->keycodes[desired])
@@ -58,7 +56,7 @@ void meProcessButtons
 (
     EditorData    *editor,
     RiverControls *controls,
-    uint32_t      button,
+    u32           button,
     bool          isDown
 ){
     if(processButton(ME_BUTTON_LEFTM, ME_BIT_LEFTM))
@@ -130,8 +128,8 @@ void meProcessKeys
 void meProcessPointer
 (
     EngineData *engine,
-    uint32_t   x,
-    uint32_t   y
+    u32        x,
+    u32        y
 ){
     Dimensions dim = rvGetWindowSize(engine);
 
@@ -144,8 +142,8 @@ void meProcessPointer
         y = dim.height;
     }
 
-    engine->controls.pointer.x = (float)x / (float)dim.width;
-    engine->controls.pointer.y = (float)y / (float)dim.height;
+    engine->controls.pointer.x = (f32)x / (f32)dim.width;
+    engine->controls.pointer.y = (f32)y / (f32)dim.height;
 }
 
 void meScroll

@@ -103,7 +103,7 @@ void meInit
     editor->mapLayers    = 10;
     editor->currentLayer = 1;
 
-    StringView title_sv  = pdCstrSV("RV MAP EDITOR");
+    StringView title_sv  = pdCstrSV("RIVER2D MAP EDITOR");
     StringView new_sv    = pdCstrSV("NEW PROJECT");
     StringView load_sv   = pdCstrSV("LOAD PROJECT");
     StringView save_sv   = pdCstrSV("SAVE PROJECT");
@@ -123,13 +123,13 @@ void meInit
     rvCreateImage(engine, &engine->planes[ME_PLANE_TILEPICKER],
                         engine->backbuffer.width, engine->backbuffer.height);
 
-    uint8_t charsize = 16;
-    uint8_t hSpacing = 1;
-    uint8_t vSpacing = 2;
-    uint8_t elements = 3;
+    u08 charsize = 16;
+    u08 hSpacing = 1;
+    u08 vSpacing = 2;
+    u08 elements = 3;
 
     rvCreateImage(engine, &engine->planes[ME_PLANE_CONTEXTMENU],
-                        (charsize + hSpacing * 2) * (uint32_t)animation_sv.size,
+                        (charsize + hSpacing * 2) * (u32)animation_sv.size,
                         (charsize + vSpacing * 2) * elements);
 
     // always show, for now.
@@ -201,7 +201,7 @@ void meInit
     set.img = &engine->planes[ME_PLANE_PAUSEMENU];
     rvCreateButton(engine, &set);
 
-    float bufHeight = (float)engine->backbuffer.height;
+    f32 bufHeight = (f32)engine->backbuffer.height;
 
     set.name      = &close_sv;
     set.img       = &engine->planes[ME_PLANE_TILEPICKER];
@@ -221,8 +221,8 @@ void meInit
 
     set.name    = &animation_sv;
     set.img     = &engine->planes[ME_PLANE_CONTEXTMENU];
-    set.point.y = (float)(charsize + vSpacing) /
-                    (float)engine->planes[ME_PLANE_CONTEXTMENU].height;
+    set.point.y = (f32)(charsize + vSpacing) /
+                  (f32)engine->planes[ME_PLANE_CONTEXTMENU].height;
     set.button  = &editor->animation_b;
     rvCreateButton(engine, &set);
 
@@ -232,7 +232,7 @@ void meInit
     StringView ls     = pdListFiles(dir, listed);
     StringView folder = pdCstrSV("assets/custom/");
 
-    for(uint16_t i = 0; i < dir.size; ++i)
+    for(u16 i = 0; i < dir.size; ++i)
     {
         StringView file = pdSVFindByDelim(ls, ';', i);
         if(!file.data || !file.size)
@@ -265,25 +265,25 @@ void meInit
     editor->mapWidth  = engine->config.canvasWidth  / editor->tilesize;
     editor->mapHeight = engine->config.canvasHeight / editor->tilesize;
 
-    uint64_t tilecount  = editor->mapLayers * editor->mapWidth * editor->mapHeight;
+    u64 tilecount  = editor->mapLayers * editor->mapWidth * editor->mapHeight;
     editor->placedTiles = malloc(tilecount * sizeof(TileIndex));
-    for(uint64_t i = 0; i < tilecount; ++i)
+    for(u64 i = 0; i < tilecount; ++i)
     {
-        editor->placedTiles[i].x = UINT16_MAX;
+        editor->placedTiles[i].x = U16MAX;
     }
 
-    uint32_t sheetCountX = engine->planes[ME_PLANE_TILESHEET].width /
+    u32 sheetCountX = engine->planes[ME_PLANE_TILESHEET].width /
                            editor->tilesize;
 
-    uint32_t sheetCountY = engine->planes[ME_PLANE_TILESHEET].height /
+    u32 sheetCountY = engine->planes[ME_PLANE_TILESHEET].height /
                            editor->tilesize;
 
     editor->tileData = calloc(sheetCountX * sheetCountY, sizeof(TileMetadata));
     editor->actions  = malloc(ME_MAX_ACTIONS * sizeof(Action));
-    for(uint32_t i = 0; i < ME_MAX_ACTIONS; ++i)
+    for(u32 i = 0; i < ME_MAX_ACTIONS; ++i)
     {
-        editor->actions[i].stroke_start.s  = INT64_MIN;
-        editor->actions[i].stroke_start.ns = INT64_MIN;
+        editor->actions[i].stroke_start.s  = I64MIN;
+        editor->actions[i].stroke_start.ns = I64MIN;
     }
 
     if(!editor->inputBuffer.data)
@@ -360,7 +360,7 @@ int32_t meShutdown
 void meChangeState
 (
     EditorData *editor,
-    uint8_t    nextState
+    u08        nextState
 ){
     if(editor->currentState == nextState)
     {

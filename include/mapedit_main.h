@@ -116,7 +116,7 @@
 typedef struct Action
 {
     RiverTime stroke_start;
-    uint64_t  map_index;
+    u64       map_index;
     TileIndex prev_tile;
     TileIndex new_tile;
 }
@@ -124,26 +124,26 @@ Action;
 
 typedef struct EditorData
 {
-    uint16_t     runningFrames;
+    u16          runningFrames;
     RiverTime    lastFPSTime;
     RiverTime    lastUpdateTime;
     RiverTime    lastPresentTime;
     RiverTime    lastSaveTime;
     RiverTime    lastActionStart;
-    uint8_t      currentState;
-    uint8_t      previousState;
-    uint8_t      currentLayer;
+    u08          currentState;
+    u08          previousState;
+    u08          currentLayer;
     bool         isolate;
-    uint16_t     selectedX;
-    uint16_t     selectedY;
-    uint8_t      selectMult;
-    uint16_t     tilesize;
-    uint32_t     mapWidth;
-    uint32_t     mapHeight;
-    uint8_t      mapLayers;
+    u16          selectedX;
+    u16          selectedY;
+    u08          selectMult;
+    u16          tilesize;
+    u32          mapWidth;
+    u32          mapHeight;
+    u08          mapLayers;
     TileMetadata *tileData;
     TileIndex    *placedTiles;
-    uint8_t      flags;
+    u08          flags;
     Button       new_b;
     Button       load_b;
     Button       save_b;
@@ -152,13 +152,13 @@ typedef struct EditorData
     Button       close_b;
     Button       collision_b;
     Button       animation_b;
-    uint8_t      i_button;
+    u08          i_button;
     Action       *actions;
-    uint32_t     currentAction;
+    u32          currentAction;
     String       inputBuffer;
     StringView   filename;
-    uint8_t      viewScroll;
-    uint8_t      cursor;
+    u08          viewScroll;
+    u08          cursor;
     bool         confirmed;
 }
 EditorData;
@@ -202,7 +202,7 @@ extern void meProcessButtons
 (
     EditorData    *editor,
     RiverControls *controls,
-    uint32_t      button,
+    u32           button,
     bool          isDown
 );
 
@@ -216,22 +216,22 @@ extern void meProcessKeys
 extern void meProcessPointer
 (
     EngineData *engine,
-    uint32_t   x,
-    uint32_t   y
+    u32        x,
+    u32        y
 );
 
 extern void mePlaceSelectedTiles
 (
     EngineData *engine,
     EditorData *editor,
-    uint16_t   tileX,
-    uint16_t   tileY
+    u16        tileX,
+    u16        tileY
 );
 
 extern void meChangeState
 (
     EditorData *editor,
-    uint8_t    nextState
+    u08        nextState
 );
 
 extern void meSaveProject
