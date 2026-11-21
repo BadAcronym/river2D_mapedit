@@ -26,7 +26,7 @@ src/mapedit_tiles.c \
 -Ivendor/river2D/vendor/imgsurf/vendor/datasurf/vendor/puddle/include/ \
 -Lvendor/river2D/bin/$build \
 -Wextra -Wall -Wpedantic -Wconversion -Wshadow -Wsign-compare -Wtype-limits -Wunused \
--std=c99 \
+-std=gnu99 \
 -fuse-ld=mold \
 -lriver2Dcommon
 -lm"
