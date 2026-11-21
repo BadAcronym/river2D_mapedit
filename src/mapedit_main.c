@@ -1,6 +1,7 @@
 #include "mapedit_main.h"
 #include "me_print_macros.h"
 
+#include "pd_path.h"
 #include "pd_string_view.h"
 
 #include <stdio.h>
